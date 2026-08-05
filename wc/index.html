@@ -3,84 +3,788 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>厕所</title>
+<meta name="author" content="RikkaLove0721">
+<title>厕所状态</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
+  /* 全局变量与基础样式 */
+  :root {
+    --color-primary: #18181B;
+    --color-on-primary: #FFFFFF;
+    --color-secondary: #3F3F46;
+    --color-accent: #2563EB;
+    --color-accent-dark: #1D4ED8;
+    --color-background: #FAFAFA;
+    --color-foreground: #09090B;
+    --color-muted: #E8ECF0;
+    --color-border: #E4E4E7;
+    --color-danger: #DC2626;
+    --color-danger-dark: #B91C1C;
+    --color-success: #22C55E;
+    --font-sans: 'Inter', -apple-system, 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(9, 9, 11, .08);
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+  }
+
   body {
-    font-family: "Microsoft YaHei", sans-serif;
-    background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+    font-family: var(--font-sans);
+    background: var(--color-background);
+    color: var(--color-foreground);
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    padding: 24px 16px;
   }
+
   .card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.15);
-    width: 90%;
-    max-width: 360px;
+    position: relative;
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 40px 32px 28px;
+    width: 100%;
+    max-width: 380px;
   }
-  .emoji {
-    font-size: 90px;
-    line-height: 1.2;
+
+  .card-icon {
+    width: 56px;
+    height: 56px;
+    color: var(--color-accent);
     animation: bounce 1.5s infinite;
   }
+
   @keyframes bounce {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    50% { transform: translateY(-6px); }
   }
-  h1 { color: #00695c; margin: 10px 0; }
-  p { color: #607d8b; margin-bottom: 20px; }
+
+  h1 {
+    color: var(--color-foreground);
+    font-size: 24px;
+    font-weight: 700;
+    margin: 14px 0 8px;
+  }
+
+  .desc {
+    color: var(--color-secondary);
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
   .status {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 8px 20px;
-    border-radius: 20px;
-    font-size: 16px;
-    font-weight: bold;
-    color: #fff;
-    background: #26a69a;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #FFFFFF;
+    background: var(--color-success);
   }
-  .status.occupied { background: #ef5350; }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .9);
+  }
+
+  .status.occupied {
+    background: var(--color-danger);
+  }
+
+  .timer {
+    margin-top: 16px;
+    min-height: 24px;
+    font-size: 14px;
+    color: var(--color-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .timer-num {
+    display: inline-block;
+  }
+
+  .timer-num.tick {
+    animation: timer-tick .3s ease-out;
+  }
+
+  @keyframes timer-tick {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  .flush-wave {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 60px;
+    height: 60px;
+    margin: -30px 0 0 -30px;
+    border-radius: 50%;
+    border: 3px solid var(--color-accent);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .flush-wave.flushing {
+    animation: wave 1s ease-out forwards;
+  }
+
+  @keyframes wave {
+    0% { opacity: .8; transform: scale(.3); }
+    100% { opacity: 0; transform: scale(2.5); }
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 18px;
+  }
+
   .btn {
-    margin-top: 20px;
-    padding: 12px 30px;
+    padding: 10px 22px;
     border: none;
-    border-radius: 25px;
-    background: #26a69a;
-    color: #fff;
-    font-size: 16px;
+    border-radius: 999px;
+    background: var(--color-accent);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    transition: background .3s;
+    transition: transform .15s, background .2s, box-shadow .2s;
   }
-  .btn:hover { background: #00897b; }
+
+  .btn:hover {
+    background: var(--color-accent-dark);
+    transform: scale(1.06);
+  }
+
+  .btn:active {
+    transform: scale(.94);
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .btn-secondary {
+    background: var(--color-primary);
+  }
+
+  .btn-secondary:hover {
+    background: #000000;
+  }
+
+  .btn-leave {
+    background: var(--color-danger);
+    margin-top: 14px;
+  }
+
+  .btn-leave:hover {
+    background: var(--color-danger-dark);
+    transform: scale(1.06);
+  }
+
+  .btn-confirm {
+    background: var(--color-danger-dark);
+    animation: pulse .5s infinite alternate;
+  }
+
+  @keyframes pulse {
+    from { transform: scale(.94); }
+    to { transform: scale(1.06); }
+  }
+
+  .stats-table {
+    width: 100%;
+    margin-top: 24px;
+    border-collapse: collapse;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .stats-table th {
+    background: var(--color-muted);
+    color: var(--color-secondary);
+    font-weight: 600;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .stats-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-foreground);
+  }
+
+  .stats-table th:first-child {
+    border-radius: 10px 0 0 10px;
+  }
+
+  .stats-table th:last-child {
+    border-radius: 0 10px 10px 0;
+  }
+
+  .stats-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .stats-table .stat-label {
+    color: var(--color-secondary);
+  }
+
+  .stats-table .stat-value {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .author {
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--color-secondary);
+  }
+
+  .notice {
+    margin-top: 8px;
+    min-height: 20px;
+    font-size: 12px;
+    color: var(--color-danger);
+    font-weight: bold;
+  }
+
+  .notice.pop {
+    animation: notice-pop .6s ease-out;
+  }
+
+  @keyframes notice-pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+  }
+
+  .toilet-paper {
+    position: fixed;
+    width: 64px;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    z-index: 10;
+    filter: drop-shadow(0 4px 8px rgba(9, 9, 11, .25));
+  }
+
+  .toilet-paper:active {
+    cursor: grabbing;
+  }
+
+  .toilet-paper svg {
+    display: block;
+    width: 100%;
+  }
+
+  .toilet-paper .tp-core {
+    display: none;
+  }
+
+  .toilet-paper.empty .tp-full {
+    display: none;
+  }
+
+  .toilet-paper.empty .tp-core {
+    display: block;
+  }
+
+  .toilet-paper.empty {
+    cursor: pointer;
+  }
+
+  .tp-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-danger);
+    color: #FFFFFF;
+    font-size: 12px;
+    line-height: 22px;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card-icon { animation: none; }
+    .flush-wave.flushing { animation: none; opacity: 0; }
+    .notice.pop { animation: none; }
+    .timer-num.tick { animation: none; }
+    .btn, .btn-confirm { animation: none; transition: none; }
+  }
 </style>
 </head>
 <body>
   <div class="card">
-    <div class="emoji">🚽</div>
+    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="7" y="2" width="10" height="5" rx="1.5"/>
+      <path d="M5.5 7h13v6.5a6.5 6.5 0 0 1-13 0z"/>
+      <path d="M10 17.5h4V21h-4z"/>
+    </svg>
     <h1>厕所状态</h1>
-    <p>有空位的厕所，放心使用</p>
-    <div id="status" class="status">🟢 空闲</div>
-    <br>
-    <button class="btn" onclick="toggle()">切换占用/空闲</button>
+    <p id="desc" class="desc">有空位的厕所，放心使用</p>
+    <div id="status" class="status">
+      <span class="status-dot"></span>
+      <span id="status-text">空闲</span>
+    </div>
+    <div class="flush-wave" id="flush-wave"></div>
+    <p id="timer" class="timer"></p>
+    <div class="btn-group">
+      <button class="btn" id="toggle-btn">切换占用/空闲</button>
+      <button class="btn btn-secondary" id="flush-btn">冲水</button>
+    </div>
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th>统计项</th>
+          <th>累计</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="stat-label">如厕次数</td>
+          <td class="stat-value" id="stat-count">0 次</td>
+        </tr>
+        <tr>
+          <td class="stat-label">累计时长</td>
+          <td class="stat-value" id="stat-duration">0 秒</td>
+        </tr>
+        <tr>
+          <td class="stat-label">最长时长</td>
+          <td class="stat-value" id="stat-max">--</td>
+        </tr>
+        <tr>
+          <td class="stat-label">最短时长</td>
+          <td class="stat-value" id="stat-min">--</td>
+        </tr>
+        <tr>
+          <td class="stat-label">冲水次数</td>
+          <td class="stat-value" id="stat-flush">0 次</td>
+        </tr>
+        <tr>
+          <td class="stat-label">抽纸次数</td>
+          <td class="stat-value" id="stat-pulls">0 次</td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="btn btn-leave" id="leave-btn">离开厕所</button>
+    <p class="author">作者:<span id="site-author">RikkaLove0721</span></p>
+    <p id="notice" class="notice" role="status"></p>
+  </div>
+
+  <div class="toilet-paper" id="toilet-paper" role="button" aria-label="卷纸,拖动移动位置,点击抽取一格">
+    <svg class="tp-full" viewBox="0 0 64 80" aria-hidden="true">
+      <rect x="10" y="6" width="44" height="34" rx="8" fill="#f5f5f5" stroke="#bdbdbd" stroke-width="2"/>
+      <line x1="16" y1="14" x2="48" y2="14" stroke="#e0e0e0" stroke-width="2"/>
+      <line x1="16" y1="22" x2="48" y2="22" stroke="#e0e0e0" stroke-width="2"/>
+      <line x1="16" y1="30" x2="48" y2="30" stroke="#e0e0e0" stroke-width="2"/>
+      <path d="M20 40h24v16l-6 6h-12l-6-6z" fill="#fafafa" stroke="#bdbdbd" stroke-width="2"/>
+      <line x1="32" y1="40" x2="32" y2="58" stroke="#e0e0e0" stroke-width="2"/>
+    </svg>
+    <svg class="tp-core" viewBox="0 0 64 80" aria-hidden="true">
+      <rect x="10" y="6" width="44" height="34" rx="8" fill="#e0e0e0" stroke="#9e9e9e" stroke-width="2"/>
+      <ellipse cx="32" cy="6" rx="8" ry="4" fill="#bdbdbd"/>
+      <ellipse cx="32" cy="40" rx="8" ry="4" fill="#bdbdbd"/>
+    </svg>
+    <span class="tp-badge" id="tp-badge">20</span>
   </div>
 
 <script>
-  let occupied = false;
-  function toggle() {
-    occupied = !occupied;
-    const el = document.getElementById('status');
-    if (occupied) {
-      el.textContent = '🔴 有人';
-      el.className = 'status occupied';
-    } else {
-      el.textContent = '🟢 空闲';
-      el.className = 'status';
+  /* 站点作者信息常量,开发者修改此处即可全局替换作者信息 */
+  const SITE_AUTHOR = "RikkaLove0721";
+
+  /* 存储键前缀,统一使用 wc_test 避免污染同域名其他页面 */
+  const STORAGE_PREFIX = "wc_test";
+  const KEY_OCCUPIED = STORAGE_PREFIX + "_occupied";
+  const KEY_SINCE = STORAGE_PREFIX + "_occupied_since";
+  const KEY_ACTIVE = STORAGE_PREFIX + "_occupied_active";
+  const KEY_STATS = STORAGE_PREFIX + "_stats";
+  const KEY_TP_X = STORAGE_PREFIX + "_tp_x";
+  const KEY_TP_Y = STORAGE_PREFIX + "_tp_y";
+  const KEY_TP_LEFT = STORAGE_PREFIX + "_tp_left";
+  const KEY_FLUSH = STORAGE_PREFIX + "_flush_count";
+  const KEY_TP_PULLS = STORAGE_PREFIX + "_tp_pulls";
+
+  const OVERDUE_SECONDS = 600;
+  const TP_TOTAL = 20;
+
+  /* 存储读写封装,不可用时静默降级 */
+  function storageGet(key) {
+    try {
+      return localStorage.getItem(key);
+    } catch (error) {
+      return null;
     }
   }
+
+  function storageSet(key, value) {
+    try {
+      localStorage.setItem(key, String(value));
+    } catch (error) {
+      /* 存储不可用时静默失败,不影响页面使用 */
+    }
+  }
+
+  function storageRemove(key) {
+    try {
+      localStorage.removeItem(key);
+    } catch (error) {
+      /* 存储不可用时静默失败,不影响页面使用 */
+    }
+  }
+
+  /* 清空本页会话数据,保留累积统计与剩余纸张 */
+  const KEEP_KEYS = [KEY_STATS, KEY_FLUSH, KEY_TP_PULLS, KEY_TP_LEFT];
+
+  function clearWcTestData() {
+    try {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.indexOf(STORAGE_PREFIX) === 0 && KEEP_KEYS.indexOf(key) === -1) {
+          localStorage.removeItem(key);
+        }
+      }
+    } catch (error) {
+      /* 存储不可用时静默失败,不影响页面使用 */
+    }
+  }
+
+  /* 状态数据 */
+  let occupied = storageGet(KEY_OCCUPIED) === "true";
+  let since = Number(storageGet(KEY_SINCE) || 0);
+  let activeSeconds = Number(storageGet(KEY_ACTIVE) || 0);
+  let stats = { count: 0, totalSeconds: 0, maxSeconds: 0, minSeconds: 0 };
+  let flushCount = Number(storageGet(KEY_FLUSH) || 0);
+  let tpPulls = Number(storageGet(KEY_TP_PULLS) || 0);
+  let tpLeft = Number(storageGet(KEY_TP_LEFT));
+  if (!(tpLeft >= 0)) {
+    tpLeft = TP_TOTAL;
+  }
+  let reminded = false;
+
+  try {
+    const saved = JSON.parse(storageGet(KEY_STATS) || "null");
+    if (saved && typeof saved.count === "number") {
+      stats.count = saved.count;
+    }
+    if (saved && typeof saved.totalSeconds === "number") {
+      stats.totalSeconds = saved.totalSeconds;
+    } else if (saved && typeof saved.totalMillis === "number") {
+      stats.totalSeconds = Math.floor(saved.totalMillis / 1000);
+    }
+    if (saved && typeof saved.maxSeconds === "number") {
+      stats.maxSeconds = saved.maxSeconds;
+    }
+    if (saved && typeof saved.minSeconds === "number") {
+      stats.minSeconds = saved.minSeconds;
+    }
+  } catch (error) {
+    /* 统计解析失败时使用默认值 */
+  }
+
+  /* 提示输出到作者信息下方固定区域 */
+  let noticeTimer = null;
+
+  function setNotice(message) {
+    const notice = document.getElementById("notice");
+    notice.textContent = message;
+    notice.classList.remove("pop");
+    void notice.offsetWidth;
+    notice.classList.add("pop");
+    clearTimeout(noticeTimer);
+    noticeTimer = setTimeout(function () {
+      notice.textContent = "";
+      notice.classList.remove("pop");
+    }, 3500);
+  }
+
+  /* 秒级时长格式化 */
+  function formatSeconds(seconds) {
+    if (seconds < 60) {
+      return seconds + " 秒";
+    }
+    if (seconds < 3600) {
+      return Math.floor(seconds / 60) + " 分 " + (seconds % 60) + " 秒";
+    }
+    return Math.floor(seconds / 3600) + " 小时 " + Math.floor((seconds % 3600) / 60) + " 分";
+  }
+
+  /* 统计表格更新 */
+  function updateStatsTable() {
+    document.getElementById("stat-count").textContent = stats.count + " 次";
+    document.getElementById("stat-duration").textContent = formatSeconds(stats.totalSeconds);
+    document.getElementById("stat-max").textContent = stats.maxSeconds > 0 ? formatSeconds(stats.maxSeconds) : "--";
+    document.getElementById("stat-min").textContent = stats.minSeconds > 0 ? formatSeconds(stats.minSeconds) : "--";
+    document.getElementById("stat-flush").textContent = flushCount + " 次";
+    document.getElementById("stat-pulls").textContent = tpPulls + " 次";
+  }
+
+  /* 状态渲染 */
+  function render() {
+    const statusEl = document.getElementById("status");
+    const statusText = document.getElementById("status-text");
+    const descEl = document.getElementById("desc");
+    const timerEl = document.getElementById("timer");
+    if (occupied) {
+      statusText.textContent = "有人";
+      statusEl.className = "status occupied";
+      descEl.textContent = "厕所暂被占用，请稍候";
+    } else {
+      statusText.textContent = "空闲";
+      statusEl.className = "status";
+      descEl.textContent = "有空位的厕所，放心使用";
+    }
+    renderTimer(timerEl);
+    updateStatsTable();
+  }
+
+  let lastElapsedSeconds = -1;
+
+  /* 秒级时长格式化,数字部分包裹 span 以便单独动画 */
+  function formatSecondsHtml(seconds) {
+    return formatSeconds(seconds).replace(/(\d+)/g, '<span class="timer-num">$1</span>');
+  }
+
+  function renderTimer(timerEl) {
+    if (occupied) {
+      const elapsed = activeSeconds + Math.floor((Date.now() - since) / 1000);
+      timerEl.innerHTML = "已占用 " + formatSecondsHtml(elapsed);
+      if (elapsed !== lastElapsedSeconds) {
+        lastElapsedSeconds = elapsed;
+        timerEl.querySelectorAll(".timer-num").forEach(function (numEl) {
+          numEl.classList.remove("tick");
+          void numEl.offsetWidth;
+          numEl.classList.add("tick");
+        });
+      }
+    } else {
+      timerEl.textContent = "当前空闲";
+    }
+  }
+
+  /* 超时提醒检查 */
+  function checkOverdue() {
+    if (occupied && !reminded) {
+      const elapsed = activeSeconds + Math.floor((Date.now() - since) / 1000);
+      if (elapsed >= OVERDUE_SECONDS) {
+        reminded = true;
+        setNotice("已占用超过 " + Math.floor(OVERDUE_SECONDS / 60) + " 分钟,小心腿麻");
+      }
+    }
+  }
+
+  /* 占用会话结算 */
+  function settleActive() {
+    if (occupied) {
+      activeSeconds += Math.floor((Date.now() - since) / 1000);
+      since = Date.now();
+      storageSet(KEY_ACTIVE, activeSeconds);
+      storageSet(KEY_SINCE, since);
+    }
+  }
+
+  /* 切换占用状态 */
+  function toggle() {
+    if (occupied) {
+      const sessionSeconds = activeSeconds + Math.floor((Date.now() - since) / 1000);
+      stats.count += 1;
+      stats.totalSeconds += sessionSeconds;
+      if (stats.maxSeconds === 0 || sessionSeconds > stats.maxSeconds) {
+        stats.maxSeconds = sessionSeconds;
+      }
+      if (stats.minSeconds === 0 || sessionSeconds < stats.minSeconds) {
+        stats.minSeconds = sessionSeconds;
+      }
+      storageSet(KEY_STATS, JSON.stringify(stats));
+      activeSeconds = 0;
+      occupied = false;
+      storageSet(KEY_OCCUPIED, "false");
+      storageRemove(KEY_SINCE);
+      storageRemove(KEY_ACTIVE);
+      reminded = false;
+      setNotice("本次如厕 " + formatSeconds(sessionSeconds) + " 记录已更新");
+    } else {
+      occupied = true;
+      since = Date.now();
+      activeSeconds = 0;
+      storageSet(KEY_OCCUPIED, "true");
+      storageSet(KEY_SINCE, since);
+      storageRemove(KEY_ACTIVE);
+      reminded = false;
+    }
+    render();
+  }
+
+  /* 冲水 */
+  function flush() {
+    flushCount += 1;
+    storageSet(KEY_FLUSH, flushCount);
+    const wave = document.getElementById("flush-wave");
+    wave.classList.remove("flushing");
+    void wave.offsetWidth;
+    wave.classList.add("flushing");
+    updateStatsTable();
+  }
+
+  /* 离开厕所:清空会话数据并返回主页 */
+  function leave() {
+    clearWcTestData();
+    location.href = "../";
+  }
+
+  /* 离开按钮:先替换为确认按钮,3 秒内点击确认,超时回归初始状态 */
+  const leaveBtn = document.getElementById("leave-btn");
+  let leaveConfirmTimer = null;
+
+  function resetLeaveBtn() {
+    leaveBtn.textContent = "离开厕所";
+    leaveBtn.classList.remove("btn-confirm");
+  }
+
+  leaveBtn.addEventListener("click", function () {
+    if (leaveBtn.classList.contains("btn-confirm")) {
+      clearTimeout(leaveConfirmTimer);
+      leave();
+      return;
+    }
+    leaveBtn.textContent = "确认离开?";
+    leaveBtn.classList.add("btn-confirm");
+    clearTimeout(leaveConfirmTimer);
+    leaveConfirmTimer = setTimeout(resetLeaveBtn, 3000);
+  });
+
+  /* 卷纸:拖动与抽纸 */
+  const tpEl = document.getElementById("toilet-paper");
+  const tpBadge = document.getElementById("tp-badge");
+  let dragging = false;
+  let moved = false;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+
+  function saveTPPosition() {
+    storageSet(KEY_TP_X, tpEl.offsetLeft);
+    storageSet(KEY_TP_Y, tpEl.offsetTop);
+  }
+
+  function loadTPPosition() {
+    const savedX = Number(storageGet(KEY_TP_X));
+    const savedY = Number(storageGet(KEY_TP_Y));
+    if (Number.isFinite(savedX) && Number.isFinite(savedY)) {
+      tpEl.style.left = savedX + "px";
+      tpEl.style.top = savedY + "px";
+    } else {
+      tpEl.style.left = (window.innerWidth - 110) + "px";
+      tpEl.style.top = "120px";
+    }
+  }
+
+  function updateTPBadge() {
+    tpBadge.textContent = tpLeft;
+    tpEl.classList.toggle("empty", tpLeft <= 0);
+  }
+
+  function pullPaper() {
+    if (tpLeft > 0) {
+      tpLeft -= 1;
+      tpPulls += 1;
+      storageSet(KEY_TP_LEFT, tpLeft);
+      storageSet(KEY_TP_PULLS, tpPulls);
+      updateTPBadge();
+      updateStatsTable();
+      if (tpLeft <= 0) {
+        setNotice("纸抽完了,只剩纸筒,点击纸筒换新卷");
+      } else {
+        setNotice("抽走一格纸,还剩 " + tpLeft + " 格");
+      }
+    } else {
+      tpLeft = TP_TOTAL;
+      storageSet(KEY_TP_LEFT, tpLeft);
+      updateTPBadge();
+      setNotice("换上了新卷");
+    }
+  }
+
+  tpEl.addEventListener("pointerdown", function (event) {
+    dragging = true;
+    moved = false;
+    dragOffsetX = event.clientX - tpEl.offsetLeft;
+    dragOffsetY = event.clientY - tpEl.offsetTop;
+    tpEl.setPointerCapture(event.pointerId);
+  });
+
+  tpEl.addEventListener("pointermove", function (event) {
+    if (!dragging) {
+      return;
+    }
+    if (Math.abs(event.movementX) > 2 || Math.abs(event.movementY) > 2) {
+      moved = true;
+    }
+    tpEl.style.left = (event.clientX - dragOffsetX) + "px";
+    tpEl.style.top = (event.clientY - dragOffsetY) + "px";
+  });
+
+  tpEl.addEventListener("pointerup", function () {
+    if (!dragging) {
+      return;
+    }
+    dragging = false;
+    saveTPPosition();
+    if (!moved) {
+      pullPaper();
+    }
+  });
+
+  /* 页面隐藏或关闭时结算当前占用时长,避免丢失 */
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      settleActive();
+    }
+  });
+  window.addEventListener("pagehide", settleActive);
+
+  /* 页面主体初始化 */
+  document.getElementById("toggle-btn").addEventListener("click", toggle);
+  document.getElementById("flush-btn").addEventListener("click", flush);
+  document.getElementById("site-author").textContent = SITE_AUTHOR;
+  loadTPPosition();
+  updateTPBadge();
+  render();
+  checkOverdue();
+  setInterval(function () {
+    if (occupied) {
+      renderTimer(document.getElementById("timer"));
+      checkOverdue();
+    }
+  }, 1000);
 </script>
 </body>
 </html>
