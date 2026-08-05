@@ -58,7 +58,15 @@
     --shadow: 0 4px 24px rgba(9, 9, 11, .08);
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  /* 移动端修复:长按或点击按钮、链接、厕纸时不出现选中蓝色高亮效果 */
+  button,
+  a,
+  #toilet-paper {
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
 
   html {
     scrollbar-width: none;
