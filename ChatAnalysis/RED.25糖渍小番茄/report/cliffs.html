@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RED.25糖渍小番茄 · 活跃断层与社交阶层分析</title>
+<script>
+(function() {
+    var t = localStorage.getItem('theme') || 'light';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --text: #1d1d1f;
+    --text-muted: #86868b;
+    --accent: #007aff;
+    --accent-hover: #0056b3;
+    --link: #007aff;
+    --link-hover: #0056b3;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --code-bg: #f5f5f7;
+    --code-color: #c0392b;
+    --pre-color: #6c5ce7;
+    --table-header-bg: #f5f5f7;
+    --hover-bg: rgba(0,0,0,0.03);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --blockquote-bg: rgba(0,122,255,0.04);
+    --blockquote-border: #007aff;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+}
+
+:root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --link: #0a84ff;
+    --link-hover: #409cff;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.2);
+    --code-bg: #1c1c1e;
+    --code-color: #f48fb1;
+    --pre-color: #ce93d8;
+    --table-header-bg: #1c1c1e;
+    --hover-bg: rgba(255,255,255,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --blockquote-bg: rgba(10,132,255,0.08);
+    --blockquote-border: #0a84ff;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+
+body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* ===== 主题切换按钮 ===== */
+.theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--surface);
+    color: var(--text); font-size: 13px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
+}
+.theme-toggle:hover { background: var(--hover-bg); border-color: var(--border-strong); }
+
+/* ===== 面包屑 ===== */
+.breadcrumb {
+    padding: 8px 0; margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); }
+.breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+
+/* ===== 排版 ===== */
+h1 { font-size: 1.8em; font-weight: 700; margin: 0 0 24px; line-height: 1.3; }
+h2 { font-size: 1.4em; font-weight: 700; margin: 40px 0 16px; line-height: 1.35; }
+h3 { font-size: 1.15em; font-weight: 600; margin: 24px 0 8px; line-height: 1.4; }
+h4 { font-size: 1em; font-weight: 600; margin: 16px 0 4px; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ===== 表格 ===== */
+table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13px;
+}
+th, td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th { background: var(--table-header-bg); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: var(--hover-bg); }
+
+/* ===== 代码块 ===== */
+pre {
+    background: var(--code-bg); color: var(--pre-color);
+    padding: 16px 20px; border-radius: 10px;
+    overflow-x: auto; font-size: 0.88em; line-height: 1.6;
+    margin: 16px 0;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono",
+                 "Cascadia Code", Consolas, monospace;
+}
+code {
+    background: var(--code-bg); color: var(--code-color);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* ===== 引用块 ===== */
+blockquote {
+    border-left: 3px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted); font-size: 0.95em;
+}
+
+/* ===== 高危区块 ===== */
+.danger-block {
+    border-left: 4px solid var(--danger);
+    background: color-mix(in srgb, var(--danger) 6%, transparent);
+    padding: 14px 18px; margin: 16px 0;
+    border-radius: 0 10px 10px 0;
+}
+.danger-block::before {
+    content: "⚠️ 高危提醒";
+    display: block; font-weight: 700; color: var(--danger);
+    margin-bottom: 8px; font-size: 0.9em;
+}
+
+/* ===== 折叠块 ===== */
+.collapsed-links { margin: 8px 0; }
+.collapsed-links summary {
+    cursor: pointer; font-weight: 600; padding: 8px 0;
+    color: var(--text-muted); font-size: 13px;
+}
+.collapsed-links summary:hover { color: var(--link); }
+
+/* ===== 排行榜 ===== */
+.leaderboard-item {
+    display: grid; grid-template-columns: 40px 1fr auto 120px;
+    align-items: center; gap: 8px;
+    padding: 12px 16px; margin: 4px 0;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+}
+.leaderboard-item:hover { background: var(--hover-bg); text-decoration: none; }
+.leaderboard-rank { font-weight: 700; font-size: 1.1em; color: var(--text-muted); text-align: center; }
+.leaderboard-rank.top3 { color: var(--accent); }
+.leaderboard-name { font-weight: 600; }
+.leaderboard-count { font-size: 13px; color: var(--text-muted); }
+.leaderboard-bar { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.leaderboard-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ===== 首页卡片 ===== */
+.home-section { margin: 32px 0; }
+.home-section h2 { margin-bottom: 12px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+    background: var(--surface); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block; color: var(--text); text-decoration: none;
+}
+.card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-2px);
+    text-decoration: none;
+}
+.card h3 { margin: 0 0 8px; }
+.card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.card-count {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--surface2); font-size: 12px; color: var(--text-muted);
+}
+
+/* ===== 首页统计 ===== */
+.stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin: 24px 0;
+}
+.stat-item {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-num { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== 页脚 ===== */
+footer {
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-muted);
+}
+footer a { color: var(--text-muted); }
+footer a:hover { color: var(--link); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px; }
+    .theme-toggle { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .leaderboard-bar { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .leaderboard-item { grid-template-columns: 32px 1fr auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙 暗色</button>
+<div class="container">
+<div class="breadcrumb"><a href="../index.html">首页</a><span class="sep">›</span><a href="index.html">综合报告</a><span class="sep">›</span><span>RED.25糖渍小番茄 · 活跃断层与社交阶层分析</span></div>
+
+<h1 id="red25">RED.25糖渍小番茄 · 活跃断层与社交阶层分析</h1>
+<h2 id="_1">一、分析范围与方法</h2>
+<h3 id="11">1.1 数据基础</h3>
+<p>本报告基于 2026-06-01 至 2026-08-05 期间共 66 个自然日的完整消息记录，覆盖群「RED.25糖渍小番茄」。统计口径如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">指标</th>
+<th style="text-align: center;">数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">消息总数</td>
+<td style="text-align: center;">44,632</td>
+</tr>
+<tr>
+<td style="text-align: center;">发送者数量</td>
+<td style="text-align: center;">173</td>
+</tr>
+<tr>
+<td style="text-align: center;">活跃天数</td>
+<td style="text-align: center;">66</td>
+</tr>
+<tr>
+<td style="text-align: center;">统计区间</td>
+<td style="text-align: center;">2026-06-01 至 2026-08-05</td>
+</tr>
+</tbody>
+</table>
+<p>消息类型分布：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">类型</th>
+<th style="text-align: center;">数量</th>
+<th style="text-align: center;">占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">文字</td>
+<td style="text-align: center;">29,110</td>
+<td style="text-align: center;">65.22%</td>
+</tr>
+<tr>
+<td style="text-align: center;">图片</td>
+<td style="text-align: center;">8,730</td>
+<td style="text-align: center;">19.56%</td>
+</tr>
+<tr>
+<td style="text-align: center;">回复</td>
+<td style="text-align: center;">6,024</td>
+<td style="text-align: center;">13.50%</td>
+</tr>
+<tr>
+<td style="text-align: center;">方括号文本</td>
+<td style="text-align: center;">409</td>
+<td style="text-align: center;">0.92%</td>
+</tr>
+<tr>
+<td style="text-align: center;">转发</td>
+<td style="text-align: center;">275</td>
+<td style="text-align: center;">0.62%</td>
+</tr>
+<tr>
+<td style="text-align: center;">视频</td>
+<td style="text-align: center;">57</td>
+<td style="text-align: center;">0.13%</td>
+</tr>
+<tr>
+<td style="text-align: center;">文件</td>
+<td style="text-align: center;">24</td>
+<td style="text-align: center;">0.05%</td>
+</tr>
+<tr>
+<td style="text-align: center;">语音</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">0.01%</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>说明：回复消息占比 13.5%，说明群内大量讨论建立在&rdquo;引用他人消息&rdquo;的对话链上，互动密度较高。</p>
+</blockquote>
+<h3 id="12">1.2 数据口径说明</h3>
+<p>本报告所用发送者名称是导出时的昵称快照。由于群成员改名的现象比较常见，同一自然人在消息记录里可能以多个昵称出现，例如回复引用中出现的「26南梁改造工程 白祥」与消息记录中的「枫糖总帅」指向同一高频发言者。本报告以数据文件中的发送者字段为准，昵称快照的具体差异在第 3.4 节另行讨论。</p>
+<blockquote>
+<p>提示：所有按发送者统计的数字均来自 <code>.output/chat_stats.json</code> 的发送者明细，未做人工合并，跨昵称统计可能存在轻微偏差。</p>
+</blockquote>
+<hr />
+<h2 id="_2">二、整体活跃度画像</h2>
+<h3 id="21">2.1 月度活跃趋势</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">月份</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">占比</th>
+<th style="text-align: center;">日均</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">2026-06</td>
+<td style="text-align: center;">27,029</td>
+<td style="text-align: center;">60.56%</td>
+<td style="text-align: center;">901</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-07</td>
+<td style="text-align: center;">15,657</td>
+<td style="text-align: center;">35.08%</td>
+<td style="text-align: center;">505</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-08（1-5日）</td>
+<td style="text-align: center;">1,946</td>
+<td style="text-align: center;">4.36%</td>
+<td style="text-align: center;">389</td>
+</tr>
+</tbody>
+</table>
+<p>六月与七月之间存在明显的量级落差，七月日均仅为六月的 56%，呈现&rdquo;开群高热度、随后自然回落&rdquo;的特征。六月的热度高峰与开群初期的新鲜感、六月一日的节日接龙、以及期末复习期的抱团吐槽有直接关联。</p>
+<h3 id="22">2.2 时段活跃分布</h3>
+<p>全天最活跃的时段集中在傍晚到深夜：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">时段</th>
+<th style="text-align: center;">相对热度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">18 时</td>
+<td style="text-align: center;">峰值</td>
+</tr>
+<tr>
+<td style="text-align: center;">17 时</td>
+<td style="text-align: center;">次高</td>
+</tr>
+<tr>
+<td style="text-align: center;">19 时</td>
+<td style="text-align: center;">第三</td>
+</tr>
+<tr>
+<td style="text-align: center;">0 时</td>
+<td style="text-align: center;">第四</td>
+</tr>
+</tbody>
+</table>
+<p>傍晚 18 时是全群参与度最高的时刻，这符合学生群体放学、下班后集中刷手机的生活节律。值得注意的是凌晨 0 时仍保持较高热度，说明存在一批&rdquo;夜猫子&rdquo;成员。</p>
+<h3 id="23">2.3 全时段满勤特征</h3>
+<p>统计区间内每一天都有消息产生（活跃天数 = 总天数 = 66），说明群自建立以来从未出现过&rdquo;空窗日&rdquo;。即便在八月前五天热度明显下降的情况下，日均仍达到 389 条。</p>
+<hr />
+<h2 id="_3">三、发送者分层体系</h2>
+<h3 id="31">3.1 分层方法</h3>
+<p>本报告按发送者总消息数从高到低排序，结合相邻位次的差值，将 173 位发送者划分为五个层级。分层原则是&rdquo;数据驱动的断点优先&rdquo;：优先选择相邻位次落差明显的分界点，而不是人为划定等距阈值。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">层级</th>
+<th style="text-align: center;">消息量区间</th>
+<th style="text-align: center;">人数</th>
+<th style="text-align: center;">群内占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">核心层（T1）</td>
+<td style="text-align: center;">2,200 以上</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">2.3%</td>
+</tr>
+<tr>
+<td style="text-align: center;">中坚层（T2）</td>
+<td style="text-align: center;">1,500 - 2,200</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">4.0%</td>
+</tr>
+<tr>
+<td style="text-align: center;">活跃层（T3）</td>
+<td style="text-align: center;">800 - 1,500</td>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">4.0%</td>
+</tr>
+<tr>
+<td style="text-align: center;">参与层（T4）</td>
+<td style="text-align: center;">150 - 800</td>
+<td style="text-align: center;">28</td>
+<td style="text-align: center;">16.2%</td>
+</tr>
+<tr>
+<td style="text-align: center;">边缘层（T5）</td>
+<td style="text-align: center;">150 以下</td>
+<td style="text-align: center;">127</td>
+<td style="text-align: center;">73.4%</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>数据观察：前 18 位发送者合计贡献了约七成消息量，而排名靠后的 127 位成员合计贡献不足一成，群内活跃度呈明显的&rdquo;长尾分布&rdquo;。</p>
+</blockquote>
+<h3 id="32-t1">3.2 核心层（T1）</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">排名</th>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">图片数</th>
+<th style="text-align: center;">活跃天数</th>
+<th style="text-align: center;">平均长度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">3,737</td>
+<td style="text-align: center;">700</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">14.7</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">3,692</td>
+<td style="text-align: center;">329</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">14.8</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">3,375</td>
+<td style="text-align: center;">211</td>
+<td style="text-align: center;">63</td>
+<td style="text-align: center;">8.1</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">2,228</td>
+<td style="text-align: center;">895</td>
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">8.2</td>
+</tr>
+</tbody>
+</table>
+<p>核心层四人的共同特征是：消息量断层式领先、活跃天数接近满勤、全天候在群内接话。这四人相当于群的&rdquo;值班水群员&rdquo;，几乎所有话题都能看到他们的身影。</p>
+<p>波克洛克与若至的消息量在 3,700 上下，两者都保持 66 天全勤，是全群最稳定的两位发言者；26瓦斯以文字为主（3,375 条消息中图片仅 211 张），回复链条参与度极高；子路则是全群图片发送量最高的人（895 张），呈现明显的&rdquo;图说话&rdquo;风格。</p>
+<h3 id="33-t2">3.3 中坚层（T2）</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">排名</th>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">图片数</th>
+<th style="text-align: center;">活跃天数</th>
+<th style="text-align: center;">平均长度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">番茄斗罗</td>
+<td style="text-align: center;">2,011</td>
+<td style="text-align: center;">347</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">8.3</td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">得胜已是定局</td>
+<td style="text-align: center;">1,893</td>
+<td style="text-align: center;">764</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">8.0</td>
+</tr>
+<tr>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">苦来兮苦</td>
+<td style="text-align: center;">1,834</td>
+<td style="text-align: center;">222</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">8.8</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">雪花沉睡</td>
+<td style="text-align: center;">1,804</td>
+<td style="text-align: center;">900</td>
+<td style="text-align: center;">65</td>
+<td style="text-align: center;">8.3</td>
+</tr>
+<tr>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">1,635</td>
+<td style="text-align: center;">313</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">12.7</td>
+</tr>
+<tr>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">颜回momo</td>
+<td style="text-align: center;">1,554</td>
+<td style="text-align: center;">231</td>
+<td style="text-align: center;">58</td>
+<td style="text-align: center;">10.5</td>
+</tr>
+<tr>
+<td style="text-align: center;">11</td>
+<td style="text-align: center;">系统消息</td>
+<td style="text-align: center;">1,505</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">29.3</td>
+</tr>
+</tbody>
+</table>
+<p>中坚层是群话题的&rdquo;第二梯队&rdquo;，其中番茄斗罗、得胜已是定局、苦来兮苦、枫糖总帅四人同样保持 66 天满勤。系统消息（1,505 条）是特殊存在：它由 QQ 机器人互动通知构成（详见 Bot 互动报告），不是自然人，但客观上占据了一个较高的发送量位次。</p>
+<p>得胜已是定局（764 张图片）与雪花沉睡（900 张图片）同样属于&rdquo;图片党&rdquo;，两人加总图片数接近全群图片量的五分之一。</p>
+<h3 id="34-t3">3.4 活跃层（T3）</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">排名</th>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">图片数</th>
+<th style="text-align: center;">活跃天数</th>
+<th style="text-align: center;">平均长度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">赤焰琉霄</td>
+<td style="text-align: center;">1,497</td>
+<td style="text-align: center;">301</td>
+<td style="text-align: center;">60</td>
+<td style="text-align: center;">10.7</td>
+</tr>
+<tr>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">某个好人</td>
+<td style="text-align: center;">1,382</td>
+<td style="text-align: center;">299</td>
+<td style="text-align: center;">65</td>
+<td style="text-align: center;">10.4</td>
+</tr>
+<tr>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">26叶道化</td>
+<td style="text-align: center;">1,174</td>
+<td style="text-align: center;">166</td>
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">9.6</td>
+</tr>
+<tr>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">白鹭神社小狐</td>
+<td style="text-align: center;">1,031</td>
+<td style="text-align: center;">147</td>
+<td style="text-align: center;">60</td>
+<td style="text-align: center;">10.2</td>
+</tr>
+<tr>
+<td style="text-align: center;">16</td>
+<td style="text-align: center;">002</td>
+<td style="text-align: center;">1,007</td>
+<td style="text-align: center;">309</td>
+<td style="text-align: center;">35</td>
+<td style="text-align: center;">9.3</td>
+</tr>
+<tr>
+<td style="text-align: center;">17</td>
+<td style="text-align: center;">(ᗜ˰ᗜ)（怀念河图版）</td>
+<td style="text-align: center;">822</td>
+<td style="text-align: center;">85</td>
+<td style="text-align: center;">56</td>
+<td style="text-align: center;">10.8</td>
+</tr>
+<tr>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">潜水艇</td>
+<td style="text-align: center;">810</td>
+<td style="text-align: center;">185</td>
+<td style="text-align: center;">58</td>
+<td style="text-align: center;">6.9</td>
+</tr>
+</tbody>
+</table>
+<p>活跃层成员消息量稳定在 800 以上，是群内&rdquo;随叫随到&rdquo;的熟面孔。其中 002 比较特殊：消息总量排第 16，但活跃天数仅 35 天，说明其消息集中在某个时间段内高强度输出，之后转入沉默。这类&rdquo;阶段性活跃&rdquo;成员在长周期统计中容易被低估。</p>
+<h3 id="35-t4">3.5 参与层（T4）</h3>
+<p>消息量在 150 至 800 之间，共 28 人。按消息量从高到低列举代表性成员：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">消息数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">雪花巧克力</td>
+<td style="text-align: center;">574</td>
+<td style="text-align: center;">鸣剑</td>
+<td style="text-align: center;">277</td>
+</tr>
+<tr>
+<td style="text-align: center;">~时.冰雨</td>
+<td style="text-align: center;">571</td>
+<td style="text-align: center;">月下之影</td>
+<td style="text-align: center;">264</td>
+</tr>
+<tr>
+<td style="text-align: center;">盲目之亡骸</td>
+<td style="text-align: center;">545</td>
+<td style="text-align: center;">炎之魔导</td>
+<td style="text-align: center;">250</td>
+</tr>
+<tr>
+<td style="text-align: center;">群主</td>
+<td style="text-align: center;">544</td>
+<td style="text-align: center;">特利迦奥特曼</td>
+<td style="text-align: center;">230</td>
+</tr>
+<tr>
+<td style="text-align: center;">白雪公主</td>
+<td style="text-align: center;">513</td>
+<td style="text-align: center;">2025露西亚</td>
+<td style="text-align: center;">230</td>
+</tr>
+<tr>
+<td style="text-align: center;">二十七花</td>
+<td style="text-align: center;">461</td>
+<td style="text-align: center;">三十二画生</td>
+<td style="text-align: center;">211</td>
+</tr>
+<tr>
+<td style="text-align: center;">打一盆水</td>
+<td style="text-align: center;">410</td>
+<td style="text-align: center;">25-御</td>
+<td style="text-align: center;">189</td>
+</tr>
+<tr>
+<td style="text-align: center;">雪花</td>
+<td style="text-align: center;">392</td>
+<td style="text-align: center;">七夕</td>
+<td style="text-align: center;">187</td>
+</tr>
+<tr>
+<td style="text-align: center;">御风</td>
+<td style="text-align: center;">383</td>
+<td style="text-align: center;">紫电R</td>
+<td style="text-align: center;">179</td>
+</tr>
+<tr>
+<td style="text-align: center;">诗酒</td>
+<td style="text-align: center;">378</td>
+<td style="text-align: center;">群托鸽</td>
+<td style="text-align: center;">170</td>
+</tr>
+<tr>
+<td style="text-align: center;">初凌鸦羽</td>
+<td style="text-align: center;">340</td>
+<td style="text-align: center;">小薯条</td>
+<td style="text-align: center;">168</td>
+</tr>
+<tr>
+<td style="text-align: center;">群内委员</td>
+<td style="text-align: center;">311</td>
+<td style="text-align: center;">星空矿车</td>
+<td style="text-align: center;">163</td>
+</tr>
+</tbody>
+</table>
+<p>参与层成员已从&rdquo;水群主力&rdquo;退化为&rdquo;选择性参与&rdquo;：他们只在自己感兴趣的话题（如特定游戏、特定节日）出现，平时保持潜伏。</p>
+<h3 id="36-t5">3.6 边缘层（T5）</h3>
+<p>消息量不足 150 的成员共 127 人，其中多数人的消息量是个位数。这些成员包括：</p>
+<ul>
+<li>一次性冒泡后消失的&rdquo;过客&rdquo;；</li>
+<li>被他人 @ 才出现的潜水者；</li>
+<li>带其他群宣传后缀进群、只发过一两条消息的成员。</li>
+</ul>
+<p>边缘层体量占全群的 73.4%，是群成员构成的&rdquo;底座&rdquo;。这部分成员的存在说明群的&rdquo;名义规模&rdquo;远大于&rdquo;实际活跃规模&rdquo;。</p>
+<hr />
+<h2 id="_4">四、活跃断层识别</h2>
+<h3 id="41">4.1 消息量断层</h3>
+<p>对发送者消息量做相邻位次差分，最明显的断点如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">断点</th>
+<th style="text-align: center;">相邻两位发送者</th>
+<th style="text-align: center;">消息量差</th>
+<th style="text-align: center;">相对落差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">断层一</td>
+<td style="text-align: center;">子路 → 番茄斗罗</td>
+<td style="text-align: center;">217</td>
+<td style="text-align: center;">9.7%</td>
+</tr>
+<tr>
+<td style="text-align: center;">断层二</td>
+<td style="text-align: center;">白鹭神社小狐 → 002</td>
+<td style="text-align: center;">24</td>
+<td style="text-align: center;">2.3%</td>
+</tr>
+<tr>
+<td style="text-align: center;">断层三</td>
+<td style="text-align: center;">潜水艇 → 雪花巧克力</td>
+<td style="text-align: center;">236</td>
+<td style="text-align: center;">29.1%</td>
+</tr>
+<tr>
+<td style="text-align: center;">断层四</td>
+<td style="text-align: center;">星空矿车 → 25 W. nikke群</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">7.4%</td>
+</tr>
+</tbody>
+</table>
+<p>四个断点中，最显著的是潜水艇（810）到雪花巧克力（574）之间的断层：消息量在 800 附近出现 29.1% 的相对落差，这一区间正是&rdquo;长期活跃&rdquo;与&rdquo;话题型参与&rdquo;的分水岭。</p>
+<h3 id="42">4.2 活跃天数断层</h3>
+<p>全勤（66 天）成员共 6 人：波克洛克、若至、番茄斗罗、得胜已是定局、苦来兮苦、枫糖总帅。活跃天数在 60 天以上的成员约占前 20 位中的大多数，但活跃天数与消息量并不完全正相关：</p>
+<ul>
+<li>002 消息量 1,007（第 16 位），但活跃天数仅 35 天，属于&rdquo;阶段突击型&rdquo;；</li>
+<li>枫糖总帅消息量仅排第 9，但保持 66 天满勤，属于&rdquo;细水长流型&rdquo;；</li>
+<li>颜回momo 活跃 58 天，有 8 天缺席，在核心常驻成员中出勤率相对较低。</li>
+</ul>
+<h3 id="43">4.3 月度衰减断层</h3>
+<p>六月到七月的总量变化是最大的&rdquo;时间维度断层&rdquo;：</p>
+<pre><code>6月消息数   27,029
+7月消息数   15,657
+8月前5天    1,946
+</code></pre>
+<p>从六月到七月，消息量下跌 42.1%；以日均换算，六月日均 901 条、七月日均 505 条、八月前五天日均 389 条。虽然七月的总天数更多，但并没有出现&rdquo;总量被天数摊平&rdquo;的情况，说明活跃度的下降是真实的，而非统计口径造成的假象。</p>
+<h3 id="44">4.4 断层成因推测</h3>
+<p>结合抽样片段（详见各抽样文件），群活跃度衰减的可能原因包括：</p>
+<ol>
+<li>期末复习期结束，群成员从&rdquo;抱团复习吐槽&rdquo;模式转入各自休假；</li>
+<li>开学季热度带来的&rdquo;开群红利&rdquo;消退；</li>
+<li>部分阶段性活跃成员（如 002）在六月中下旬逐渐离场。</li>
+</ol>
+<blockquote>
+<p>以上均为基于消息内容的推断，不构成确定结论。</p>
+</blockquote>
+<hr />
+<h2 id="_5">五、分层特征分析</h2>
+<h3 id="51">5.1 文字与图片偏好</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">特征类型</th>
+<th style="text-align: center;">典型成员</th>
+<th style="text-align: center;">特征</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">文字主导型</td>
+<td style="text-align: center;">26瓦斯（文字/图片 14:1）</td>
+<td style="text-align: center;">长回复链，逻辑辩论</td>
+</tr>
+<tr>
+<td style="text-align: center;">图片主导型</td>
+<td style="text-align: center;">子路、得胜已是定局、雪花沉睡</td>
+<td style="text-align: center;">表情包、图片盖楼</td>
+</tr>
+<tr>
+<td style="text-align: center;">均衡型</td>
+<td style="text-align: center;">波克洛克、若至</td>
+<td style="text-align: center;">文字与图片混合输出</td>
+</tr>
+</tbody>
+</table>
+<p>雪花沉睡是唯一&rdquo;图片多于文字&rdquo;的成员（900 张图片 vs 817 条文字），其发言风格接近&rdquo;用图说话&rdquo;。这提示图片类互动在该群具有独立的传播价值，详见 Bot 互动报告中的表情包触发机制。</p>
+<h3 id="52">5.2 发言时段偏好</h3>
+<p>从活跃层以上成员的峰值时段来看，绝大多数集中在 17-19 时，属于&rdquo;傍晚集中活跃型&rdquo;。少数成员例外：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">成员</th>
+<th style="text-align: center;">峰值时段</th>
+<th style="text-align: center;">特征</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">26叶道化</td>
+<td style="text-align: center;">23 时</td>
+<td style="text-align: center;">深夜活跃</td>
+</tr>
+<tr>
+<td style="text-align: center;">赤焰琉霄</td>
+<td style="text-align: center;">0 时</td>
+<td style="text-align: center;">深夜活跃</td>
+</tr>
+<tr>
+<td style="text-align: center;">月光下的约定</td>
+<td style="text-align: center;">22 时</td>
+<td style="text-align: center;">深夜活跃</td>
+</tr>
+<tr>
+<td style="text-align: center;">雪花沉睡</td>
+<td style="text-align: center;">18/19/0 时</td>
+<td style="text-align: center;">傍晚 + 深夜双峰</td>
+</tr>
+</tbody>
+</table>
+<p>深夜活跃成员的存在，支撑了凌晨 0 时依然保持较高热度的现象。</p>
+<h3 id="53">5.3 发言长度偏好</h3>
+<p>各发送者平均消息长度在 6 到 30 字之间波动：</p>
+<ul>
+<li>26瓦斯（8.1 字）与潜水艇（6.9 字）倾向短句快节奏；</li>
+<li>若至（14.8 字）与波克洛克（14.7 字）会输出更完整的表达；</li>
+<li>系统消息平均长度 29.3 字，因为 QQ 互动通知的固定模板本身较长。</li>
+</ul>
+<blockquote>
+<p>平均长度仅基于文字消息统计，图片消息不参与计算。</p>
+</blockquote>
+<hr />
+<h2 id="_6">六、阶层稳定性观察</h2>
+<h3 id="61">6.1 核心层成员的多重身份</h3>
+<p>抽样数据中出现了明显的昵称快照差异，说明核心成员频繁改名：</p>
+<pre><code>某消息的发送者字段为「枫糖总帅」
+同一消息被回复时，回复引用显示的昵称为「26南梁改造工程 白祥」
+
+某消息的发送者字段为「002」
+同一消息被回复时，回复引用显示的昵称为「25郁光望月（高阶伪人）」
+
+某消息的发送者字段为「若至」
+同一消息被回复时，回复引用显示的昵称为「26 雷火剑」
+</code></pre>
+<blockquote>
+<p>上述现象表明：群内存在高频改名习惯，昵称本身就构成了群文化的一部分（详见群文化与梗传播报告）。在按人统计时，此类多重昵称会带来轻微的重名/漏算误差，本报告未对跨昵称身份做合并。</p>
+</blockquote>
+<h3 id="62">6.2 群主与管理层</h3>
+<p>「群主」（544 条）与「群内委员」（311 条）的发言量处于参与层，属于&rdquo;管理型存在&rdquo;而非&rdquo;水群型存在&rdquo;。群内还观察到「群心理委员」「群斟茶兵」「群托鸽」「群线充」「群龙王」等带&rdquo;群&rdquo;字前缀的昵称，构成了一套戏谑的&rdquo;官职体系&rdquo;，说明群内存在拟官化、角色扮演式的命名文化。</p>
+<h3 id="63">6.3 新成员进入</h3>
+<p>昵称带「25-」「26-」「24-」等入学年级前缀的成员大量出现，如 25RS、25-Alios、25-御、26-倾雨、24凪蓝 等。结合群内出现的高校话题（详见文化报告），该群成员结构以不同年级的在校大学生为主，年级前缀是成员自我标识的一部分。</p>
+<hr />
+<h2 id="_7">七、总结</h2>
+<h3 id="71">7.1 核心结论</h3>
+<ol>
+<li>群活跃度呈明显长尾分布：前 18 位发送者贡献约七成消息，73.4% 的成员处于边缘层；</li>
+<li>核心层四人（波克洛克、若至、26瓦斯、子路）是群运转的引擎，全部接近满勤；</li>
+<li>群活跃度在七月发生 42% 的显著衰减，与期末结束、假期节奏相关；</li>
+<li>傍晚 18 时是全天最高活跃时段，深夜 0 时仍保有热度；</li>
+<li>群内存在高频改名与拟官化昵称文化，给按人统计带来一定复杂性。</li>
+</ol>
+<h3 id="72">7.2 数据使用建议</h3>
+<ul>
+<li>后续分析若涉及&rdquo;人&rdquo;维度的对比，建议先对多重昵称做身份归并；</li>
+<li>对 002 这类&rdquo;阶段突击型&rdquo;成员，应结合时间窗口而非全期总量评估其活跃度；</li>
+<li>系统消息（1,505 条）在参与统计时应单独标注，避免与自然人混淆。</li>
+</ul>
+<hr />
+<h2 id="a">附录 A：活跃层及以上发送者明细</h2>
+<p>以下表格覆盖消息量排名前 18 位的发送者，字段依次为消息总数、文字数、图片数、活跃天数、峰值时段（取前三位）与平均文字长度：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">排名</th>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">总数</th>
+<th style="text-align: center;">文字</th>
+<th style="text-align: center;">图片</th>
+<th style="text-align: center;">天数</th>
+<th style="text-align: center;">峰值时段</th>
+<th style="text-align: center;">均长</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">3,737</td>
+<td style="text-align: center;">1,655</td>
+<td style="text-align: center;">700</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">18/17/0</td>
+<td style="text-align: center;">14.7</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">3,692</td>
+<td style="text-align: center;">2,223</td>
+<td style="text-align: center;">329</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">18/16/17</td>
+<td style="text-align: center;">14.8</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">3,375</td>
+<td style="text-align: center;">3,042</td>
+<td style="text-align: center;">211</td>
+<td style="text-align: center;">63</td>
+<td style="text-align: center;">18/17/20</td>
+<td style="text-align: center;">8.1</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">2,228</td>
+<td style="text-align: center;">995</td>
+<td style="text-align: center;">895</td>
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">15/17/16</td>
+<td style="text-align: center;">8.2</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">番茄斗罗</td>
+<td style="text-align: center;">2,011</td>
+<td style="text-align: center;">1,468</td>
+<td style="text-align: center;">347</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">18/17/10</td>
+<td style="text-align: center;">8.3</td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">得胜已是定局</td>
+<td style="text-align: center;">1,893</td>
+<td style="text-align: center;">922</td>
+<td style="text-align: center;">764</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">18/17/14</td>
+<td style="text-align: center;">8.0</td>
+</tr>
+<tr>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">苦来兮苦</td>
+<td style="text-align: center;">1,834</td>
+<td style="text-align: center;">1,431</td>
+<td style="text-align: center;">222</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">18/17/20</td>
+<td style="text-align: center;">8.8</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">雪花沉睡</td>
+<td style="text-align: center;">1,804</td>
+<td style="text-align: center;">817</td>
+<td style="text-align: center;">900</td>
+<td style="text-align: center;">65</td>
+<td style="text-align: center;">18/19/0</td>
+<td style="text-align: center;">8.3</td>
+</tr>
+<tr>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">1,635</td>
+<td style="text-align: center;">1,088</td>
+<td style="text-align: center;">313</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">18/19/0</td>
+<td style="text-align: center;">12.7</td>
+</tr>
+<tr>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">颜回momo</td>
+<td style="text-align: center;">1,554</td>
+<td style="text-align: center;">1,147</td>
+<td style="text-align: center;">231</td>
+<td style="text-align: center;">58</td>
+<td style="text-align: center;">19/20/23</td>
+<td style="text-align: center;">10.5</td>
+</tr>
+<tr>
+<td style="text-align: center;">11</td>
+<td style="text-align: center;">系统消息</td>
+<td style="text-align: center;">1,505</td>
+<td style="text-align: center;">1,505</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">19/18/15</td>
+<td style="text-align: center;">29.3</td>
+</tr>
+<tr>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">赤焰琉霄</td>
+<td style="text-align: center;">1,497</td>
+<td style="text-align: center;">1,012</td>
+<td style="text-align: center;">301</td>
+<td style="text-align: center;">60</td>
+<td style="text-align: center;">0/18/20</td>
+<td style="text-align: center;">10.7</td>
+</tr>
+<tr>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">某个好人</td>
+<td style="text-align: center;">1,382</td>
+<td style="text-align: center;">831</td>
+<td style="text-align: center;">299</td>
+<td style="text-align: center;">65</td>
+<td style="text-align: center;">18/19/17</td>
+<td style="text-align: center;">10.4</td>
+</tr>
+<tr>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">26叶道化</td>
+<td style="text-align: center;">1,174</td>
+<td style="text-align: center;">795</td>
+<td style="text-align: center;">166</td>
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">23/18/0</td>
+<td style="text-align: center;">9.6</td>
+</tr>
+<tr>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">白鹭神社小狐</td>
+<td style="text-align: center;">1,031</td>
+<td style="text-align: center;">780</td>
+<td style="text-align: center;">147</td>
+<td style="text-align: center;">60</td>
+<td style="text-align: center;">15/12/16</td>
+<td style="text-align: center;">10.2</td>
+</tr>
+<tr>
+<td style="text-align: center;">16</td>
+<td style="text-align: center;">002</td>
+<td style="text-align: center;">1,007</td>
+<td style="text-align: center;">591</td>
+<td style="text-align: center;">309</td>
+<td style="text-align: center;">35</td>
+<td style="text-align: center;">18/10/17</td>
+<td style="text-align: center;">9.3</td>
+</tr>
+<tr>
+<td style="text-align: center;">17</td>
+<td style="text-align: center;">(ᗜ˰ᗜ)（怀念河图版）</td>
+<td style="text-align: center;">822</td>
+<td style="text-align: center;">620</td>
+<td style="text-align: center;">85</td>
+<td style="text-align: center;">56</td>
+<td style="text-align: center;">21/15/11</td>
+<td style="text-align: center;">10.8</td>
+</tr>
+<tr>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">潜水艇</td>
+<td style="text-align: center;">810</td>
+<td style="text-align: center;">530</td>
+<td style="text-align: center;">185</td>
+<td style="text-align: center;">58</td>
+<td style="text-align: center;">0/18/23</td>
+<td style="text-align: center;">6.9</td>
+</tr>
+</tbody>
+</table>
+<p>由该明细表可以补充观察：</p>
+<ol>
+<li>26瓦斯是&rdquo;纯文字输出王&rdquo;，3,042 条文字远超第二位若至的 2,223 条，图片仅 211 张；</li>
+<li>子路（895 张）与雪花沉睡（900 张）的图片量远超其他成员，两者均为&rdquo;图党&rdquo;代表；</li>
+<li>峰值时段为 0 时的赤焰琉霄、潜水艇属于深夜活跃成员，支撑了群内凌晨热度；</li>
+<li>若至与波克洛克的均长（14.7/14.8）明显高于第三名枫糖总帅（12.7），说明核心层中这两人倾向于输出更完整的语句。</li>
+</ol>
+<blockquote>
+<p>说明：均长为文字消息的平均字数，图片、回复与系统消息不参与计算；&rdquo;天数&rdquo;为消息活跃天数，满勤为 66 天。</p>
+</blockquote>
+<h2 id="b">附录 B：数据局限说明</h2>
+<ol>
+<li>发送者昵称为导出时快照，跨昵称身份未做归并，见 3.4 节；</li>
+<li>平均长度统计未包含图片类消息，图片倾向明显的成员（子路、得胜已是定局、雪花沉睡）实际参与强度可能被低估；</li>
+<li>撤回消息内容不可见，可能造成少量话题统计缺失；</li>
+<li>月度日均计算中，八月仅统计前 5 天，不直接与整月对比。</li>
+</ol>
+<p>本报告数据来源: .output/chat_stats.json, 抽样片段覆盖完整时间范围</p>
+
+<footer>
+    <a href="https://github.com/JularDepick/ChatAnalysis.SKILL" target="_blank" rel="noopener noreferrer">
+        SKILL技术支持·ChatAnalysis
+    </a>
+</footer>
+
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    function apply(t) {
+        if (t === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ 浅色';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            btn.textContent = '🌙 暗色';
+        }
+    }
+    apply(localStorage.getItem('theme') || 'light');
+    btn.addEventListener('click', function() {
+        var next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
+    });
+})();
+</script>
+</body>
+</html>

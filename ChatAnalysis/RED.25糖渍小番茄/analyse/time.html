@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>时间活跃度分析</title>
+<script>
+(function() {
+    var t = localStorage.getItem('theme') || 'light';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --text: #1d1d1f;
+    --text-muted: #86868b;
+    --accent: #007aff;
+    --accent-hover: #0056b3;
+    --link: #007aff;
+    --link-hover: #0056b3;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --code-bg: #f5f5f7;
+    --code-color: #c0392b;
+    --pre-color: #6c5ce7;
+    --table-header-bg: #f5f5f7;
+    --hover-bg: rgba(0,0,0,0.03);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --blockquote-bg: rgba(0,122,255,0.04);
+    --blockquote-border: #007aff;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+}
+
+:root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --link: #0a84ff;
+    --link-hover: #409cff;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.2);
+    --code-bg: #1c1c1e;
+    --code-color: #f48fb1;
+    --pre-color: #ce93d8;
+    --table-header-bg: #1c1c1e;
+    --hover-bg: rgba(255,255,255,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --blockquote-bg: rgba(10,132,255,0.08);
+    --blockquote-border: #0a84ff;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+
+body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* ===== 主题切换按钮 ===== */
+.theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--surface);
+    color: var(--text); font-size: 13px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
+}
+.theme-toggle:hover { background: var(--hover-bg); border-color: var(--border-strong); }
+
+/* ===== 面包屑 ===== */
+.breadcrumb {
+    padding: 8px 0; margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); }
+.breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+
+/* ===== 排版 ===== */
+h1 { font-size: 1.8em; font-weight: 700; margin: 0 0 24px; line-height: 1.3; }
+h2 { font-size: 1.4em; font-weight: 700; margin: 40px 0 16px; line-height: 1.35; }
+h3 { font-size: 1.15em; font-weight: 600; margin: 24px 0 8px; line-height: 1.4; }
+h4 { font-size: 1em; font-weight: 600; margin: 16px 0 4px; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ===== 表格 ===== */
+table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13px;
+}
+th, td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th { background: var(--table-header-bg); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: var(--hover-bg); }
+
+/* ===== 代码块 ===== */
+pre {
+    background: var(--code-bg); color: var(--pre-color);
+    padding: 16px 20px; border-radius: 10px;
+    overflow-x: auto; font-size: 0.88em; line-height: 1.6;
+    margin: 16px 0;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono",
+                 "Cascadia Code", Consolas, monospace;
+}
+code {
+    background: var(--code-bg); color: var(--code-color);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* ===== 引用块 ===== */
+blockquote {
+    border-left: 3px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted); font-size: 0.95em;
+}
+
+/* ===== 高危区块 ===== */
+.danger-block {
+    border-left: 4px solid var(--danger);
+    background: color-mix(in srgb, var(--danger) 6%, transparent);
+    padding: 14px 18px; margin: 16px 0;
+    border-radius: 0 10px 10px 0;
+}
+.danger-block::before {
+    content: "⚠️ 高危提醒";
+    display: block; font-weight: 700; color: var(--danger);
+    margin-bottom: 8px; font-size: 0.9em;
+}
+
+/* ===== 折叠块 ===== */
+.collapsed-links { margin: 8px 0; }
+.collapsed-links summary {
+    cursor: pointer; font-weight: 600; padding: 8px 0;
+    color: var(--text-muted); font-size: 13px;
+}
+.collapsed-links summary:hover { color: var(--link); }
+
+/* ===== 排行榜 ===== */
+.leaderboard-item {
+    display: grid; grid-template-columns: 40px 1fr auto 120px;
+    align-items: center; gap: 8px;
+    padding: 12px 16px; margin: 4px 0;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+}
+.leaderboard-item:hover { background: var(--hover-bg); text-decoration: none; }
+.leaderboard-rank { font-weight: 700; font-size: 1.1em; color: var(--text-muted); text-align: center; }
+.leaderboard-rank.top3 { color: var(--accent); }
+.leaderboard-name { font-weight: 600; }
+.leaderboard-count { font-size: 13px; color: var(--text-muted); }
+.leaderboard-bar { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.leaderboard-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ===== 首页卡片 ===== */
+.home-section { margin: 32px 0; }
+.home-section h2 { margin-bottom: 12px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+    background: var(--surface); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block; color: var(--text); text-decoration: none;
+}
+.card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-2px);
+    text-decoration: none;
+}
+.card h3 { margin: 0 0 8px; }
+.card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.card-count {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--surface2); font-size: 12px; color: var(--text-muted);
+}
+
+/* ===== 首页统计 ===== */
+.stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin: 24px 0;
+}
+.stat-item {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-num { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== 页脚 ===== */
+footer {
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-muted);
+}
+footer a { color: var(--text-muted); }
+footer a:hover { color: var(--link); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px; }
+    .theme-toggle { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .leaderboard-bar { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .leaderboard-item { grid-template-columns: 32px 1fr auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙 暗色</button>
+<div class="container">
+<div class="breadcrumb"><a href="../index.html">首页</a><span class="sep">›</span><a href="index.html">统计分析</a><span class="sep">›</span><span>时间活跃度分析</span></div>
+
+<h1 id="_1">时间活跃度分析</h1>
+<h2 id="_2">统计范围与整体节奏</h2>
+<p>本报告基于 2026-06-01 至 2026-08-05 共 66 天的完整数据，对 RED.25糖渍小番茄 的活跃时间分布进行分析。全期消息总量 44,632 条，日均约 676 条。整体来看，群聊活跃度在一天内呈现出「下午抬升、傍晚见顶、夜间回落」的形态，在一周内呈现出「工作日高、周末低」的形态，在三个月度间呈现出「递减」的形态。</p>
+<p>这三个维度叠加，构成了群聊活跃度的基本骨架：一天之中 18 时为顶点，一周之中周二最活跃，一个统计周期内 6 月最活跃。本报告将分别展开说明。</p>
+<h2 id="_3">小时分布</h2>
+<p>以下为 0 时至 23 时的消息量分布：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">时段</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">时段</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">时段</th>
+<th style="text-align: center;">消息数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0 时</td>
+<td style="text-align: center;">2,759</td>
+<td style="text-align: center;">8 时</td>
+<td style="text-align: center;">1,015</td>
+<td style="text-align: center;">16 时</td>
+<td style="text-align: center;">3,024</td>
+</tr>
+<tr>
+<td style="text-align: center;">1 时</td>
+<td style="text-align: center;">1,099</td>
+<td style="text-align: center;">9 时</td>
+<td style="text-align: center;">1,371</td>
+<td style="text-align: center;">17 时</td>
+<td style="text-align: center;">3,529</td>
+</tr>
+<tr>
+<td style="text-align: center;">2 时</td>
+<td style="text-align: center;">184</td>
+<td style="text-align: center;">10 时</td>
+<td style="text-align: center;">2,079</td>
+<td style="text-align: center;">18 时</td>
+<td style="text-align: center;">4,901</td>
+</tr>
+<tr>
+<td style="text-align: center;">3 时</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;">11 时</td>
+<td style="text-align: center;">2,221</td>
+<td style="text-align: center;">19 时</td>
+<td style="text-align: center;">2,902</td>
+</tr>
+<tr>
+<td style="text-align: center;">4 时</td>
+<td style="text-align: center;">47</td>
+<td style="text-align: center;">12 时</td>
+<td style="text-align: center;">2,460</td>
+<td style="text-align: center;">20 时</td>
+<td style="text-align: center;">2,925</td>
+</tr>
+<tr>
+<td style="text-align: center;">5 时</td>
+<td style="text-align: center;">22</td>
+<td style="text-align: center;">13 时</td>
+<td style="text-align: center;">1,922</td>
+<td style="text-align: center;">21 时</td>
+<td style="text-align: center;">2,339</td>
+</tr>
+<tr>
+<td style="text-align: center;">6 时</td>
+<td style="text-align: center;">80</td>
+<td style="text-align: center;">14 时</td>
+<td style="text-align: center;">2,470</td>
+<td style="text-align: center;">22 时</td>
+<td style="text-align: center;">1,939</td>
+</tr>
+<tr>
+<td style="text-align: center;">7 时</td>
+<td style="text-align: center;">184</td>
+<td style="text-align: center;">15 时</td>
+<td style="text-align: center;">2,949</td>
+<td style="text-align: center;">23 时</td>
+<td style="text-align: center;">2,161</td>
+</tr>
+</tbody>
+</table>
+<p>将各时段绘制为时间轴可直观看到全天的活跃节奏：</p>
+<pre><code>0   2,759  ████████████████████
+1   1,099  ████████
+2     184  █
+3      50  ▌
+4      47  ▌
+5      22  ▌
+6      80  ▌
+7     184  █
+8   1,015  ████████
+9   1,371  ██████████
+10  2,079  ███████████████
+11  2,221  ████████████████
+12  2,460  ██████████████████
+13  1,922  ██████████████
+14  2,470  ██████████████████
+15  2,949  ████████████████████
+16  3,024  ████████████████████
+17  3,529  ██████████████████████
+18  4,901  ████████████████████████
+19  2,902  ████████████████████
+20  2,925  ████████████████████
+21  2,339  █████████████████
+22  1,939  ██████████████
+23  2,161  ████████████████
+</code></pre>
+<h2 id="_4">全天活跃阶段划分</h2>
+<p>将 24 个小时划分为四个阶段，可以更清晰地看出群聊的作息规律：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">阶段</th>
+<th style="text-align: center;">时段</th>
+<th style="text-align: center;">消息合计</th>
+<th style="text-align: center;">占比</th>
+<th style="text-align: center;">特征</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">深夜</td>
+<td style="text-align: center;">0-5 时</td>
+<td style="text-align: center;">4,161</td>
+<td style="text-align: center;">9.3%</td>
+<td style="text-align: center;">0 时活跃，2 时后近乎沉寂</td>
+</tr>
+<tr>
+<td style="text-align: center;">上午</td>
+<td style="text-align: center;">6-11 时</td>
+<td style="text-align: center;">7,069</td>
+<td style="text-align: center;">15.8%</td>
+<td style="text-align: center;">8 时启动，逐时抬升</td>
+</tr>
+<tr>
+<td style="text-align: center;">下午</td>
+<td style="text-align: center;">12-17 时</td>
+<td style="text-align: center;">16,354</td>
+<td style="text-align: center;">36.6%</td>
+<td style="text-align: center;">全天持续高位</td>
+</tr>
+<tr>
+<td style="text-align: center;">晚间</td>
+<td style="text-align: center;">18-23 时</td>
+<td style="text-align: center;">17,167</td>
+<td style="text-align: center;">38.5%</td>
+<td style="text-align: center;">18 时见顶后回落</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，晚间（38.5%）与下午（36.6%）合计贡献了约四分之三的消息量，上午的启动相对缓慢，深夜则是「前半夜活跃、后半夜休眠」的形态。四个阶段的划分说明群聊的核心活跃窗口集中在 15 时至 21 时。</p>
+<h2 id="_5">高峰时段特征</h2>
+<p>全期各时段消息量的前五名如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">排名</th>
+<th style="text-align: center;">时段</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">18 时</td>
+<td style="text-align: center;">4,901</td>
+<td style="text-align: center;">11.0%</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">17 时</td>
+<td style="text-align: center;">3,529</td>
+<td style="text-align: center;">7.9%</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">16 时</td>
+<td style="text-align: center;">3,024</td>
+<td style="text-align: center;">6.8%</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">15 时</td>
+<td style="text-align: center;">2,949</td>
+<td style="text-align: center;">6.6%</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">20 时</td>
+<td style="text-align: center;">2,925</td>
+<td style="text-align: center;">6.6%</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，前五名时段中有四个集中在 15 时至 18 时，形成「下午到傍晚」的连续高峰带。18 时是绝对的峰值（4,901 条），且比第二位的 17 时高出近 1,400 条，可见傍晚 6 点左右是群聊讨论的爆发时刻。</p>
+<p>这一时段特征在群聊首日就有体现，午夜的接龙刚结束，清晨的消息已经启动。傍晚时段成员集中出现的场景在抽样中反复出现：</p>
+<pre><code>26瓦斯：我已经玩红温老老实实回来预习了
+若至：嗯？是不是反了？
+若至：不应该是学红温老老实实回来玩吗？
+番茄斗罗：不想复习。
+002：那就玩
+</code></pre>
+<h2 id="0-5">深夜活动（0-5 时）</h2>
+<p>0 时至 5 时的消息量合计为 4,161 条，占全期消息的 9.3%。深夜时段并非完全沉寂，尤其是 0 时仍有 2,759 条消息，属于「夜猫子」的活跃窗口，随后在 2-5 时断崖式滑落到几十条的极低水平。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">时段</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0 时</td>
+<td style="text-align: center;">2,759</td>
+<td style="text-align: center;">6.2%</td>
+</tr>
+<tr>
+<td style="text-align: center;">1 时</td>
+<td style="text-align: center;">1,099</td>
+<td style="text-align: center;">2.5%</td>
+</tr>
+<tr>
+<td style="text-align: center;">2 时</td>
+<td style="text-align: center;">184</td>
+<td style="text-align: center;">0.4%</td>
+</tr>
+<tr>
+<td style="text-align: center;">3 时</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;">0.1%</td>
+</tr>
+<tr>
+<td style="text-align: center;">4 时</td>
+<td style="text-align: center;">47</td>
+<td style="text-align: center;">0.1%</td>
+</tr>
+<tr>
+<td style="text-align: center;">5 时</td>
+<td style="text-align: center;">22</td>
+<td style="text-align: center;">0.0%</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，0 时的活跃度甚至高于 8 时（1,015 条）与 13 时（1,922 条）之外的多个白天时段，说明群聊具有明显的熬夜属性。深夜讨论的话题多为游戏、动画、闲聊等非学业内容，例如在 0 时前后的节日接龙：</p>
+<pre><code>得胜已是定局：六一快乐孩子们
+苦来兮苦：母亲节快乐
+群斟茶兵：情人节快乐
+永雏伯虎：重阳节快乐
+某个好人：元旦快乐
+</code></pre>
+<p>深夜 2 时之后消息量骤减，说明绝大多数成员在凌晨 2 点前入睡，只有极少数「修仙党」仍在活动。5 时的 22 条是全期最低值，群聊在该时段几乎处于休眠状态。</p>
+<h2 id="_6">星期分布</h2>
+<p>按星期统计的消息量如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">星期</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">平均每日</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">周一</td>
+<td style="text-align: center;">7,340</td>
+<td style="text-align: center;">9.4 周</td>
+</tr>
+<tr>
+<td style="text-align: center;">周二</td>
+<td style="text-align: center;">8,166</td>
+<td style="text-align: center;">10.5 周</td>
+</tr>
+<tr>
+<td style="text-align: center;">周三</td>
+<td style="text-align: center;">7,534</td>
+<td style="text-align: center;">9.7 周</td>
+</tr>
+<tr>
+<td style="text-align: center;">周四</td>
+<td style="text-align: center;">7,357</td>
+<td style="text-align: center;">9.4 周</td>
+</tr>
+<tr>
+<td style="text-align: center;">周五</td>
+<td style="text-align: center;">5,941</td>
+<td style="text-align: center;">7.6 周</td>
+</tr>
+<tr>
+<td style="text-align: center;">周六</td>
+<td style="text-align: center;">3,416</td>
+<td style="text-align: center;">4.4 周</td>
+</tr>
+<tr>
+<td style="text-align: center;">周日</td>
+<td style="text-align: center;">4,878</td>
+<td style="text-align: center;">6.3 周</td>
+</tr>
+</tbody>
+</table>
+<p>说明：上表「平均每日」按统计区间内各星期出现的周数折算。从数据中可观察到，周一至周四保持在 7,300 至 8,200 条的较高水平，周二（8,166 条）为全周峰值；周五开始下滑至 5,941 条，周末两天大幅走低，周六（3,416 条）为全周最低。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">对比项</th>
+<th style="text-align: center;">数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">工作日合计（周一至周五）</td>
+<td style="text-align: center;">36,338 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">周末合计（周六至周日）</td>
+<td style="text-align: center;">8,294 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">工作日占比</td>
+<td style="text-align: center;">81.4%</td>
+</tr>
+<tr>
+<td style="text-align: center;">峰值日（周二）</td>
+<td style="text-align: center;">8,166 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">谷值日（周六）</td>
+<td style="text-align: center;">3,416 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">周内最大落差</td>
+<td style="text-align: center;">4,750 条</td>
+</tr>
+</tbody>
+</table>
+<p>周末活跃度明显低于工作日，这一形态与「群聊内容依托日常校园生活」的特征一致。工作日成员在学校上课、自习时频繁交流，而周末各有安排，刷群频率下降。周五的活跃度低于周一至周四，可能因为周五下午课程结束后部分成员离校回家。</p>
+<p>工作日群聊的话题围绕课程、教室展开，抽样中可以直观看到成员在上课时间互相确认教室位置：</p>
+<pre><code>苦来兮苦：有无在综c203的
+颜回momo：在你隔壁
+26瓦斯：还好在一教b
+雪花沉睡：还好在一教b
+群心理委员：还好在一教b
+</code></pre>
+<h2 id="_7">月度趋势</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">月份</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">日均</th>
+<th style="text-align: center;">与上月对比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">2026-06</td>
+<td style="text-align: center;">27,029</td>
+<td style="text-align: center;">901</td>
+<td style="text-align: center;">基准月</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-07</td>
+<td style="text-align: center;">15,657</td>
+<td style="text-align: center;">505</td>
+<td style="text-align: center;">下降 42.1%</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-08（至 05 日）</td>
+<td style="text-align: center;">1,946</td>
+<td style="text-align: center;">389</td>
+<td style="text-align: center;">延续低位</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，6 月贡献了全期 60.5% 的消息量，日均超过 900 条；7 月降至日均 505 条，降幅显著；8 月仅统计前 5 天，日均 389 条，热度进一步回落。这一趋势与学期结束、暑假开始的时间线吻合。6 月末的期末考试复习期反而出现活跃高峰，抽样片段记录了密集的复习吐槽：</p>
+<pre><code>L：微积分必须学，不然就直接等补考和重修了
+L：泥🚢高数三件套是真的难
+L：比起其它学校
+若至：打熊会出现一大堆表情包
+</code></pre>
+<p>各月份的日平均消息量差异明显，按日均折算的对比：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">对比项</th>
+<th style="text-align: center;">2026-06</th>
+<th style="text-align: center;">2026-07</th>
+<th style="text-align: center;">2026-08</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">统计天数</td>
+<td style="text-align: center;">30</td>
+<td style="text-align: center;">31</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr>
+<td style="text-align: center;">日均消息</td>
+<td style="text-align: center;">901</td>
+<td style="text-align: center;">505</td>
+<td style="text-align: center;">389</td>
+</tr>
+<tr>
+<td style="text-align: center;">日均图片</td>
+<td style="text-align: center;">162</td>
+<td style="text-align: center;">113</td>
+<td style="text-align: center;">71</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，即使折算到日均口径，6 月仍比 7 月高出近一倍，而 8 月前 5 天的日均也明显低于 7 月，说明暑期热度持续下行。</p>
+<h2 id="_8">日活跃趋势</h2>
+<p>按日统计的消息量中，单日最高的 10 天如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">日期</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">2026-06-29</td>
+<td style="text-align: center;">1,939</td>
+<td style="text-align: center;">全期峰值</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-06-03</td>
+<td style="text-align: center;">1,827</td>
+<td style="text-align: center;">月初活跃</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-06-05</td>
+<td style="text-align: center;">1,692</td>
+<td style="text-align: center;">月初活跃</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-06-04</td>
+<td style="text-align: center;">1,688</td>
+<td style="text-align: center;">月初活跃</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-06-23</td>
+<td style="text-align: center;">1,526</td>
+<td style="text-align: center;">期末复习期</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-06-18</td>
+<td style="text-align: center;">1,469</td>
+<td style="text-align: center;">学期中后段</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-06-30</td>
+<td style="text-align: center;">1,454</td>
+<td style="text-align: center;">月末</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-06-16</td>
+<td style="text-align: center;">1,401</td>
+<td style="text-align: center;">学期中段</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-06-25</td>
+<td style="text-align: center;">1,333</td>
+<td style="text-align: center;">期末复习期</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-06-17</td>
+<td style="text-align: center;">1,220</td>
+<td style="text-align: center;">学期中段</td>
+</tr>
+</tbody>
+</table>
+<p>单日最高的 10 天全部集中在 6 月，其中 6 月 3 日至 5 日连续三天超过 1,600 条，形成明显的活跃窗口。6 月下旬多个日期（23、25、29、30 日）再次走高，对应期末复习的集中讨论期。进入 7 月后单日最高为 7 月 13 日的 1,133 条，随后整体走低，7 月 20 日出现全期最低的 149 条。</p>
+<p>单日活跃度的几个典型日期：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">日期</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">特征</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">2026-06-01</td>
+<td style="text-align: center;">597</td>
+<td style="text-align: center;">群聊首日</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-06-03</td>
+<td style="text-align: center;">1,827</td>
+<td style="text-align: center;">首个高峰期</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-06-20</td>
+<td style="text-align: center;">281</td>
+<td style="text-align: center;">6 月低谷（周末）</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-06-29</td>
+<td style="text-align: center;">1,939</td>
+<td style="text-align: center;">全期峰值</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-07-13</td>
+<td style="text-align: center;">1,133</td>
+<td style="text-align: center;">7 月峰值</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-07-20</td>
+<td style="text-align: center;">149</td>
+<td style="text-align: center;">全期低谷</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-08-05</td>
+<td style="text-align: center;">274</td>
+<td style="text-align: center;">统计截止日</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_9">每日消息量曲线概述</h2>
+<p>将 66 天的日消息量按周切分，可以观察到周末洼地的周期性规律：每个周一到周四的日消息量通常在 600 至 1,500 条之间波动，周五开始回落，周六触底（部分周六在 200 至 400 条区间），周日回升。这一周期贯穿整个统计区间，即使在 7 月整体走低后依然保持「周末低、工作日高」的相对结构。</p>
+<p>从数据中可观察到，单日消息量的波动还受到具体事件影响，例如期末考试前一周（6 月 23-30 日）出现连续高位，进入暑期（7 月 20 日前后）则出现全期低谷。日活跃趋势本质上是「周周期」与「学期阶段」共同作用的结果。</p>
+<h2 id="6-7">6 月与 7 月对比</h2>
+<p>两个完整月份的活跃度对比：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">对比维度</th>
+<th style="text-align: center;">2026-06</th>
+<th style="text-align: center;">2026-07</th>
+<th style="text-align: center;">变化</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">消息总量</td>
+<td style="text-align: center;">27,029</td>
+<td style="text-align: center;">15,657</td>
+<td style="text-align: center;">下降 42.1%</td>
+</tr>
+<tr>
+<td style="text-align: center;">日均消息</td>
+<td style="text-align: center;">901</td>
+<td style="text-align: center;">505</td>
+<td style="text-align: center;">下降 44.0%</td>
+</tr>
+<tr>
+<td style="text-align: center;">单日最高</td>
+<td style="text-align: center;">1,939（06-29）</td>
+<td style="text-align: center;">1,133（07-13）</td>
+<td style="text-align: center;">下降 41.6%</td>
+</tr>
+<tr>
+<td style="text-align: center;">单日最低</td>
+<td style="text-align: center;">281（06-20）</td>
+<td style="text-align: center;">149（07-20）</td>
+<td style="text-align: center;">下降 47.0%</td>
+</tr>
+<tr>
+<td style="text-align: center;">图片消息</td>
+<td style="text-align: center;">4,868</td>
+<td style="text-align: center;">3,509</td>
+<td style="text-align: center;">下降 27.9%</td>
+</tr>
+<tr>
+<td style="text-align: center;">深夜消息占比</td>
+<td style="text-align: center;">未显著变化</td>
+<td style="text-align: center;">未显著变化</td>
+<td style="text-align: center;">结构稳定</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，7 月各项指标相较 6 月全线回落，其中消息总量的降幅（42.1%）大于图片降幅（27.9%），说明 7 月群聊中文字讨论减少更为明显，而图片互动的保留度相对更高。6 月 20 日（281 条）与 6 月 6 日（285 条）是 6 月的两个低点，恰逢周末；7 月的低谷则集中在 7 月 19-20 日前后，进入假期节奏后群聊热度明显收缩。</p>
+<h2 id="_10">小结</h2>
+<p>RED.25糖渍小番茄 的活跃时间呈现「傍晚高峰、工作日高峰、6 月高峰」三重特征。18 时是全天的绝对峰值，深夜 0 时仍保有一定活跃度，周末与暑假期间热度下降。整体的时间分布与高校学生的校园生活节奏高度吻合：平日上课期间高频讨论、周末与假期回落、期末考试前出现活跃冲刺。</p>
+<p>本报告数据来源: .output/chat_stats.json, 抽样片段覆盖完整时间范围</p>
+
+<footer>
+    <a href="https://github.com/JularDepick/ChatAnalysis.SKILL" target="_blank" rel="noopener noreferrer">
+        SKILL技术支持·ChatAnalysis
+    </a>
+</footer>
+
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    function apply(t) {
+        if (t === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ 浅色';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            btn.textContent = '🌙 暗色';
+        }
+    }
+    apply(localStorage.getItem('theme') || 'light');
+    btn.addEventListener('click', function() {
+        var next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
+    });
+})();
+</script>
+</body>
+</html>

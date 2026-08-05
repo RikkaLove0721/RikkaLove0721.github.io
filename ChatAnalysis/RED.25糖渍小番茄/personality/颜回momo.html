@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>人格画像：颜回momo</title>
+<script>
+(function() {
+    var t = localStorage.getItem('theme') || 'light';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --text: #1d1d1f;
+    --text-muted: #86868b;
+    --accent: #007aff;
+    --accent-hover: #0056b3;
+    --link: #007aff;
+    --link-hover: #0056b3;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --code-bg: #f5f5f7;
+    --code-color: #c0392b;
+    --pre-color: #6c5ce7;
+    --table-header-bg: #f5f5f7;
+    --hover-bg: rgba(0,0,0,0.03);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --blockquote-bg: rgba(0,122,255,0.04);
+    --blockquote-border: #007aff;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+}
+
+:root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --link: #0a84ff;
+    --link-hover: #409cff;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.2);
+    --code-bg: #1c1c1e;
+    --code-color: #f48fb1;
+    --pre-color: #ce93d8;
+    --table-header-bg: #1c1c1e;
+    --hover-bg: rgba(255,255,255,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --blockquote-bg: rgba(10,132,255,0.08);
+    --blockquote-border: #0a84ff;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+
+body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* ===== 主题切换按钮 ===== */
+.theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--surface);
+    color: var(--text); font-size: 13px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
+}
+.theme-toggle:hover { background: var(--hover-bg); border-color: var(--border-strong); }
+
+/* ===== 面包屑 ===== */
+.breadcrumb {
+    padding: 8px 0; margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); }
+.breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+
+/* ===== 排版 ===== */
+h1 { font-size: 1.8em; font-weight: 700; margin: 0 0 24px; line-height: 1.3; }
+h2 { font-size: 1.4em; font-weight: 700; margin: 40px 0 16px; line-height: 1.35; }
+h3 { font-size: 1.15em; font-weight: 600; margin: 24px 0 8px; line-height: 1.4; }
+h4 { font-size: 1em; font-weight: 600; margin: 16px 0 4px; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ===== 表格 ===== */
+table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13px;
+}
+th, td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th { background: var(--table-header-bg); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: var(--hover-bg); }
+
+/* ===== 代码块 ===== */
+pre {
+    background: var(--code-bg); color: var(--pre-color);
+    padding: 16px 20px; border-radius: 10px;
+    overflow-x: auto; font-size: 0.88em; line-height: 1.6;
+    margin: 16px 0;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono",
+                 "Cascadia Code", Consolas, monospace;
+}
+code {
+    background: var(--code-bg); color: var(--code-color);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* ===== 引用块 ===== */
+blockquote {
+    border-left: 3px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted); font-size: 0.95em;
+}
+
+/* ===== 高危区块 ===== */
+.danger-block {
+    border-left: 4px solid var(--danger);
+    background: color-mix(in srgb, var(--danger) 6%, transparent);
+    padding: 14px 18px; margin: 16px 0;
+    border-radius: 0 10px 10px 0;
+}
+.danger-block::before {
+    content: "⚠️ 高危提醒";
+    display: block; font-weight: 700; color: var(--danger);
+    margin-bottom: 8px; font-size: 0.9em;
+}
+
+/* ===== 折叠块 ===== */
+.collapsed-links { margin: 8px 0; }
+.collapsed-links summary {
+    cursor: pointer; font-weight: 600; padding: 8px 0;
+    color: var(--text-muted); font-size: 13px;
+}
+.collapsed-links summary:hover { color: var(--link); }
+
+/* ===== 排行榜 ===== */
+.leaderboard-item {
+    display: grid; grid-template-columns: 40px 1fr auto 120px;
+    align-items: center; gap: 8px;
+    padding: 12px 16px; margin: 4px 0;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+}
+.leaderboard-item:hover { background: var(--hover-bg); text-decoration: none; }
+.leaderboard-rank { font-weight: 700; font-size: 1.1em; color: var(--text-muted); text-align: center; }
+.leaderboard-rank.top3 { color: var(--accent); }
+.leaderboard-name { font-weight: 600; }
+.leaderboard-count { font-size: 13px; color: var(--text-muted); }
+.leaderboard-bar { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.leaderboard-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ===== 首页卡片 ===== */
+.home-section { margin: 32px 0; }
+.home-section h2 { margin-bottom: 12px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+    background: var(--surface); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block; color: var(--text); text-decoration: none;
+}
+.card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-2px);
+    text-decoration: none;
+}
+.card h3 { margin: 0 0 8px; }
+.card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.card-count {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--surface2); font-size: 12px; color: var(--text-muted);
+}
+
+/* ===== 首页统计 ===== */
+.stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin: 24px 0;
+}
+.stat-item {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-num { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== 页脚 ===== */
+footer {
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-muted);
+}
+footer a { color: var(--text-muted); }
+footer a:hover { color: var(--link); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px; }
+    .theme-toggle { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .leaderboard-bar { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .leaderboard-item { grid-template-columns: 32px 1fr auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙 暗色</button>
+<div class="container">
+<div class="breadcrumb"><a href="../index.html">首页</a><span class="sep">›</span><a href="index.html">人格画像</a><span class="sep">›</span><span>人格画像：颜回momo</span></div>
+
+<h1 id="momo">人格画像：颜回momo</h1>
+<h2 id="_1">一、基本信息</h2>
+<p>颜回momo是群「RED.25糖渍小番茄」中消息总量排名第十的用户，在本次数据观察期（2026-06-01 至 2026-08-05，约 66 天）内活跃 58 天，存在明显的阶段断档（缺 06-28、07-02、07-19、07-21 至 07-23、07-26 等日期），属于「间歇性潜水」型成员。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">项目</th>
+<th style="text-align: center;">数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">群内消息排名</td>
+<td style="text-align: center;">第 10 名</td>
+</tr>
+<tr>
+<td style="text-align: center;">消息总数</td>
+<td style="text-align: center;">1554 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">文本消息</td>
+<td style="text-align: center;">1147 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">图片消息</td>
+<td style="text-align: center;">231 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">活跃天数</td>
+<td style="text-align: center;">58 天</td>
+</tr>
+<tr>
+<td style="text-align: center;">平均消息长度</td>
+<td style="text-align: center;">10.5 字</td>
+</tr>
+<tr>
+<td style="text-align: center;">峰值时段</td>
+<td style="text-align: center;">19 时（193 条）、20 时（125 条）、23 时（122 条）</td>
+</tr>
+<tr>
+<td style="text-align: center;">回复速度（中位数）</td>
+<td style="text-align: center;">12 秒</td>
+</tr>
+<tr>
+<td style="text-align: center;">回复速度（平均数）</td>
+<td style="text-align: center;">69.3 秒（五人画像中最低）</td>
+</tr>
+<tr>
+<td style="text-align: center;">回复事件数</td>
+<td style="text-align: center;">841 次</td>
+</tr>
+</tbody>
+</table>
+<p>从峰值时段可以观察到，颜回momo的活跃高峰集中在 19-23 时的晚间至深夜，是五人画像中时段最晚的一位。回复中位数 12 秒、均值仅 69.3 秒，为五人中响应最迅速的成员。</p>
+<p><strong>消息长度分布</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">长度区间</th>
+<th style="text-align: center;">消息数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1-5</td>
+<td style="text-align: center;">393</td>
+</tr>
+<tr>
+<td style="text-align: center;">6-20</td>
+<td style="text-align: center;">697</td>
+</tr>
+<tr>
+<td style="text-align: center;">21-50</td>
+<td style="text-align: center;">49</td>
+</tr>
+<tr>
+<td style="text-align: center;">51-100</td>
+<td style="text-align: center;">7</td>
+</tr>
+<tr>
+<td style="text-align: center;">100+</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
+<p>长度分布以 6-20 字为主（约 61%），1-5 字短句占约 34%，中长句（21 字以上）合计 57 条，具备一定的完整表达意愿。</p>
+<h2 id="_2">二、语言风格</h2>
+<p>从文本抽样中可以观察到，颜回momo的语言风格具有以下特征：</p>
+<ul>
+<li><strong>高度场景化</strong>：发言大量涉及具体地点（综合楼b、一教b、食堂、红旗连锁、幼儿园），疑似学生身份且习惯「报坐标式」聊天。</li>
+<li><strong>自创脑洞梗</strong>：「蜘蛛有点扫码」「我是奶龙粑粑」「蘑菇是地球ol新手礼包自带所以不会过期」等，主动创造新梗而非仅接梗。</li>
+<li><strong>饮食吐槽</strong>：「食堂肉酸的」「鸡肉是酸的」「咪食堂的东百窗口怎么关了」，对食堂品质不满且乐于吐槽。</li>
+<li><strong>文艺内核偶现</strong>：「不高山抹茶河遇知音」等文雅句式，在玩梗外壳下偶见抒情。</li>
+<li><strong>外放型社交</strong>：「@秋水祀 来我家」「我家很大」「有啤酒和面包」，喜欢以喜剧化方式发出线下邀约。</li>
+<li><strong>深夜脑洞</strong>：23 时活跃进入前三，凌晨段子与长单点餐单（kfc 大合集）均出现在深夜。</li>
+</ul>
+<p>示例引用（从聊天记录中抽样）：</p>
+<pre><code>[2026-06-01 00:17:28] 颜回momo: [回复消息]把我变成小男孩
+[2026-06-01 00:17:35] 颜回momo: 别变成会爆炸那款
+[2026-06-01 00:17:42] 颜回momo: 我明天去幼儿园出差
+</code></pre>
+<pre><code>[2026-06-04 19:23:50] 颜回momo: 综合楼b
+[2026-06-04 19:23:52] 颜回momo: 二楼
+[2026-06-04 19:30:34] 颜回momo: 在你隔壁
+[2026-06-04 19:30:38] 颜回momo: [图片]
+</code></pre>
+<pre><code>[2026-07-04 22:25:51] 颜回momo: 蜘蛛有点扫码
+[2026-07-04 22:26:05] 颜回momo: 在长桥上拉反载具蜘蛛网
+[2026-07-04 22:28:23] 颜回momo: 这蜘蛛有点聪明
+</code></pre>
+<pre><code>[2026-06-20 17:32:57] 颜回momo: 我是奶龙粑粑
+[2026-06-20 17:33:05] 颜回momo: 大家好
+[2026-06-20 17:34:06] 颜回momo: 不高山抹茶河遇知音
+</code></pre>
+<pre><code>[2026-06-09 11:25:42] 颜回momo: 哦妈咪食堂的东百窗口怎么关了
+[2026-06-09 11:48:29] 颜回momo: 食堂肉酸的
+[2026-06-09 11:48:43] 颜回momo: 鸡肉是酸的
+</code></pre>
+<h2 id="_3">三、沟通策略</h2>
+<ul>
+<li><strong>报点式发言</strong>：习惯附上具体地点（「综合楼b/二楼」「在你隔壁」「一教b」），以空间信息增强发言的真实感与互动性。</li>
+<li><strong>AI 整活联动</strong>：「把我变成小男孩」与枫糖总帅的「变成儿童萝莉」同场联动，属于群内整活圈层的固定玩家。</li>
+<li><strong>食堂吐槽常态化</strong>：食堂菜品质疑是其稳定的话题来源，容易引发群内共鸣。</li>
+<li><strong>脑洞开题</strong>：「蜘蛛有点扫码」等无厘头观察属于主动创造梗，而非被动接梗。</li>
+<li><strong>线下邀约式社交</strong>：以「我家很大」「有啤酒和面包」等喜剧化语言推进线下关系。</li>
+<li><strong>深夜高活跃</strong>：19-23 时为主要在线时段，深夜话题参与度高。</li>
+</ul>
+<p>模式示例：</p>
+<pre><code>[2026-06-04 19:23:41] 颜回momo: [回复消息]你不会也在...
+[2026-06-04 19:23:50] 颜回momo: 综合楼b
+[2026-06-04 19:23:52] 颜回momo: 二楼
+[2026-06-04 19:26:40] 波克洛克: 果然红社成员之间，存在某种「引力」啊
+[2026-06-04 19:30:34] 颜回momo: 在你隔壁
+</code></pre>
+<pre><code>[2026-08-04 01:01:44] 颜回momo: @25-电子🐟 我先来的
+[2026-08-04 01:02:09] 颜回momo: @秋水祀 来我家
+[2026-08-04 01:02:10] 25-电子🐟: [回复消息]你知道后发先至吗
+[2026-08-04 01:02:14] 颜回momo: 我家很大
+[2026-08-04 01:02:19] 颜回momo: 有啤酒和面包
+[2026-08-04 01:02:42] 波克洛克: [回复消息]@秋水祀 那我躺床底
+[2026-08-04 01:02:48] 波克洛克: 当锦衣卫
+</code></pre>
+<h2 id="_4">四、兴趣图谱</h2>
+<p>基于关键词画像（日常生活 55、学业/职场 30、社交/关系 17、科技/AI 11、娱乐 7、情绪 6、Bot互动 5、二次元/游戏 3），结合原文证据，可以观察到以下主要兴趣领域：</p>
+<h3 id="1-55">1. 日常生活（日常生活 55 项）</h3>
+<p>食堂、通勤、购物、宿舍等生活话题占比为五人画像中最高，是五人中最「生活流」的一位。</p>
+<pre><code>[2026-06-09 11:25:42] 颜回momo: 哦妈咪食堂的东百窗口怎么关了
+[2026-06-09 11:48:29] 颜回momo: 食堂肉酸的
+[2026-06-09 11:48:43] 颜回momo: 鸡肉是酸的
+[2026-07-04 23:04:02] 颜回momo: 我刚从红旗连锁出门
+</code></pre>
+<h3 id="2-30">2. 学业与校园（学业/职场 30 项）</h3>
+<p>上课地点、教室环境、军训等校园话题。</p>
+<pre><code>[2026-06-03 10:20:27] 颜回momo: 一教b
+[2026-06-04 19:23:50] 颜回momo: 综合楼b
+[2026-06-27 17:39:54] 颜回momo: 按理没这么逆天，之前军训我记得真正训练都不到几天，全程下雨摸鱼
+[2026-07-10 16:29:54] 颜回momo: 差点被一教b楼梯口一地的水击杀了
+</code></pre>
+<h3 id="3-3-7">3. 游戏与二次元（二次元/游戏 3、娱乐 7 项）</h3>
+<p>星露谷、地球ol 等游戏梗，统计口径虽低但玩梗式提及并不少。</p>
+<pre><code>[2026-07-10 14:29:47] 颜回momo: 认得的星露谷玩家已经在酿酒了
+[2026-08-04 01:04:48] 颜回momo: 蘑菇是地球ol新手礼包自带所以不会过期
+[2026-06-17 12:34:40] 颜回momo: 地球OL自带礼包
+</code></pre>
+<h3 id="4-ai-11">4. 科技话题（科技/AI 11 项）</h3>
+<p>对手机系统（鸿蒙）等话题有直接评论。</p>
+<pre><code>[2026-08-04 01:03:45] 颜回momo: 鸿蒙牛逼
+</code></pre>
+<h3 id="5-17">5. 群内社交（社交/关系 17 项）</h3>
+<p>奶龙梗、气泡话题、线下邀约等。</p>
+<pre><code>[2026-06-20 17:32:57] 颜回momo: 我是奶龙粑粑
+[2026-06-20 13:58:23] 颜回momo: 这样你就是七彩奶龙了
+[2026-06-20 13:59:10] 颜回momo: 今有一日用尽奶龙炮
+[2026-08-04 01:08:45] 颜回momo: 别人：各种气泡\n我：默认气泡\n就很…
+</code></pre>
+<h2 id="_5">五、社交互动</h2>
+<h3 id="top-10">回复目标（观察期内回复次数 Top 10）</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">回复目标</th>
+<th style="text-align: center;">次数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">20</td>
+</tr>
+<tr>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">16</td>
+</tr>
+<tr>
+<td style="text-align: center;">26南梁改造工程</td>
+<td style="text-align: center;">15</td>
+</tr>
+<tr>
+<td style="text-align: center;">某个好人</td>
+<td style="text-align: center;">13</td>
+</tr>
+<tr>
+<td style="text-align: center;">26冶北风💙💙💙</td>
+<td style="text-align: center;">13</td>
+</tr>
+<tr>
+<td style="text-align: center;">26逍遥摸金群1039369397</td>
+<td style="text-align: center;">6</td>
+</tr>
+<tr>
+<td style="text-align: center;">苦来兮苦</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr>
+<td style="text-align: center;">25</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr>
+<td style="text-align: center;">2025立春</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">5</td>
+</tr>
+</tbody>
+</table>
+<p>注：目标「26」「25」可能指代多名昵称以年级数字开头的群友，此处保留原始统计口径。</p>
+<h3 id="_6">社交角色</h3>
+<ul>
+<li><strong>脑洞型活跃成员</strong>：话题原创性强，自创梗（蜘蛛扫码、奶龙粑粑）常被群友接住。</li>
+<li><strong>空间连接者</strong>：通过报坐标（综合楼b、一教b）与群友建立校园空间上的连接感。</li>
+<li><strong>整活圈层成员</strong>：与枫糖总帅的 AI 整活联动、与 25-电子🐟 的深夜互动，显示其参与多个玩梗小圈子。</li>
+</ul>
+<h3 id="_7">影响力</h3>
+<p>从聊天记录可观察到，颜回momo 的发言常被群友直接回复（回复事件 841 次），其在食堂、奶龙、气泡等话题上的发言引发过集体接梗（如「好想吃」复读、奶龙系列）；58 天活跃中夜间存在感强，是晚间与深夜时段的重要参与者。</p>
+<h2 id="_8">六、情感表达</h2>
+<ul>
+<li><strong>幽默风格</strong>：以脑洞比喻、自创梗、戏剧化邀约为主，情绪几乎不直接表露。</li>
+<li><strong>情感范围</strong>：食堂品质不满以具体事实吐槽（「鸡肉是酸的」）直白表达；对技术的赞叹（「鸿蒙牛逼」）简洁直接；「不高山抹茶河遇知音」是罕见的文雅抒情时刻；深夜美食执念（长篇 KFC 点单）展现其直率的一面。</li>
+</ul>
+<p>直接或间接示例：</p>
+<pre><code>[2026-06-09 11:48:29] 颜回momo: 食堂肉酸的
+[2026-06-09 11:48:43] 颜回momo: 鸡肉是酸的
+</code></pre>
+<pre><code>[2026-08-04 01:03:45] 颜回momo: 鸿蒙牛逼
+</code></pre>
+<pre><code>[2026-06-20 17:32:57] 颜回momo: 我是奶龙粑粑
+[2026-06-20 17:33:05] 颜回momo: 大家好
+[2026-06-20 17:33:26] 某个好人: 你好
+[2026-06-20 17:33:58] 颜回momo: 难道你也
+[2026-06-20 17:34:06] 颜回momo: 不高山抹茶河遇知音
+</code></pre>
+<pre><code>[2026-08-04 01:01:10] 颜回momo: 想吃一份kfc疯狂星期四两份鸡块一份原味鸡，一份麦当劳里俩1+1和一份小食拼盘，一份华莱士两套鸡肉卷汉堡套餐，一份正新鸡排的大鸡排陪香肠，再来一份塔斯汀双堡和鸡块以及大薯条
+</code></pre>
+<h2 id="bot">七、Bot 互动模式</h2>
+<p>群内存在系统消息与命令式表情指令等 Bot/自动化机制，颜回momo 的 Bot 互动关键词为 5 项，且多为主动发起的创意指令，延续其脑洞整活人设。</p>
+<p>示例：</p>
+<pre><code>[2026-06-01 00:17:28] 颜回momo: [回复消息]把我变成小男孩
+[2026-06-01 00:17:35] 颜回momo: 别变成会爆炸那款
+</code></pre>
+<pre><code>[2026-06-04 19:31:07] 颜回momo: /摸鱼
+</code></pre>
+<p>观察结论：其对机器人的使用与其整体发言风格一致，机器人是玩梗道具而非功能工具；与枫糖总帅的 AI 整活存在同场联动，疑似共享玩梗文化圈。</p>
+<h2 id="_9">八、关键时刻</h2>
+<p>以下片段按时间顺序选取，均为可观察的完整对话场景。</p>
+<h3 id="1-ai-2026-06-01-0014-0018">片段1：六一凌晨 AI 整活联动（2026-06-01 00:14-00:18）</h3>
+<pre><code>[2026-06-01 00:14:22] 枫糖总帅: 豆包，帮我把群友变成儿童萝莉
+[2026-06-01 00:17:28] 颜回momo: [回复消息]把我变成小男孩
+[2026-06-01 00:17:35] 颜回momo: 别变成会爆炸那款
+[2026-06-01 00:17:42] 颜回momo: 我明天去幼儿园出差
+[2026-06-01 00:18:52] 波克洛克: [回复消息]@颜回momo 你别去教堂出差就行
+</code></pre>
+<p>分析：在枫糖总帅的 AI 整活指令下顺势接「把我变成小男孩」，并以「别变成会爆炸那款」「我明天去幼儿园出差」完成三段式自创段子，波克洛克以「教堂出差」接梗。展示其脑洞输出的即兴能力与整活圈层的默契。</p>
+<h3 id="22026-06-03-1015-1022">片段2：教学楼热量吐槽（2026-06-03 10:15-10:22）</h3>
+<pre><code>[2026-06-03 10:15:34] 颜回momo: 哦牛批教学楼内稳定比室外热
+[2026-06-03 10:15:42] 颜回momo: 焖肉呢搁这
+[2026-06-03 10:19:03] 2025立春: 哪个楼，没空调吗
+[2026-06-03 10:20:27] 颜回momo: 一教b
+[2026-06-03 10:22:05] 盲目痴愚之区: 我觉得还好
+[2026-06-03 10:22:20] 盲目痴愚之区: 比我没有空调的寝室好多了
+</code></pre>
+<p>分析：以「焖肉呢搁这」的方言化比喻吐槽教学楼高温，被问及地点后简洁回复「一教b」——典型的报点式回应，展示其场景化发言习惯。</p>
+<h3 id="32026-06-04-1922-1930">片段3：综合楼偶遇（2026-06-04 19:22-19:30）</h3>
+<pre><code>[2026-06-04 19:23:41] 颜回momo: [回复消息]你不会也在...
+[2026-06-04 19:23:50] 颜回momo: 综合楼b
+[2026-06-04 19:23:52] 颜回momo: 二楼
+[2026-06-04 19:26:40] 波克洛克: 果然红社成员之间，存在某种「引力」啊
+[2026-06-04 19:30:20] 苦来兮苦: 有无在综c203的
+[2026-06-04 19:30:34] 颜回momo: 在你隔壁
+[2026-06-04 19:30:54] 苦来兮苦: [摸鱼]
+[2026-06-04 19:30:59] 苦来兮苦: 204？
+</code></pre>
+<p>分析：通过精确坐标（综合楼b 二楼）与群友确认同处一栋楼，「在你隔壁」直接拉近空间距离，波克洛克以「红社成员之间存在引力」总结。这是其「空间连接者」角色的最典型场景。</p>
+<h3 id="42026-06-09-1125-1148">片段4：食堂连环吐槽（2026-06-09 11:25-11:48）</h3>
+<pre><code>[2026-06-09 11:25:42] 颜回momo: 哦妈咪食堂的东百窗口怎么关了
+[2026-06-09 11:27:42] 002: [图片]
+[2026-06-09 11:29:39] 波克洛克: 怎么都没退线代
+[2026-06-09 11:48:29] 颜回momo: 食堂肉酸的
+[2026-06-09 11:48:43] 颜回momo: 鸡肉是酸的
+</code></pre>
+<p>分析：先哀叹食堂窗口关闭，后抱怨菜品发酸，两条吐槽横跨同一时段的课间，展示其对食堂议题的持续关注，是五人画像中食堂话题最集中的成员。</p>
+<h3 id="52026-06-20-1732-1734">片段5：奶龙登场（2026-06-20 17:32-17:34）</h3>
+<pre><code>[2026-06-20 17:32:57] 颜回momo: 我是奶龙粑粑
+[2026-06-20 17:33:05] 颜回momo: 大家好
+[2026-06-20 17:33:26] 某个好人: 你好
+[2026-06-20 17:33:51] 系统消息: 某个好人揉了揉颜回momo的迪奥
+[2026-06-20 17:33:58] 颜回momo: 难道你也
+[2026-06-20 17:34:06] 颜回momo: 不高山抹茶河遇知音
+</code></pre>
+<p>分析：「我是奶龙粑粑/大家好」的自报家门式登场引发某个好人的配合互动，随后以「不高山抹茶河遇知音」收尾，将搞笑与文雅并置，展示其语言风格的弹性。同日早些时候还贡献了「七彩奶龙」「终极神圣气泡」等系列梗。</p>
+<h3 id="62026-07-04-2225-2228">片段6：蜘蛛观察（2026-07-04 22:25-22:28）</h3>
+<pre><code>[2026-07-04 22:25:45] 颜回momo: 成功绷住
+[2026-07-04 22:25:51] 颜回momo: 蜘蛛有点扫码
+[2026-07-04 22:26:05] 颜回momo: 在长桥上拉反载具蜘蛛网
+[2026-07-04 22:26:51] 颜回momo: 傻福蜘蛛
+[2026-07-04 22:27:20] 25鱼缸bluelue: 压力一只蜘蛛？
+[2026-07-04 22:27:53] 波克洛克: [回复消息]@颜回momo 古筝计划
+[2026-07-04 22:28:23] 颜回momo: 这蜘蛛有点聪明
+</code></pre>
+<p>分析：将蜘蛛织网观察升级为「反载具蜘蛛网」的军事化脑洞，波克洛克以「古筝计划」（三体梗）接住。展示其把日常小事转化为连环梗的能力，是脑洞型人设的巅峰时刻。</p>
+<h3 id="72026-07-10-1429">片段7：星露谷同好互认（2026-07-10 14:29）</h3>
+<pre><code>[2026-07-10 14:29:47] 颜回momo: 认得的星露谷玩家已经在酿酒了
+[2026-07-10 14:30:11] 异乡: @25 呜 你看PPT了吗？
+</code></pre>
+<p>分析：以星露谷玩家「酿酒」梗展示游戏圈层知识，虽未在此片段获得直接回应，但同日在食堂与游戏话题上的持续输出显示其话题的多样性。</p>
+<h3 id="82026-08-04-0059-0109">片段8：深夜狂欢（2026-08-04 00:59-01:09）</h3>
+<pre><code>[2026-08-04 00:59:24] 颜回momo: [图片]
+[2026-08-04 00:59:32] 颜回momo: 好想吃
+[2026-08-04 01:00:27] 波克洛克: 好想吃
+[2026-08-04 01:01:10] 颜回momo: 想吃一份kfc疯狂星期四两份鸡块一份原味鸡，一份麦当劳里俩1+1和一份小食拼盘，一份华莱士两套鸡肉卷汉堡套餐，一份正新鸡排的大鸡排陪香肠，再来一份塔斯汀双堡和鸡块以及大薯条
+[2026-08-04 01:01:44] 颜回momo: @25-电子🐟 我先来的
+[2026-08-04 01:02:09] 颜回momo: @秋水祀 来我家
+[2026-08-04 01:02:14] 颜回momo: 我家很大
+[2026-08-04 01:02:19] 颜回momo: 有啤酒和面包
+[2026-08-04 01:03:45] 颜回momo: 鸿蒙牛逼
+[2026-08-04 01:04:48] 颜回momo: 蘑菇是地球ol新手礼包自带所以不会过期
+[2026-08-04 01:05:57] 颜回momo: 想起来我之前也是三块钱赎回我的初武
+[2026-08-04 01:08:45] 颜回momo: 别人：各种气泡\n我：默认气泡\n就很…
+[2026-08-04 01:09:46] 颜回momo: 有没有xnn
+</code></pre>
+<p>分析：观察期内的「深夜全能秀」：凌晨 1 点连发美食执念（超长点单）、喜剧化线下邀约（来我家）、科技赞叹（鸿蒙牛逼）、游戏梗（地球ol 礼包、初武）与自嘲（默认气泡），展示其深夜活跃时的完整风格谱系——脑洞、直率、自嘲与社交邀请并置。</p>
+<h2 id="_10">九、局限性声明</h2>
+<ul>
+<li>本报告仅基于 2026-06-01 至 2026-08-05 的群聊文本与抽样片段，不含私聊、语音与图片内容解析，画像仅反映群聊公开场景下的行为。</li>
+<li>该用户活跃仅 58 天，存在 06-28、07-02、07-19、07-21 至 07-23、07-26 等缺勤日，断档期间行为无法观察。</li>
+<li>图片消息 231 条未被解析，部分表达可能依赖图片完成。</li>
+<li>群内存在昵称「颜回」（发送 3 条消息）的另一成员，与「颜回momo」疑似存在同名关系，两者是否同一人无法从数据确认。</li>
+<li>「回复目标」中的「26」「25」等条目疑似 QQ 群内昵称截断导致的显示片段，无法确认具体指代。</li>
+<li>关键词分类基于规则匹配，可能存在误分；所有「疑似」「推测」类结论均为统计分析推断，不构成对真实人格的定论。</li>
+</ul>
+<h2 id="_11">十、附录</h2>
+<ul>
+<li>数据来源：<code>.output/chat_stats.json</code>，抽样片段覆盖完整时间范围（10 个抽样时段，2026-06-01 至 2026-08-04）。</li>
+<li>生成方式：对 44632 条群消息按发送者聚合统计，结合按用户提取的完整文本（1147 条）逐条阅读并选取上下文片段。</li>
+<li>统计口径：回复速度以该用户作为回复方计算；关键词分类基于消息文本规则匹配。</li>
+<li>片段选取原则：优先选择同一时间窗口内的连续对话，人物发言保留原文，图片消息以 <code>[图片]</code> 占位。</li>
+</ul>
+
+<footer>
+    <a href="https://github.com/JularDepick/ChatAnalysis.SKILL" target="_blank" rel="noopener noreferrer">
+        SKILL技术支持·ChatAnalysis
+    </a>
+</footer>
+
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    function apply(t) {
+        if (t === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ 浅色';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            btn.textContent = '🌙 暗色';
+        }
+    }
+    apply(localStorage.getItem('theme') || 'light');
+    btn.addEventListener('click', function() {
+        var next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
+    });
+})();
+</script>
+</body>
+</html>

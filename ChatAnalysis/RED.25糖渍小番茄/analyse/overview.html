@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>群聊总览：RED.25糖渍小番茄</title>
+<script>
+(function() {
+    var t = localStorage.getItem('theme') || 'light';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --text: #1d1d1f;
+    --text-muted: #86868b;
+    --accent: #007aff;
+    --accent-hover: #0056b3;
+    --link: #007aff;
+    --link-hover: #0056b3;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --code-bg: #f5f5f7;
+    --code-color: #c0392b;
+    --pre-color: #6c5ce7;
+    --table-header-bg: #f5f5f7;
+    --hover-bg: rgba(0,0,0,0.03);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --blockquote-bg: rgba(0,122,255,0.04);
+    --blockquote-border: #007aff;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+}
+
+:root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --link: #0a84ff;
+    --link-hover: #409cff;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.2);
+    --code-bg: #1c1c1e;
+    --code-color: #f48fb1;
+    --pre-color: #ce93d8;
+    --table-header-bg: #1c1c1e;
+    --hover-bg: rgba(255,255,255,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --blockquote-bg: rgba(10,132,255,0.08);
+    --blockquote-border: #0a84ff;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+
+body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* ===== 主题切换按钮 ===== */
+.theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--surface);
+    color: var(--text); font-size: 13px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
+}
+.theme-toggle:hover { background: var(--hover-bg); border-color: var(--border-strong); }
+
+/* ===== 面包屑 ===== */
+.breadcrumb {
+    padding: 8px 0; margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); }
+.breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+
+/* ===== 排版 ===== */
+h1 { font-size: 1.8em; font-weight: 700; margin: 0 0 24px; line-height: 1.3; }
+h2 { font-size: 1.4em; font-weight: 700; margin: 40px 0 16px; line-height: 1.35; }
+h3 { font-size: 1.15em; font-weight: 600; margin: 24px 0 8px; line-height: 1.4; }
+h4 { font-size: 1em; font-weight: 600; margin: 16px 0 4px; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ===== 表格 ===== */
+table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13px;
+}
+th, td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th { background: var(--table-header-bg); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: var(--hover-bg); }
+
+/* ===== 代码块 ===== */
+pre {
+    background: var(--code-bg); color: var(--pre-color);
+    padding: 16px 20px; border-radius: 10px;
+    overflow-x: auto; font-size: 0.88em; line-height: 1.6;
+    margin: 16px 0;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono",
+                 "Cascadia Code", Consolas, monospace;
+}
+code {
+    background: var(--code-bg); color: var(--code-color);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* ===== 引用块 ===== */
+blockquote {
+    border-left: 3px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted); font-size: 0.95em;
+}
+
+/* ===== 高危区块 ===== */
+.danger-block {
+    border-left: 4px solid var(--danger);
+    background: color-mix(in srgb, var(--danger) 6%, transparent);
+    padding: 14px 18px; margin: 16px 0;
+    border-radius: 0 10px 10px 0;
+}
+.danger-block::before {
+    content: "⚠️ 高危提醒";
+    display: block; font-weight: 700; color: var(--danger);
+    margin-bottom: 8px; font-size: 0.9em;
+}
+
+/* ===== 折叠块 ===== */
+.collapsed-links { margin: 8px 0; }
+.collapsed-links summary {
+    cursor: pointer; font-weight: 600; padding: 8px 0;
+    color: var(--text-muted); font-size: 13px;
+}
+.collapsed-links summary:hover { color: var(--link); }
+
+/* ===== 排行榜 ===== */
+.leaderboard-item {
+    display: grid; grid-template-columns: 40px 1fr auto 120px;
+    align-items: center; gap: 8px;
+    padding: 12px 16px; margin: 4px 0;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+}
+.leaderboard-item:hover { background: var(--hover-bg); text-decoration: none; }
+.leaderboard-rank { font-weight: 700; font-size: 1.1em; color: var(--text-muted); text-align: center; }
+.leaderboard-rank.top3 { color: var(--accent); }
+.leaderboard-name { font-weight: 600; }
+.leaderboard-count { font-size: 13px; color: var(--text-muted); }
+.leaderboard-bar { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.leaderboard-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ===== 首页卡片 ===== */
+.home-section { margin: 32px 0; }
+.home-section h2 { margin-bottom: 12px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+    background: var(--surface); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block; color: var(--text); text-decoration: none;
+}
+.card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-2px);
+    text-decoration: none;
+}
+.card h3 { margin: 0 0 8px; }
+.card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.card-count {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--surface2); font-size: 12px; color: var(--text-muted);
+}
+
+/* ===== 首页统计 ===== */
+.stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin: 24px 0;
+}
+.stat-item {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-num { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== 页脚 ===== */
+footer {
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-muted);
+}
+footer a { color: var(--text-muted); }
+footer a:hover { color: var(--link); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px; }
+    .theme-toggle { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .leaderboard-bar { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .leaderboard-item { grid-template-columns: 32px 1fr auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙 暗色</button>
+<div class="container">
+<div class="breadcrumb"><a href="../index.html">首页</a><span class="sep">›</span><a href="index.html">统计分析</a><span class="sep">›</span><span>群聊总览：RED.25糖渍小番茄</span></div>
+
+<h1 id="red25">群聊总览：RED.25糖渍小番茄</h1>
+<h2 id="_1">群聊基本信息</h2>
+<p>本报告针对 QQ 群聊「RED.25糖渍小番茄」的完整导出数据进行统计分析。以下是群聊的基本信息概览：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">项目</th>
+<th style="text-align: center;">数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">平台</td>
+<td style="text-align: center;">QQ</td>
+</tr>
+<tr>
+<td style="text-align: center;">群聊名称</td>
+<td style="text-align: center;">RED.25糖渍小番茄</td>
+</tr>
+<tr>
+<td style="text-align: center;">消息格式</td>
+<td style="text-align: center;">文本导出</td>
+</tr>
+<tr>
+<td style="text-align: center;">统计范围起始</td>
+<td style="text-align: center;">2026-06-01</td>
+</tr>
+<tr>
+<td style="text-align: center;">统计范围结束</td>
+<td style="text-align: center;">2026-08-05</td>
+</tr>
+<tr>
+<td style="text-align: center;">活跃天数</td>
+<td style="text-align: center;">66 天</td>
+</tr>
+<tr>
+<td style="text-align: center;">统计范围内总天数</td>
+<td style="text-align: center;">66 天</td>
+</tr>
+<tr>
+<td style="text-align: center;">消息总数</td>
+<td style="text-align: center;">44,632 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">发送者总数</td>
+<td style="text-align: center;">173 位</td>
+</tr>
+<tr>
+<td style="text-align: center;">对话轮次</td>
+<td style="text-align: center;">552 轮</td>
+</tr>
+<tr>
+<td style="text-align: center;">日均消息量</td>
+<td style="text-align: center;">约 676 条</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，该群在统计区间内每一天都有消息产生，66 个自然日全部处于活跃状态，属于持续运营的活跃群聊。群聊命名为「糖渍小番茄」，群内成员昵称大量带有年份前缀（如 25、26），并且聊天内容中频繁出现高数、微积分、近纲、期末考试等大学生活相关词汇，可以判断这是一个以大学生为主的群聊。</p>
+<p>群聊首日的开场场景也体现了成员的年轻化与玩梗氛围。2026 年 6 月 1 日 0 时许，成员以一轮节日祝福接龙开启了群聊历史：</p>
+<pre><code>得胜已是定局：六一快乐孩子们
+苦来兮苦：母亲节快乐
+群斟茶兵：情人节快乐
+永雏伯虎：重阳节快乐
+某个好人：元旦快乐
+波克洛克：风花节快乐
+</code></pre>
+<h2 id="_2">消息总量与活跃度</h2>
+<p>在 44,632 条消息中，除去系统提示类消息后，实际由群成员产生的对话内容仍然占据绝对主体。整体活跃度在时间维度上呈现出明显的阶段性差异，这一点会在时间活跃度分析中展开。此处仅给出总量级数据：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">指标</th>
+<th style="text-align: center;">数值</th>
+<th style="text-align: center;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">消息总数</td>
+<td style="text-align: center;">44,632</td>
+<td style="text-align: center;">全部已解析消息</td>
+</tr>
+<tr>
+<td style="text-align: center;">有效消息</td>
+<td style="text-align: center;">44,632</td>
+<td style="text-align: center;">无失效消息</td>
+</tr>
+<tr>
+<td style="text-align: center;">日均消息</td>
+<td style="text-align: center;">约 676</td>
+<td style="text-align: center;">按 66 天平均</td>
+</tr>
+<tr>
+<td style="text-align: center;">最高单日消息</td>
+<td style="text-align: center;">1,939</td>
+<td style="text-align: center;">发生于 2026-06-29</td>
+</tr>
+<tr>
+<td style="text-align: center;">最低单日消息</td>
+<td style="text-align: center;">149</td>
+<td style="text-align: center;">发生于 2026-07-20</td>
+</tr>
+<tr>
+<td style="text-align: center;">群聊首日</td>
+<td style="text-align: center;">597</td>
+<td style="text-align: center;">2026-06-01</td>
+</tr>
+</tbody>
+</table>
+<p>群聊在 6 月上旬与下旬保持了较高的活跃度，进入 7 月下旬后整体热度下降，这与高校期末复习、暑假放假的时间线高度吻合。抽样片段也印证了这种校园生活的节奏感：</p>
+<pre><code>颜回momo：牛逼，最后一节近纲来了快1/2人
+颜回momo：老师竟然没爆
+26瓦斯：一样
+得胜已是定局：我们这周一就已经结束最后一节
+</code></pre>
+<h2 id="_3">消息类型分布</h2>
+<p>44,632 条消息中，文本消息占据最大比例，图片消息次之。消息类型分布如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">消息类型</th>
+<th style="text-align: center;">数量</th>
+<th style="text-align: center;">占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">text（文本）</td>
+<td style="text-align: center;">29,110</td>
+<td style="text-align: center;">65.22%</td>
+</tr>
+<tr>
+<td style="text-align: center;">image（图片）</td>
+<td style="text-align: center;">8,730</td>
+<td style="text-align: center;">19.56%</td>
+</tr>
+<tr>
+<td style="text-align: center;">reply（回复）</td>
+<td style="text-align: center;">6,024</td>
+<td style="text-align: center;">13.50%</td>
+</tr>
+<tr>
+<td style="text-align: center;">other_bracket（括号类）</td>
+<td style="text-align: center;">409</td>
+<td style="text-align: center;">0.92%</td>
+</tr>
+<tr>
+<td style="text-align: center;">forward（转发）</td>
+<td style="text-align: center;">275</td>
+<td style="text-align: center;">0.62%</td>
+</tr>
+<tr>
+<td style="text-align: center;">video（视频）</td>
+<td style="text-align: center;">57</td>
+<td style="text-align: center;">0.13%</td>
+</tr>
+<tr>
+<td style="text-align: center;">file（文件）</td>
+<td style="text-align: center;">24</td>
+<td style="text-align: center;">0.05%</td>
+</tr>
+<tr>
+<td style="text-align: center;">voice（语音）</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">0.01%</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，图片消息占比接近五分之一，群聊的「斗图」文化明显。回复型消息超过六千条，说明成员之间的互动具有较强的指向性。转发、文件、语音等类型数量较少，属于补充性内容。抽样片段中，图片消息穿插于文本之间，呈现出图文交错的对话节奏：</p>
+<pre><code>得胜已是定局：[图片:171BA00C589703252E4E1BE7C4D8DA72.jpg]
+波克洛克：[图片:C2223FA5E2ADEDD553B9AF6117810842.jpg]
+苦来兮苦：母亲节快乐
+群斟茶兵：情人节快乐
+</code></pre>
+<p>各类型的组合可以进一步刻画群聊的表达偏好：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">表达偏好</th>
+<th style="text-align: center;">数据表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">以文为主</td>
+<td style="text-align: center;">文本占 65.22%</td>
+</tr>
+<tr>
+<td style="text-align: center;">图文并重</td>
+<td style="text-align: center;">图片占 19.56%，图文比 0.30</td>
+</tr>
+<tr>
+<td style="text-align: center;">强调指向性</td>
+<td style="text-align: center;">回复型占 13.50%</td>
+</tr>
+<tr>
+<td style="text-align: center;">轻多媒体</td>
+<td style="text-align: center;">转发/视频/文件/语音合计约 0.81%</td>
+</tr>
+</tbody>
+</table>
+<h2 id="top10">TOP10 发送者</h2>
+<p>按消息总量排序，活跃度最高的前 10 位发送者如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">排名</th>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">消息数</th>
+<th style="text-align: center;">文本数</th>
+<th style="text-align: center;">图片数</th>
+<th style="text-align: center;">活跃天数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">3,737</td>
+<td style="text-align: center;">1,655</td>
+<td style="text-align: center;">700</td>
+<td style="text-align: center;">66</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">3,692</td>
+<td style="text-align: center;">2,223</td>
+<td style="text-align: center;">329</td>
+<td style="text-align: center;">66</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">3,375</td>
+<td style="text-align: center;">3,042</td>
+<td style="text-align: center;">211</td>
+<td style="text-align: center;">63</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">2,228</td>
+<td style="text-align: center;">995</td>
+<td style="text-align: center;">895</td>
+<td style="text-align: center;">64</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">番茄斗罗</td>
+<td style="text-align: center;">2,011</td>
+<td style="text-align: center;">1,468</td>
+<td style="text-align: center;">347</td>
+<td style="text-align: center;">66</td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">得胜已是定局</td>
+<td style="text-align: center;">1,893</td>
+<td style="text-align: center;">未单列</td>
+<td style="text-align: center;">764</td>
+<td style="text-align: center;">66</td>
+</tr>
+<tr>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">苦来兮苦</td>
+<td style="text-align: center;">1,834</td>
+<td style="text-align: center;">未单列</td>
+<td style="text-align: center;">222</td>
+<td style="text-align: center;">66</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">雪花沉睡</td>
+<td style="text-align: center;">1,804</td>
+<td style="text-align: center;">未单列</td>
+<td style="text-align: center;">900</td>
+<td style="text-align: center;">66</td>
+</tr>
+<tr>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">1,635</td>
+<td style="text-align: center;">未单列</td>
+<td style="text-align: center;">313</td>
+<td style="text-align: center;">66</td>
+</tr>
+<tr>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">颜回momo</td>
+<td style="text-align: center;">1,554</td>
+<td style="text-align: center;">未单列</td>
+<td style="text-align: center;">231</td>
+<td style="text-align: center;">66</td>
+</tr>
+</tbody>
+</table>
+<p>前三位发送者均超过三千条消息，其中波克洛克与若至在整个 66 天统计区间内保持全勤。子路与雪花沉睡的图片消息数接近甚至超过其文本消息数，属于典型的图片主力用户。核心发送者的发言内容可从抽样中观察到：</p>
+<pre><code>26瓦斯：我们寝室11个人，只有我玩一堆游戏
+26瓦斯：人家都是玩一两个消遣一下
+若至：打熊会出现一大堆表情包
+若至：打出狗，和打出狗子出现的表情包不一样唉
+</code></pre>
+<h2 id="_4">核心活跃用户画像</h2>
+<p>从详细统计数据中可以进一步勾勒出核心成员的发言特征：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">总消息</th>
+<th style="text-align: center;">活跃天数</th>
+<th style="text-align: center;">个人高峰时段</th>
+<th style="text-align: center;">平均消息长度</th>
+<th style="text-align: center;">主要话题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">3,737</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">18 时（440 条）</td>
+<td style="text-align: center;">14.7</td>
+<td style="text-align: center;">日常生活、娱乐</td>
+</tr>
+<tr>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">3,692</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">18 时（552 条）</td>
+<td style="text-align: center;">14.8</td>
+<td style="text-align: center;">日常生活、学业/职场</td>
+</tr>
+<tr>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">3,375</td>
+<td style="text-align: center;">63</td>
+<td style="text-align: center;">18 时（443 条）</td>
+<td style="text-align: center;">8.1</td>
+<td style="text-align: center;">日常生活、学业/职场</td>
+</tr>
+<tr>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">2,228</td>
+<td style="text-align: center;">64</td>
+<td style="text-align: center;">15 时（260 条）</td>
+<td style="text-align: center;">8.2</td>
+<td style="text-align: center;">图片为主</td>
+</tr>
+<tr>
+<td style="text-align: center;">番茄斗罗</td>
+<td style="text-align: center;">2,011</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">傍晚集中</td>
+<td style="text-align: center;">8.3</td>
+<td style="text-align: center;">日常生活、学业/职场</td>
+</tr>
+<tr>
+<td style="text-align: center;">得胜已是定局</td>
+<td style="text-align: center;">1,893</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">傍晚集中</td>
+<td style="text-align: center;">8.0</td>
+<td style="text-align: center;">图片为主</td>
+</tr>
+<tr>
+<td style="text-align: center;">苦来兮苦</td>
+<td style="text-align: center;">1,834</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">傍晚集中</td>
+<td style="text-align: center;">8.8</td>
+<td style="text-align: center;">日常生活</td>
+</tr>
+<tr>
+<td style="text-align: center;">雪花沉睡</td>
+<td style="text-align: center;">1,804</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">傍晚集中</td>
+<td style="text-align: center;">8.3</td>
+<td style="text-align: center;">图片为主</td>
+</tr>
+<tr>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">1,635</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">傍晚集中</td>
+<td style="text-align: center;">12.7</td>
+<td style="text-align: center;">日常生活</td>
+</tr>
+<tr>
+<td style="text-align: center;">颜回momo</td>
+<td style="text-align: center;">1,554</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">傍晚集中</td>
+<td style="text-align: center;">10.5</td>
+<td style="text-align: center;">学业/职场、日常生活</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，绝大多数核心成员在 66 天内保持全勤，只有 26瓦斯（63 天）与子路（64 天）各缺勤数天。所有核心成员的个人活跃高峰都集中在傍晚时段（15-18 时），这与全群的高峰时段高度一致，说明傍晚是群聊讨论的黄金时间。</p>
+<h2 id="_5">关键词分类概览</h2>
+<p>统计数据将成员发言内容按话题类别进行了归类，全群各话题类别的关键词命中数如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">话题类别</th>
+<th style="text-align: center;">关键词命中数</th>
+<th style="text-align: center;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">日常生活</td>
+<td style="text-align: center;">1,356</td>
+<td style="text-align: center;">全群最高</td>
+</tr>
+<tr>
+<td style="text-align: center;">学业/职场</td>
+<td style="text-align: center;">898</td>
+<td style="text-align: center;">校园相关</td>
+</tr>
+<tr>
+<td style="text-align: center;">社交/关系</td>
+<td style="text-align: center;">470</td>
+<td style="text-align: center;">成员互动</td>
+</tr>
+<tr>
+<td style="text-align: center;">娱乐</td>
+<td style="text-align: center;">422</td>
+<td style="text-align: center;">休闲话题</td>
+</tr>
+<tr>
+<td style="text-align: center;">情绪</td>
+<td style="text-align: center;">180</td>
+<td style="text-align: center;">表达感受</td>
+</tr>
+<tr>
+<td style="text-align: center;">科技/AI</td>
+<td style="text-align: center;">174</td>
+<td style="text-align: center;">技术话题</td>
+</tr>
+<tr>
+<td style="text-align: center;">二次元/游戏</td>
+<td style="text-align: center;">163</td>
+<td style="text-align: center;">ACG 相关</td>
+</tr>
+<tr>
+<td style="text-align: center;">Bot互动</td>
+<td style="text-align: center;">121</td>
+<td style="text-align: center;">机器人互动</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，日常生活与学业/职场两类合计超过 2,200 次，占全部类别命中的一半以上，再次印证群聊内容围绕大学生活展开。各核心成员的话题侧重略有不同，例如波克洛克的日常生活类命中 152 次、学业/职场 47 次，若至的学业/职场命中达 143 次、日常生活 154 次，比例相对均衡。</p>
+<h2 id="_6">核心统计摘要</h2>
+<p>以下列出本统计中的若干核心指标，作为后续专项分析的入口：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">指标</th>
+<th style="text-align: center;">数值</th>
+<th style="text-align: center;">备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">中文高频词 Top1</td>
+<td style="text-align: center;">什么（1,009 次）</td>
+<td style="text-align: center;">疑问类用语为主</td>
+</tr>
+<tr>
+<td style="text-align: center;">Bot 撤回相关词</td>
+<td style="text-align: center;">撤回/回了/撤回了 各 780 左右</td>
+<td style="text-align: center;">来自 Bot 互动通知</td>
+</tr>
+<tr>
+<td style="text-align: center;">系统消息</td>
+<td style="text-align: center;">1,505 条</td>
+<td style="text-align: center;">多为拍一拍、揉一揉互动提示</td>
+</tr>
+<tr>
+<td style="text-align: center;">图片/文本比</td>
+<td style="text-align: center;">0.30</td>
+<td style="text-align: center;">图片 8,730 / 文本 29,110</td>
+</tr>
+<tr>
+<td style="text-align: center;">平均消息长度最高</td>
+<td style="text-align: center;">永世帝位 75.3</td>
+<td style="text-align: center;">低频长文用户</td>
+</tr>
+<tr>
+<td style="text-align: center;">平均消息长度最低</td>
+<td style="text-align: center;">雁过也 2.0</td>
+<td style="text-align: center;">极短消息用户</td>
+</tr>
+<tr>
+<td style="text-align: center;">关键词类别 Top1</td>
+<td style="text-align: center;">日常生活 1,356</td>
+<td style="text-align: center;">分类标签计数</td>
+</tr>
+<tr>
+<td style="text-align: center;">关键词类别 Top2</td>
+<td style="text-align: center;">学业/职场 898</td>
+<td style="text-align: center;">校园生活相关</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，群内高频词以口语化的疑问、感叹与日常用语为主，「什么」「怎么」「没有」「可以」等词汇占据前列，整体语言风格轻松随意。值得注意的是，「撤回」「回了」「条消息」等词汇的高频出现并非成员实际表达，而是 Bot 互动通知内容被计入词频的结果，相关细节在内容与语言分析中展开。</p>
+<h2 id="_7">系统消息说明</h2>
+<p>系统消息共 1,505 条，约占全部消息的 3.4%。系统消息的内容以「拍了拍」「揉了揉」等互动提示与「回应了你的消息」通知为主，属于 QQ 平台的自动生成内容。系统消息的计数占比较高，但其语言内容已被排除在词频统计之外，避免干扰对成员真实语言习惯的分析。抽样中可以观察到典型的系统消息形态：</p>
+<pre><code>系统消息：27柠柠揉了揉❄冰冰子💫 怪猎组322254106的头，要融化了....
+系统消息：秋水祀回应了你的消息:
+系统消息：波克洛克回应了你的消息:
+系统消息：25-历 808970305哲♂学群进来van踢了踢波克洛克的三国杀并写了一条好评
+</code></pre>
+<h2 id="_8">发送者梯队与活动断层</h2>
+<p>按发送量排名可以观察到明显的梯队分布。排名前 13 的发送者构成了核心活跃层，之后发送量出现明显下滑。数据中记录的显著断层如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">断层位置</th>
+<th style="text-align: center;">前一名</th>
+<th style="text-align: center;">前一名消息数</th>
+<th style="text-align: center;">后一名</th>
+<th style="text-align: center;">后一名消息数</th>
+<th style="text-align: center;">降幅</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">第 3 名后</td>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">3,375</td>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">2,228</td>
+<td style="text-align: center;">34.0%</td>
+</tr>
+<tr>
+<td style="text-align: center;">第 4 名后</td>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">2,228</td>
+<td style="text-align: center;">番茄斗罗</td>
+<td style="text-align: center;">2,011</td>
+<td style="text-align: center;">9.7%</td>
+</tr>
+<tr>
+<td style="text-align: center;">第 13 名后</td>
+<td style="text-align: center;">某个好人</td>
+<td style="text-align: center;">1,382</td>
+<td style="text-align: center;">26冶北风</td>
+<td style="text-align: center;">1,174</td>
+<td style="text-align: center;">15.1%</td>
+</tr>
+<tr>
+<td style="text-align: center;">第 16 名后</td>
+<td style="text-align: center;">002</td>
+<td style="text-align: center;">1,007</td>
+<td style="text-align: center;">( ᗜ ˰ ᗜ )（怀念河图版）</td>
+<td style="text-align: center;">822</td>
+<td style="text-align: center;">18.4%</td>
+</tr>
+<tr>
+<td style="text-align: center;">第 18 名后</td>
+<td style="text-align: center;">秋水祀</td>
+<td style="text-align: center;">810</td>
+<td style="text-align: center;">雪吻巧克力</td>
+<td style="text-align: center;">574</td>
+<td style="text-align: center;">29.1%</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，第 3 名到第 4 名之间存在最显著的活跃断层（降幅 34%），说明群聊的高频发言集中在少数核心成员手中，长尾成员分布广泛。第 16 名后的断层与昵称变更背景相关，属于群内成员改名导致的历史数据分段，在后续分析中按昵称合并解读。</p>
+<h2 id="_9">长尾成员概览</h2>
+<p>除核心成员外，群聊还拥有大量中低活跃度成员，构成了活跃度的长尾。以下为部分中位活跃成员的发送量：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">排名</th>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">消息数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">11</td>
+<td style="text-align: center;">系统消息</td>
+<td style="text-align: center;">1,505</td>
+</tr>
+<tr>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">赤焰琉霄</td>
+<td style="text-align: center;">1,497</td>
+</tr>
+<tr>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">某个好人</td>
+<td style="text-align: center;">1,382</td>
+</tr>
+<tr>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">26冶北风</td>
+<td style="text-align: center;">1,174</td>
+</tr>
+<tr>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">白金迪斯科</td>
+<td style="text-align: center;">1,031</td>
+</tr>
+<tr>
+<td style="text-align: center;">16</td>
+<td style="text-align: center;">002</td>
+<td style="text-align: center;">1,007</td>
+</tr>
+<tr>
+<td style="text-align: center;">17</td>
+<td style="text-align: center;">( ᗜ ˰ ᗜ )（怀念河图版）</td>
+<td style="text-align: center;">822</td>
+</tr>
+<tr>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">秋水祀</td>
+<td style="text-align: center;">810</td>
+</tr>
+<tr>
+<td style="text-align: center;">19</td>
+<td style="text-align: center;">雪吻巧克力</td>
+<td style="text-align: center;">574</td>
+</tr>
+<tr>
+<td style="text-align: center;">20</td>
+<td style="text-align: center;">~“.“”</td>
+<td style="text-align: center;">571</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，第 11 至第 20 名成员的发送量在 571 至 1,505 条之间，仍属于较活跃群体。第 20 名之后，发送量快速滑落到数百条甚至个位数，长尾分布显著。173 位发送者的结构意味着群聊成员基数大、参与层次丰富。</p>
+<h2 id="_10">小结</h2>
+<p>综合以上数据，RED.25糖渍小番茄 是一个成员基数大、单日活跃稳定的大学氛围群聊，文本与图片并重，回复互动占比高，核心活跃成员集中。66 天的统计区间内群聊从未断更，日均消息约 676 条，活跃度随学期节奏波动。核心成员在 66 天内基本全勤，傍晚是群聊最活跃的时段，日常生活与学业话题占据主导。</p>
+<p>本报告数据来源: .output/chat_stats.json, 抽样片段覆盖完整时间范围</p>
+
+<footer>
+    <a href="https://github.com/JularDepick/ChatAnalysis.SKILL" target="_blank" rel="noopener noreferrer">
+        SKILL技术支持·ChatAnalysis
+    </a>
+</footer>
+
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    function apply(t) {
+        if (t === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ 浅色';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            btn.textContent = '🌙 暗色';
+        }
+    }
+    apply(localStorage.getItem('theme') || 'light');
+    btn.addEventListener('click', function() {
+        var next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
+    });
+})();
+</script>
+</body>
+</html>

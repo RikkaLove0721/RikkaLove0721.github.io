@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RED.25糖渍小番茄 · 群文化与梗传播</title>
+<script>
+(function() {
+    var t = localStorage.getItem('theme') || 'light';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --text: #1d1d1f;
+    --text-muted: #86868b;
+    --accent: #007aff;
+    --accent-hover: #0056b3;
+    --link: #007aff;
+    --link-hover: #0056b3;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --code-bg: #f5f5f7;
+    --code-color: #c0392b;
+    --pre-color: #6c5ce7;
+    --table-header-bg: #f5f5f7;
+    --hover-bg: rgba(0,0,0,0.03);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --blockquote-bg: rgba(0,122,255,0.04);
+    --blockquote-border: #007aff;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+}
+
+:root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --link: #0a84ff;
+    --link-hover: #409cff;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.2);
+    --code-bg: #1c1c1e;
+    --code-color: #f48fb1;
+    --pre-color: #ce93d8;
+    --table-header-bg: #1c1c1e;
+    --hover-bg: rgba(255,255,255,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --blockquote-bg: rgba(10,132,255,0.08);
+    --blockquote-border: #0a84ff;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+
+body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* ===== 主题切换按钮 ===== */
+.theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--surface);
+    color: var(--text); font-size: 13px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
+}
+.theme-toggle:hover { background: var(--hover-bg); border-color: var(--border-strong); }
+
+/* ===== 面包屑 ===== */
+.breadcrumb {
+    padding: 8px 0; margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); }
+.breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+
+/* ===== 排版 ===== */
+h1 { font-size: 1.8em; font-weight: 700; margin: 0 0 24px; line-height: 1.3; }
+h2 { font-size: 1.4em; font-weight: 700; margin: 40px 0 16px; line-height: 1.35; }
+h3 { font-size: 1.15em; font-weight: 600; margin: 24px 0 8px; line-height: 1.4; }
+h4 { font-size: 1em; font-weight: 600; margin: 16px 0 4px; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ===== 表格 ===== */
+table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13px;
+}
+th, td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th { background: var(--table-header-bg); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: var(--hover-bg); }
+
+/* ===== 代码块 ===== */
+pre {
+    background: var(--code-bg); color: var(--pre-color);
+    padding: 16px 20px; border-radius: 10px;
+    overflow-x: auto; font-size: 0.88em; line-height: 1.6;
+    margin: 16px 0;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono",
+                 "Cascadia Code", Consolas, monospace;
+}
+code {
+    background: var(--code-bg); color: var(--code-color);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* ===== 引用块 ===== */
+blockquote {
+    border-left: 3px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted); font-size: 0.95em;
+}
+
+/* ===== 高危区块 ===== */
+.danger-block {
+    border-left: 4px solid var(--danger);
+    background: color-mix(in srgb, var(--danger) 6%, transparent);
+    padding: 14px 18px; margin: 16px 0;
+    border-radius: 0 10px 10px 0;
+}
+.danger-block::before {
+    content: "⚠️ 高危提醒";
+    display: block; font-weight: 700; color: var(--danger);
+    margin-bottom: 8px; font-size: 0.9em;
+}
+
+/* ===== 折叠块 ===== */
+.collapsed-links { margin: 8px 0; }
+.collapsed-links summary {
+    cursor: pointer; font-weight: 600; padding: 8px 0;
+    color: var(--text-muted); font-size: 13px;
+}
+.collapsed-links summary:hover { color: var(--link); }
+
+/* ===== 排行榜 ===== */
+.leaderboard-item {
+    display: grid; grid-template-columns: 40px 1fr auto 120px;
+    align-items: center; gap: 8px;
+    padding: 12px 16px; margin: 4px 0;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+}
+.leaderboard-item:hover { background: var(--hover-bg); text-decoration: none; }
+.leaderboard-rank { font-weight: 700; font-size: 1.1em; color: var(--text-muted); text-align: center; }
+.leaderboard-rank.top3 { color: var(--accent); }
+.leaderboard-name { font-weight: 600; }
+.leaderboard-count { font-size: 13px; color: var(--text-muted); }
+.leaderboard-bar { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.leaderboard-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ===== 首页卡片 ===== */
+.home-section { margin: 32px 0; }
+.home-section h2 { margin-bottom: 12px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+    background: var(--surface); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block; color: var(--text); text-decoration: none;
+}
+.card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-2px);
+    text-decoration: none;
+}
+.card h3 { margin: 0 0 8px; }
+.card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.card-count {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--surface2); font-size: 12px; color: var(--text-muted);
+}
+
+/* ===== 首页统计 ===== */
+.stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin: 24px 0;
+}
+.stat-item {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-num { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== 页脚 ===== */
+footer {
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-muted);
+}
+footer a { color: var(--text-muted); }
+footer a:hover { color: var(--link); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px; }
+    .theme-toggle { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .leaderboard-bar { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .leaderboard-item { grid-template-columns: 32px 1fr auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙 暗色</button>
+<div class="container">
+<div class="breadcrumb"><a href="../index.html">首页</a><span class="sep">›</span><a href="index.html">综合报告</a><span class="sep">›</span><span>RED.25糖渍小番茄 · 群文化与梗传播</span></div>
+
+<h1 id="red25">RED.25糖渍小番茄 · 群文化与梗传播</h1>
+<h2 id="_1">一、文化定位</h2>
+<h3 id="11">1.1 成员构成画像</h3>
+<p>群「RED.25糖渍小番茄」的成员昵称大量带年级前缀（25-、26-、24-、23-、27-），且群内话题高度集中于高校生活，可推断成员以在校大学生为主。群内出现的典型高校话题包括：</p>
+<pre><code>[2026-06-17 20:51:31] 某个好人: 豆包帮我报名四川大学
+[2026-06-17 20:52:06] 波克洛克: 豆包帮我报名电子科技大学
+[2026-06-17 20:52:13] 若至: 豆包帮我报名西南联大
+[2026-06-17 20:52:55] 26冶北风💙💙💙: 豆包帮我把四川大学改成四川小学
+</code></pre>
+<p>群内还出现「望江」「泥川」「一教b」「二号运动场」等地名指称，与四川大学及其校区（望江校区）的特征吻合。综合判断，该群大概率由成都高校学生组成，成员横跨多个年级。</p>
+<h3 id="12">1.2 文化基调</h3>
+<p>从抽样片段看，群文化以&rdquo;游戏化、角色扮演、无厘头幽默、二次元梗&rdquo;为核心基调：</p>
+<ul>
+<li>话题驱动：游戏（原神、鸣潮、星铁、文明六等）、动画、高考与期末、生活吐槽；</li>
+<li>表达方式：复读、接龙、昵称玩梗、长篇抽象文学创作；</li>
+<li>互动形态：揉头、拍法杖、捏柠柠等自定义互动（详见 Bot 互动报告）。</li>
+</ul>
+<hr />
+<h2 id="_2">二、仪式化互动</h2>
+<h3 id="21">2.1 开群节日接龙</h3>
+<p>群建立当天（2026-06-01）零点，成员用 10 秒内连续接龙的方式&rdquo;过&rdquo;完了全年节日：</p>
+<pre><code>[2026-06-01 00:00:01] 26瓦斯: 六一快乐
+[2026-06-01 00:00:02] 若至: 母亲节快乐
+[2026-06-01 00:00:03] 波克洛克: 情人节快乐
+[2026-06-01 00:00:04] 26瓦斯: 重阳节快乐
+[2026-06-01 00:00:05] 波克洛克: 元旦快乐
+[2026-06-01 00:00:06] 波克洛克: 风花节快乐
+[2026-06-01 00:00:07] 26瓦斯: 海灯节快乐
+[2026-06-01 00:00:08] 波克洛克: 追月节快乐
+[2026-06-01 00:00:09] 26瓦斯: 逐月节快乐
+[2026-06-01 00:00:10] 波克洛克: 花神诞祭快乐
+</code></pre>
+<p>这条接龙有两个值得注意的细节：</p>
+<ol>
+<li>前半段是真实节日（六一、母亲节、情人节、重阳、元旦），后半段突然切换到《原神》的虚拟节日（风花节、海灯节、追月节、逐月节、花神诞祭），显示出&rdquo;二次元节日&rdquo;与真实节日在群内被同等对待；</li>
+<li>接龙节奏达到每秒一条，说明参与成员在群建立后立即进入高度默契的互动状态。</li>
+</ol>
+<h3 id="22">2.2 每日任务与今日挑战</h3>
+<p>群内由成员「26南梁改造工程 白祥」（昵称快照，下同）牵头，形成了一套&rdquo;每日任务/今日挑战&rdquo;发布仪式：</p>
+<pre><code>[2026-06-01 16:39:39] 枫糖总帅: 今日任务之突然说莫名其妙的话并且后面加上&quot;有没有懂的&quot;
+[2026-06-01 16:41:45] 波克洛克: @26南梁改造工程 白祥 给多少原石
+[2026-06-02 23:47:11] 波克洛克: @26南梁改造工程 白祥 每日任务:发布每日任务
+[2026-06-03 01:02:53] 波克洛克: @26南梁改造工程 白祥 你不发今日任务我上哪拿原石去
+[2026-06-11 16:45:45] 枫糖总帅: 今日挑战之突然在大街上展开领域（最好是时间系）
+</code></pre>
+<p>「每日任务」「原石」是《原神》的术语，群内将其移植到现实行为上，形成&rdquo;完成今日任务换取原石&rdquo;的游戏化设定。成员会把现实中的小事（&rdquo;去运动场上做一组引体向上&rdquo;）包装成任务：</p>
+<pre><code>[2026-06-04 21:57:07] 002: 今日任务：去运动场上做一组引体向上
+[2026-06-05 10:08:47] 26瓦斯: 我的每日任务啊
+</code></pre>
+<h3 id="23">2.3 揉冰子日常</h3>
+<p>「揉冰子」是最具辨识度的日常互动（详见 Bot 互动报告）：全群累计揉头 703 次，其中 640 次针对同一位成员「❄冰冰子💫 怪猎组322254106」。这一互动甚至被正式写进&rdquo;今日任务&rdquo;：</p>
+<pre><code>[2026-06-04 16:45:47] 波克洛克: 向着星辰和深渊！
+今日任务:揉冰子（0/1）
+奖励:原石✖️20
+</code></pre>
+<p>「向着星辰和深渊！」是《原神》前台角色凯瑟琳的开场白，此处被用作任务发布器的固定台词。揉冰子从一次互动演变成&rdquo;每日任务&rdquo;的一部分，是群文化中&rdquo;互动行为仪式化&rdquo;的典型样本。</p>
+<h3 id="24">2.4 歌曲接龙</h3>
+<p>开群当天凌晨，成员以《后来》（刘若英）歌词为素材进行接龙，并故意改写歌词：</p>
+<pre><code>[2026-06-01 00:22:58] 枫糖总帅: 后来
+[2026-06-01 00:24:12] 波克洛克: 我总算学会了
+[2026-06-01 00:24:35] 波克洛克: 早已消失在人海
+[2026-06-01 00:24:42] 枫糖总帅: 后来
+[2026-06-01 00:25:02] 枫糖总帅: 一旦搓过就不在
+[2026-06-01 00:25:27] 枫糖总帅: 栀子花
+</code></pre>
+<p>原歌词为&rdquo;有些人，一旦错过就不再&rdquo;，群内被改成&rdquo;一旦搓过就不在&rdquo;。&rdquo;搓&rdquo;与群内高频的&rdquo;揉&rdquo;互动形成呼应，属于&rdquo;把歌词改成群内梗&rdquo;的二次创作。这一接龙在六月反复出现（&rdquo;可后来，又偏偏是她&rdquo;、&rdquo;后来，再也没见过那夜似的好豆&rdquo;等），&rdquo;后来&rdquo;几乎成为群内的固定开场白。</p>
+<hr />
+<h2 id="_3">三、抽象表达与梗系统</h2>
+<h3 id="31">3.1 伪人、蒸馏与夺舍</h3>
+<p>&ldquo;伪人&rdquo;&ldquo;蒸馏&rdquo;&ldquo;夺舍&rdquo;三词在群内高频出现（相关提及 100 余处），构成一套关于&rdquo;身份造假与侵占&rdquo;的梗系统：</p>
+<ul>
+<li>「伪人」：指&rdquo;看似是群友、实际可能不是人&rdquo;的调侃，直接出现在成员昵称中——「25郁光望月（高阶伪人）」；</li>
+<li>「蒸馏」：指&rdquo;把群友提纯/改造&rdquo;的抽象说法；</li>
+<li>「夺舍」：指&rdquo;精神被侵占&rdquo;的修仙梗。</li>
+</ul>
+<p>典型场景（集中于 8 月 4 日）：</p>
+<pre><code>[2026-08-04] 枫糖总帅: 马上准备把群友全部蒸馏一下
+[2026-08-04] 波克洛克: 其实我是伪人
+[2026-08-04] 波克洛克: 以后夺舍你就参考这个
+</code></pre>
+<p>更早的六月语境中，&rdquo;夺舍&rdquo;已被用于评价群友状态：</p>
+<pre><code>[2026-06-17 11:23:53] 枫糖总帅: 被夺舍了
+[2026-06-17 11:32:31] 青釭剑: 竟能抗击夺舍
+</code></pre>
+<p>这套梗系统的特点是把&rdquo;AI 话题&rdquo;和&rdquo;修仙玄幻&rdquo;混在一起，用来调侃群友的异常发言。当某人的发言风格突变时，群友就会用&rdquo;被夺舍了&rdquo;&ldquo;伪人&rdquo;来调侃。</p>
+<h3 id="32">3.2 南梁与男娘</h3>
+<p>「南梁」「男娘」是群内另一套高频梗，直接进入昵称系统——「26南梁改造工程 白祥」就是核心成员在六月的昵称（对应活跃层成员枫糖总帅）。</p>
+<p>群内对&rdquo;男娘&rdquo;话题有大量讨论：</p>
+<pre><code>[2026-06-05 10:24:43] 番茄斗罗: 男娘？
+[2026-06-05 10:25:36] 若至: 还有男娘？
+[2026-06-05 10:42:37] 若至: 我男娘😋😋😋
+
+[2026-06-11 09:03:56] 枫糖总帅: 南梁和给是一类吗
+[2026-06-11 09:05:45] 26冶北风💙💙💙: 男娘本身可以细分我说
+[2026-06-11 09:06:21] 若至: 是一类的，都是性压抑的表现
+</code></pre>
+<p>昵称「26南梁改造工程 白祥」将&rdquo;南梁&rdquo;（男娘谐音）与&rdquo;改造工程&rdquo;组合，形成一本正经的调侃式工程命名，是群内&rdquo;用词条造人设&rdquo;的典型手法。相关的自定义互动&rdquo;拍了拍白祥的法杖，被改造成了猫娘&rdquo;也强化了这一人设。</p>
+<h3 id="33">3.3 奶龙</h3>
+<p>「奶龙」是 2025 年以来流行的表情包角色，群内将其与豆包绑定：</p>
+<pre><code>[2026-06-23 21:16:22] 26冶北风💙💙💙: 豆包是奶龙
+[2026-08-04 01:04:28] 波克洛克: @26 雷火剑 可惜你错过了他的奶龙时期
+</code></pre>
+<p>群内还出现过以&rdquo;奶龙&rdquo;为主角的魔改转发文案（&rdquo;美国人当场羞辱奶龙，说奶龙只会玩原神喊芭芭拉冲呀……&rdquo;），属于典型的&rdquo;转发魔改&rdquo;梗传播行为。</p>
+<h3 id="34">3.4 张雪峰与巧乐兹</h3>
+<p>「张雪峰」是群内的高频文化符号。成员青釭剑在 6 月 17 日发布长篇文言文《张氏子彪列传》，以仿《史记》笔法戏谑张雪峰：</p>
+<pre><code>[2026-06-17 20:47] 波克洛克: 《张氏子彪列传》
+[2026-06-17 20:49:07] 青釭剑: 张氏子彪，世称雪峰，齐州富裕人也。……昔公尝戏言：&quot;勿玩原神，当效科比。&quot;一语成谶。……
+</code></pre>
+<p>该文把张雪峰、巧乐兹（其直播名场面）、原神（&rdquo;勿玩原神&rdquo;）等元素编织进文言文，属于群内原创的&rdquo;梗文学&rdquo;代表作。巧乐兹本身也是群内反复出现的食物梗：</p>
+<pre><code>[2026-06-02 00:08:41] 某个好人: 哦对了，刚刚想查巧乐兹零售价，结果发现豆包有文字狱
+[2026-06-02 00:04] 某个好人: 这必须要回来啊，当年的五块钱放现在可是几根巧乐兹啊
+</code></pre>
+<h3 id="35">3.5 豆包扮演</h3>
+<p>&ldquo;豆包&rdquo;在本群不是真实 AI，而是由成员若至等人扮演的&rdquo;人工 AI&rdquo;（详见 Bot 互动报告）。成员以&rdquo;豆包，帮我……&rdquo;句式提出各种无厘头请求，扮演者借机发挥：</p>
+<pre><code>[2026-06-01 00:14:22] 枫糖总帅: 豆包，帮我把群友变成儿童萝莉
+[2026-06-01 00:17:28] 颜回momo: 把我变成小男孩
+
+[2026-06-17 20:51:31] 某个好人: 豆包帮我报名四川大学
+[2026-06-17 20:52:13] 若至: 豆包帮我报名西南联大
+</code></pre>
+<p>豆包扮演让&rdquo;与 AI 对话&rdquo;变成了群内的集体行为艺术，其模式与&rdquo;每日任务&rdquo;一脉相承：都是&rdquo;以虚构系统为框架、用真实互动填充&rdquo;的游戏化表达。</p>
+<hr />
+<h2 id="_4">四、游戏文化</h2>
+<h3 id="41">4.1 米哈游系游戏</h3>
+<p>《原神》是群内渗透最深的文化元素：</p>
+<ul>
+<li>虚拟节日进入接龙清单（风花节、海灯节、追月节、逐月节、花神诞祭）；</li>
+<li>「原石」成为&rdquo;每日任务&rdquo;的奖励货币；</li>
+<li>凯瑟琳台词「向着星辰和深渊！」被用作任务发布器固定开头；</li>
+<li>「请问可以用原石支付吗」等衍生表达常态化。</li>
+</ul>
+<p>《崩坏：星穹铁道》同样有存在感，成员以游戏术语互相对话：</p>
+<pre><code>[2026-06-09 16:55:09] 波克洛克: @25郁光望月（高阶伪人） 听我的抽彦卿，最强冰系巡猎
+</code></pre>
+<p>《鸣潮》《崩坏3》等也有提及（&rdquo;鸣潮虽然现在很好但是玩不动了&rdquo;）。</p>
+<h3 id="42">4.2 多游戏并行</h3>
+<p>群内游戏话题覆盖面广，除米哈游系外还包括：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">游戏</th>
+<th style="text-align: center;">群内痕迹</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">文明六</td>
+<td style="text-align: center;">&ldquo;我元旦在打文明六，过年在打文明六，情人节在打文明六……&rdquo;</td>
+</tr>
+<tr>
+<td style="text-align: center;">怪物猎人</td>
+<td style="text-align: center;">昵称「❄冰冰子💫 怪猎组322254106」</td>
+</tr>
+<tr>
+<td style="text-align: center;">初音未来相关</td>
+<td style="text-align: center;">&ldquo;米库是不是初音未来&rdquo;</td>
+</tr>
+<tr>
+<td style="text-align: center;">植物大战僵尸</td>
+<td style="text-align: center;">昵称「小喷菇」</td>
+</tr>
+</tbody>
+</table>
+<p>游戏不只是话题，还渗入了成员昵称（如&rdquo;怪猎组&rdquo;后缀、&rdquo;小喷菇&rdquo;）和日常表达，形成&rdquo;游戏化生活&rdquo;的群风。</p>
+<h3 id="43">4.3 游戏化叙事</h3>
+<p>群内成员擅长把现实事件改写成游戏/文学叙事。例如波克洛克在 8 月 3 日发布的长篇叙事，将&rdquo;温泉旅店打工&rdquo;、&rdquo;拔神刀&rdquo;、&rdquo;遇见巫女服幼刀&rdquo;组合成一个完整故事（&rdquo;她是守护这片土地的幼刀，因为这一拔，她便成了唯独缠着我的幽灵&rdquo;）。这类&rdquo;把日常过成设定&rdquo;的创作倾向，是该群文化的底层逻辑。</p>
+<hr />
+<h2 id="_5">五、复读与接龙传统</h2>
+<h3 id="51">5.1 复读</h3>
+<p>群内存在高度默契的复读行为。6 月 4 日晚，成员针对&rdquo;还好在一教b&rdquo;连续复读：</p>
+<pre><code>[2026-06-04 19:35:12] 若至: 还好在一教b
+[2026-06-04 19:35:13] 苦来兮苦: 还好在一教b
+[2026-06-04 19:35:15] 番茄斗罗: 还好在一教b
+[2026-06-04 19:35:17] 波克洛克: 还好在一教b
+[2026-06-04 19:35:18] 枫糖总帅: 还好在一教b
+[2026-06-04 19:35:20] 苦来兮苦: 还好在一教b
+[2026-06-04 19:35:21] 26瓦斯: 还好在一教b
+</code></pre>
+<p>复读的意义在于&rdquo;同步情绪&rdquo;：当一个成员抛出金句，其他成员通过重复来表达认同，同时用叠加的刷屏效果制造喜剧感。类似的复读还出现在&rdquo;人山人海&rdquo;（群内接&rdquo;人少人海&rdquo;）等场景中。</p>
+<h3 id="52">5.2 昵称文化</h3>
+<p>昵称是群文化的重要载体，主要玩法包括：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">玩法</th>
+<th style="text-align: center;">实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">梗入昵称</td>
+<td style="text-align: center;">26南梁改造工程 白祥、25郁光望月（高阶伪人）</td>
+</tr>
+<tr>
+<td style="text-align: center;">拟官化</td>
+<td style="text-align: center;">群主、群内委员、群心理委员、群斟茶兵、群托鸽、群线充、群龙王</td>
+</tr>
+<tr>
+<td style="text-align: center;">游戏元素</td>
+<td style="text-align: center;">❄冰冰子💫 怪猎组322254106、小喷菇</td>
+</tr>
+<tr>
+<td style="text-align: center;">纪念性改名</td>
+<td style="text-align: center;">(ᗜ˰ᗜ)（怀念河图版）、25 白祥（怀念张雪峰版）</td>
+</tr>
+</tbody>
+</table>
+<p>&ldquo;怀念河图版&rdquo;&ldquo;怀念张雪峰版&rdquo;这类后缀说明成员会用改名来表达对某位人物/某个梗的&rdquo;纪念&rdquo;，昵称成为梗传播的存档位。群主为日常管理员，群内委员、群心理委员等&rdquo;官职&rdquo;则属于戏谑的官方体系，进一步强化角色扮演氛围。</p>
+<hr />
+<h2 id="_6">六、群内文学创作</h2>
+<h3 id="61">6.1 抽象文学</h3>
+<p>群内存在明显的&rdquo;抽象文学&rdquo;创作传统，即用严肃文体写荒诞内容：</p>
+<ol>
+<li>波克洛克 6 月 1 日发布的《！？区区？！》，以高考作文格式写一篇关于&rdquo;区&rdquo;的讽刺文，全文数千字，被群友评论&rdquo;迅哥笔法&rdquo;：</li>
+</ol>
+<pre><code>[2026-06-01 15:48:06] オトナシアリス: 迅哥笔法
+</code></pre>
+<ol start="2">
+<li>子路 7 月 25 日发布&rdquo;医学版白雪公主&rdquo;，把医学名词（血栓性外痔、光氨酸结石、柏油样便、内痔）套进童话：</li>
+</ol>
+<pre><code>[2026-07-25 20:10:56] 子路: 很久很久之前，一所三甲里有一位正高级王后，她常年穿着血栓性外痔一般暗紫色的衣服……
+</code></pre>
+<ol start="3">
+<li>青釭剑的《张氏子彪列传》（见 3.4）。</li>
+</ol>
+<h3 id="62">6.2 梗文学</h3>
+<p>除长篇创作外，还有大量短篇梗文学，例如若至把化学知识写成拟人故事：</p>
+<pre><code>[2026-06-14 23:38:49] 若至: 什么时候画电解水的本子，电极把氢离子夺走，氢氧根想去夺回来，结果氢离子已经恶堕成氢气了，看到氢气变成这样，氢氧根自刎归天()
+</code></pre>
+<p>这类创作把学科知识、网络梗（恶堕、本子）、童话（白雪公主）任意拼接，体现了群成员&rdquo;将任何素材改造成梗&rdquo;的能力。</p>
+<hr />
+<h2 id="_7">七、梗的传播机制</h2>
+<h3 id="71">7.1 从内容到身份</h3>
+<p>群内梗的传播遵循&rdquo;内容 → 昵称 → 身份&rdquo;的路径：</p>
+<ul>
+<li>先是出现一个梗（如&rdquo;南梁&rdquo;&ldquo;伪人&rdquo;&ldquo;夺舍&rdquo;）；</li>
+<li>成员把梗写进昵称（26南梁改造工程 白祥、25郁光望月（高阶伪人））；</li>
+<li>昵称反过来成为后续互动的目标（&rdquo;拍了拍白祥的法杖，被改造成了猫娘&rdquo;）。</li>
+</ul>
+<p>梗一旦进入昵称和互动模板，就完成了&rdquo;制度化&rdquo;，具有长期存续的生命力。</p>
+<h3 id="72">7.2 从个别到惯例</h3>
+<p>&ldquo;揉冰子&rdquo;&ldquo;每日任务&rdquo;&ldquo;后来接龙&rdquo;都是从个别行为演变为惯例的：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">起始行为</th>
+<th style="text-align: center;">演变结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">某次揉头互动</td>
+<td style="text-align: center;">累计 640 次针对冰冰子的固定日常</td>
+</tr>
+<tr>
+<td style="text-align: center;">某次&rdquo;今日任务&rdquo;发布</td>
+<td style="text-align: center;">形成每日发布任务、群友催更原石的机制</td>
+</tr>
+<tr>
+<td style="text-align: center;">某次&rdquo;后来&rdquo;接龙</td>
+<td style="text-align: center;">形成反复出现的固定开场白</td>
+</tr>
+</tbody>
+</table>
+<p>惯例一旦形成，就成为新成员融入群文化的&rdquo;入门内容&rdquo;。</p>
+<h3 id="73">7.3 跨群流动</h3>
+<p>群内存在大量带其他群后缀的昵称（如&rdquo;怪猎组322254106&rdquo;&ldquo;文字游戏群&rdquo;&ldquo;番剧群&rdquo;&ldquo;恋爱群&rdquo;&ldquo;nikke群&rdquo;），并出现转发其他群的聊天记录与文案（男娘讨论、奶龙文案、猪博会宣传等）。这说明群并非封闭孤岛，梗在群与群之间流动，该群同时是梗的接收方和二次加工方。</p>
+<hr />
+<h2 id="_8">八、总结</h2>
+<h3 id="81">8.1 核心结论</h3>
+<ol>
+<li>群文化以&rdquo;游戏化、角色扮演、无厘头幽默、二次元梗&rdquo;为基调，成员以成都高校学生为主；</li>
+<li>存在成熟的仪式化互动：节日接龙、每日任务、揉冰子、歌曲接龙；</li>
+<li>梗系统分层清晰：伪人/蒸馏/夺舍、南梁/男娘、奶龙、张雪峰/巧乐兹、豆包扮演各自成体系；</li>
+<li>昵称是梗的核心载体，成员通过改名实现&rdquo;内容 → 身份&rdquo;的转化；</li>
+<li>群内有活跃的抽象文学创作传统，严肃文体与荒诞内容混搭。</li>
+</ol>
+<h3 id="82">8.2 建议</h3>
+<ul>
+<li>若需留存群文化，可考虑整理《！？区区？！》《张氏子彪列传》等原创文本；</li>
+<li>昵称类梗（南梁改造工程、高阶伪人）随时间推移会被再次改名覆盖，如需存档应及时记录。</li>
+</ul>
+<p>本报告数据来源: .output/chat_stats.json, 抽样片段覆盖完整时间范围</p>
+
+<footer>
+    <a href="https://github.com/JularDepick/ChatAnalysis.SKILL" target="_blank" rel="noopener noreferrer">
+        SKILL技术支持·ChatAnalysis
+    </a>
+</footer>
+
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    function apply(t) {
+        if (t === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ 浅色';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            btn.textContent = '🌙 暗色';
+        }
+    }
+    apply(localStorage.getItem('theme') || 'light');
+    btn.addEventListener('click', function() {
+        var next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
+    });
+})();
+</script>
+</body>
+</html>

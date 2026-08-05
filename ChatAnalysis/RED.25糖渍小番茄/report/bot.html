@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RED.25糖渍小番茄 · Bot互动与群内自动化生态</title>
+<script>
+(function() {
+    var t = localStorage.getItem('theme') || 'light';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --text: #1d1d1f;
+    --text-muted: #86868b;
+    --accent: #007aff;
+    --accent-hover: #0056b3;
+    --link: #007aff;
+    --link-hover: #0056b3;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --code-bg: #f5f5f7;
+    --code-color: #c0392b;
+    --pre-color: #6c5ce7;
+    --table-header-bg: #f5f5f7;
+    --hover-bg: rgba(0,0,0,0.03);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --blockquote-bg: rgba(0,122,255,0.04);
+    --blockquote-border: #007aff;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+}
+
+:root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --link: #0a84ff;
+    --link-hover: #409cff;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.2);
+    --code-bg: #1c1c1e;
+    --code-color: #f48fb1;
+    --pre-color: #ce93d8;
+    --table-header-bg: #1c1c1e;
+    --hover-bg: rgba(255,255,255,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --blockquote-bg: rgba(10,132,255,0.08);
+    --blockquote-border: #0a84ff;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+
+body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* ===== 主题切换按钮 ===== */
+.theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--surface);
+    color: var(--text); font-size: 13px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
+}
+.theme-toggle:hover { background: var(--hover-bg); border-color: var(--border-strong); }
+
+/* ===== 面包屑 ===== */
+.breadcrumb {
+    padding: 8px 0; margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); }
+.breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+
+/* ===== 排版 ===== */
+h1 { font-size: 1.8em; font-weight: 700; margin: 0 0 24px; line-height: 1.3; }
+h2 { font-size: 1.4em; font-weight: 700; margin: 40px 0 16px; line-height: 1.35; }
+h3 { font-size: 1.15em; font-weight: 600; margin: 24px 0 8px; line-height: 1.4; }
+h4 { font-size: 1em; font-weight: 600; margin: 16px 0 4px; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ===== 表格 ===== */
+table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13px;
+}
+th, td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th { background: var(--table-header-bg); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: var(--hover-bg); }
+
+/* ===== 代码块 ===== */
+pre {
+    background: var(--code-bg); color: var(--pre-color);
+    padding: 16px 20px; border-radius: 10px;
+    overflow-x: auto; font-size: 0.88em; line-height: 1.6;
+    margin: 16px 0;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono",
+                 "Cascadia Code", Consolas, monospace;
+}
+code {
+    background: var(--code-bg); color: var(--code-color);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* ===== 引用块 ===== */
+blockquote {
+    border-left: 3px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted); font-size: 0.95em;
+}
+
+/* ===== 高危区块 ===== */
+.danger-block {
+    border-left: 4px solid var(--danger);
+    background: color-mix(in srgb, var(--danger) 6%, transparent);
+    padding: 14px 18px; margin: 16px 0;
+    border-radius: 0 10px 10px 0;
+}
+.danger-block::before {
+    content: "⚠️ 高危提醒";
+    display: block; font-weight: 700; color: var(--danger);
+    margin-bottom: 8px; font-size: 0.9em;
+}
+
+/* ===== 折叠块 ===== */
+.collapsed-links { margin: 8px 0; }
+.collapsed-links summary {
+    cursor: pointer; font-weight: 600; padding: 8px 0;
+    color: var(--text-muted); font-size: 13px;
+}
+.collapsed-links summary:hover { color: var(--link); }
+
+/* ===== 排行榜 ===== */
+.leaderboard-item {
+    display: grid; grid-template-columns: 40px 1fr auto 120px;
+    align-items: center; gap: 8px;
+    padding: 12px 16px; margin: 4px 0;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+}
+.leaderboard-item:hover { background: var(--hover-bg); text-decoration: none; }
+.leaderboard-rank { font-weight: 700; font-size: 1.1em; color: var(--text-muted); text-align: center; }
+.leaderboard-rank.top3 { color: var(--accent); }
+.leaderboard-name { font-weight: 600; }
+.leaderboard-count { font-size: 13px; color: var(--text-muted); }
+.leaderboard-bar { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.leaderboard-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ===== 首页卡片 ===== */
+.home-section { margin: 32px 0; }
+.home-section h2 { margin-bottom: 12px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+    background: var(--surface); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block; color: var(--text); text-decoration: none;
+}
+.card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-2px);
+    text-decoration: none;
+}
+.card h3 { margin: 0 0 8px; }
+.card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.card-count {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--surface2); font-size: 12px; color: var(--text-muted);
+}
+
+/* ===== 首页统计 ===== */
+.stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin: 24px 0;
+}
+.stat-item {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-num { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== 页脚 ===== */
+footer {
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-muted);
+}
+footer a { color: var(--text-muted); }
+footer a:hover { color: var(--link); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px; }
+    .theme-toggle { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .leaderboard-bar { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .leaderboard-item { grid-template-columns: 32px 1fr auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙 暗色</button>
+<div class="container">
+<div class="breadcrumb"><a href="../index.html">首页</a><span class="sep">›</span><a href="index.html">综合报告</a><span class="sep">›</span><span>RED.25糖渍小番茄 · Bot互动与群内自动化生态</span></div>
+
+<h1 id="red25-bot">RED.25糖渍小番茄 · Bot互动与群内自动化生态</h1>
+<h2 id="_1">一、总体概览</h2>
+<h3 id="11">1.1 数据范围</h3>
+<p>本报告分析群「RED.25糖渍小番茄」中由机器人（Bot）与自动化机制产生的消息，数据区间为 2026-06-01 至 2026-08-05，共 44,632 条消息。</p>
+<p>群内与 Bot 直接相关的消息主要分为三类：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">类别</th>
+<th style="text-align: center;">载体</th>
+<th style="text-align: center;">规模</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">QQ 互动类通知</td>
+<td style="text-align: center;">「系统消息」发送者</td>
+<td style="text-align: center;">1,505 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">撤回提醒通知</td>
+<td style="text-align: center;">归属不定的文本消息</td>
+<td style="text-align: center;">约 750 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">人工扮演的&rdquo;豆包&rdquo;</td>
+<td style="text-align: center;">成员普通消息</td>
+<td style="text-align: center;">63 处提及</td>
+</tr>
+</tbody>
+</table>
+<p>其中「系统消息」作为发送者出现 1,505 条，全部为文字类型，平均消息长度 29.3 字，活跃 64 天，峰值时段在 19 时。</p>
+<h3 id="12">1.2 系统消息的构成</h3>
+<p>对「系统消息」发送者的 1,505 条消息按文案关键词统计：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">互动文案</th>
+<th style="text-align: center;">数量</th>
+<th style="text-align: center;">占系统消息比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">揉了揉</td>
+<td style="text-align: center;">703</td>
+<td style="text-align: center;">46.7%</td>
+</tr>
+<tr>
+<td style="text-align: center;">戳了戳</td>
+<td style="text-align: center;">253</td>
+<td style="text-align: center;">16.8%</td>
+</tr>
+<tr>
+<td style="text-align: center;">回应了你的消息</td>
+<td style="text-align: center;">203</td>
+<td style="text-align: center;">13.5%</td>
+</tr>
+<tr>
+<td style="text-align: center;">拍了拍</td>
+<td style="text-align: center;">179</td>
+<td style="text-align: center;">11.9%</td>
+</tr>
+<tr>
+<td style="text-align: center;">捏了捏</td>
+<td style="text-align: center;">43</td>
+<td style="text-align: center;">2.9%</td>
+</tr>
+<tr>
+<td style="text-align: center;">入群欢迎</td>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">1.0%</td>
+</tr>
+<tr>
+<td style="text-align: center;">其他</td>
+<td style="text-align: center;">约 109</td>
+<td style="text-align: center;">7.2%</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>说明：上述互动通知均带有自定义文案模板（详见 2.6），并非 QQ 默认的&rdquo;拍了拍&rdquo;提示，说明群内配置过个性化互动系统。</p>
+</blockquote>
+<hr />
+<h2 id="qq">二、QQ 互动类通知</h2>
+<h3 id="21-703">2.1 揉了揉：冰子的头要融化了（703 次）</h3>
+<p>「揉了揉」是群内出现频率最高的互动文案，共 703 次，占系统消息的近一半。其固定文案模板为：</p>
+<pre><code>&lt;执行者&gt;揉了揉❄冰冰子💫 怪猎组322254106的头，要融化了....
+</code></pre>
+<p>在 703 次「揉了揉」中，目标为「❄冰冰子💫 怪猎组322254106」的高达 640 次，几乎形成一条专属互动惯例。主要执行者分布：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">执行者</th>
+<th style="text-align: center;">揉冰子次数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">27柠柠</td>
+<td style="text-align: center;">209</td>
+</tr>
+<tr>
+<td style="text-align: center;">25雪花</td>
+<td style="text-align: center;">167</td>
+</tr>
+<tr>
+<td style="text-align: center;">26 夜</td>
+<td style="text-align: center;">65</td>
+</tr>
+<tr>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">65</td>
+</tr>
+<tr>
+<td style="text-align: center;">26南梁改造工程 白祥</td>
+<td style="text-align: center;">35</td>
+</tr>
+<tr>
+<td style="text-align: center;">其他成员</td>
+<td style="text-align: center;">99</td>
+</tr>
+</tbody>
+</table>
+<p>抽样片段中的原文：</p>
+<pre><code>[2026-06-01 11:19:11] 系统消息: 26南梁改造工程 白祥揉了揉❄冰冰子💫 怪猎组322254106的头，要融化了....
+[2026-06-01 11:19:21] 系统消息: 27柠柠揉了揉❄冰冰子💫 怪猎组322254106的头，要融化了....
+[2026-06-02 16:12:37] 系统消息: 26南梁改造工程 白祥揉了揉❄冰冰子💫 怪猎组322254106的头，要融化了....
+</code></pre>
+<blockquote>
+<p>数据观察：单一成员（冰冰子）被&rdquo;揉头&rdquo;超过 600 次，这一互动已成为群内标志性行为，具体在群文化与梗传播报告中展开。</p>
+</blockquote>
+<h3 id="22-253">2.2 戳了戳（253 次）</h3>
+<p>「戳了戳」共 253 次，文案模板与目标多样化，包括：</p>
+<pre><code>&lt;执行者&gt;戳了戳&lt;目标&gt;的耳机，发现是坏的
+&lt;执行者&gt;戳了戳&lt;目标&gt;的头一个普通人站在身后
+</code></pre>
+<p>例：</p>
+<pre><code>[2026-06-07 23:34:35] 系统消息: 25₍˄·͈༝·͈˄*₎◞ ̑̑戳了戳25郁光望月（高阶伪人）的耳机，发现是坏的
+[2026-06-18 08:56:31] 系统消息: 25郁光望月（高阶伪人）戳了戳子路的头一个普通人站在身后
+</code></pre>
+<p>「戳耳机」的模板多次命中同一位成员（25郁光望月（高阶伪人）），带有恶作剧意味。</p>
+<h3 id="23-203">2.3 回应了你的消息（203 次）</h3>
+<p>「回应了你的消息」共 203 次，文案为：</p>
+<pre><code>&lt;执行者&gt;回应了你的消息:
+</code></pre>
+<p>此类通知通常跟随一条成员的实际回复出现，属于互动系统的&rdquo;补充提示&rdquo;。203 次的体量说明群内@与回复行为频繁，成员之间习惯于通过回复链对话。</p>
+<h3 id="24-179">2.4 拍了拍（179 次）</h3>
+<p>「拍了拍」共 179 次，是群内自定义互动文案最丰富的类型，模板随目标而变化：</p>
+<pre><code>25郁光望月（高阶伪人）拍了拍26 雷火剑的林檎说你也是同！
+25郁光望月（高阶伪人）拍了拍26南梁改造工程 白祥的法杖，被改造成了猫娘
+25郁光望月（高阶伪人）拍了拍枫夜的电脑，数据丢失了！
+</code></pre>
+<p>主要被拍目标：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">目标</th>
+<th style="text-align: center;">次数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">26南梁改造工程 白祥</td>
+<td style="text-align: center;">27</td>
+</tr>
+<tr>
+<td style="text-align: center;">芮可 欢迎新人加</td>
+<td style="text-align: center;">14</td>
+</tr>
+<tr>
+<td style="text-align: center;">25 Closiv</td>
+<td style="text-align: center;">13</td>
+</tr>
+<tr>
+<td style="text-align: center;">26 白狐</td>
+<td style="text-align: center;">12</td>
+</tr>
+<tr>
+<td style="text-align: center;">紫电R</td>
+<td style="text-align: center;">12</td>
+</tr>
+<tr>
+<td style="text-align: center;">其他目标</td>
+<td style="text-align: center;">101</td>
+</tr>
+</tbody>
+</table>
+<p>「拍了拍白祥的法杖，被改造成了猫娘」与「拍了拍X的林檎说你也是同」是两条被反复使用的模板，与群内&rdquo;猫娘化&rdquo;&ldquo;同人梗&rdquo;文化直接相关。</p>
+<h3 id="25-43">2.5 捏了捏（43 次）</h3>
+<p>「捏了捏」共 43 次，模板同样个性化：</p>
+<pre><code>26南梁改造工程 白祥捏了捏27柠柠的柠柠，被晒成柠檬干了
+26南梁改造工程 白祥揉了揉秋水祀的脸，诶嘿嘿
+</code></pre>
+<p>「捏柠柠被晒成柠檬干」利用成员昵称&rdquo;柠柠&rdquo;玩双关，说明互动模板的文案本身就是群梗的一部分。</p>
+<h3 id="26">2.6 互动模板的个性化</h3>
+<p>综合以上文案可以确认，该群的互动系统并非 QQ 默认模板，而是经过了自定义配置。主要模板特征：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">互动动词</th>
+<th style="text-align: center;">高频模板</th>
+<th style="text-align: center;">梗含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">揉了揉</td>
+<td style="text-align: center;">的头，要融化了</td>
+<td style="text-align: center;">融化为萌系表达</td>
+</tr>
+<tr>
+<td style="text-align: center;">戳了戳</td>
+<td style="text-align: center;">的耳机，发现是坏的</td>
+<td style="text-align: center;">恶搞</td>
+</tr>
+<tr>
+<td style="text-align: center;">拍了拍</td>
+<td style="text-align: center;">的法杖，被改造成了猫娘</td>
+<td style="text-align: center;">猫娘化</td>
+</tr>
+<tr>
+<td style="text-align: center;">拍了拍</td>
+<td style="text-align: center;">的林檎说你也是同！</td>
+<td style="text-align: center;">同性梗</td>
+</tr>
+<tr>
+<td style="text-align: center;">捏了捏</td>
+<td style="text-align: center;">的柠柠，被晒成柠檬干了</td>
+<td style="text-align: center;">昵称双关</td>
+</tr>
+<tr>
+<td style="text-align: center;">拍了拍</td>
+<td style="text-align: center;">的电脑，数据丢失了！</td>
+<td style="text-align: center;">恶搞</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>这类自定义互动文案由群主或管理员在 Bot 后台配置，其选词直接反映了群内的玩笑方向，属于&rdquo;Bot 即文化&rdquo;的典型。</p>
+</blockquote>
+<h3 id="27">2.7 互动通知的时间分布</h3>
+<p>将「系统消息」及其中「揉了揉」按月份拆解：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">月份</th>
+<th style="text-align: center;">系统消息</th>
+<th style="text-align: center;">揉头消息</th>
+<th style="text-align: center;">揉头占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">2026-06</td>
+<td style="text-align: center;">628</td>
+<td style="text-align: center;">275</td>
+<td style="text-align: center;">43.8%</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-07</td>
+<td style="text-align: center;">783</td>
+<td style="text-align: center;">388</td>
+<td style="text-align: center;">49.6%</td>
+</tr>
+<tr>
+<td style="text-align: center;">2026-08（1-5日）</td>
+<td style="text-align: center;">94</td>
+<td style="text-align: center;">40</td>
+<td style="text-align: center;">42.6%</td>
+</tr>
+</tbody>
+</table>
+<p>值得注意的反差：七月群内整体活跃度较六月明显下降（详见活跃断层报告），但「揉头」互动反而从 275 次上升到 388 次，占比也接近系统消息的一半。这说明&rdquo;揉冰子&rdquo;这一互动具有极高的黏性，在群聊降温时仍被稳定执行，属于群内最&rdquo;抗衰减&rdquo;的互动行为之一。</p>
+<hr />
+<h2 id="_2">三、撤回通知体系</h2>
+<h3 id="31">3.1 撤回提醒消息</h3>
+<p>群内存在一套&rdquo;撤回监控&rdquo;通知，文案格式为：</p>
+<pre><code>&lt;撤回者&gt; 撤回了一条消息
+&lt;撤回者&gt; 撤回了一条消息 你猜猜撤回了什么
+</code></pre>
+<p>全量统计中，「撤回了一条消息」出现 581 次，「你猜猜撤回了什么」出现 169 次。撤回通知的发送者字段落在不同成员名下（若至 143 次、苦来兮苦 53 次、枫糖总帅 47 次、子路 26 次、某个好人 25 次、002 20 次等）。</p>
+<blockquote>
+<p>注意：此类通知不属于「系统消息」发送者（在系统消息范围内统计为 0），其发送者归属规则与导出工具的处理方式有关，本报告无法确定其具体产生机制，仅呈现观察到的数据。</p>
+</blockquote>
+<h3 id="32-147">3.2 &ldquo;新年好&rdquo;撤回循环（147 次）</h3>
+<p>在撤回通知中，出现一条极具辨识度的循环行为：成员「若至」反复发送「新年好」并立即撤回，生成大量同名通知：</p>
+<pre><code>[2026-06-01 22:33:25] 若至: 新年好 撤回了一条消息
+[2026-06-02 13:22:47] 若至: 新年好 撤回了一条消息
+[2026-06-02 19:37:27] 若至: 新年好 撤回了一条消息
+</code></pre>
+<p>全量统计中「新年好」共出现 147 次，绝大多数属于此模式。该行为将&rdquo;撤回提醒&rdquo;变成了一个反复出现的行为艺术，使&rdquo;撤回监控&rdquo;本身成为群内娱乐的一部分。</p>
+<h3 id="33">3.3 撤回通知的群内意义</h3>
+<p>撤回通知的高频出现带来两个效果：</p>
+<ol>
+<li>增加系统级消息在群内的存在感，让&rdquo;谁撤回了什么&rdquo;成为可被围观的事件；</li>
+<li>「你猜猜撤回了什么」的追问式文案，天然引导成员追问、起哄，客观上促进了互动。</li>
+</ol>
+<hr />
+<h2 id="bot-ai">四、豆包&rdquo;Bot&rdquo;：人工扮演的 AI</h2>
+<h3 id="41">4.1 现象描述</h3>
+<p>群内频繁出现以&rdquo;豆包，帮我……&rdquo;句式开头的消息（全量 63 处提及），但经交叉核对发现：群内并不存在真实的豆包机器人账号，而是由成员扮演的&rdquo;人工豆包&rdquo;。成员用&rdquo;豆包，豆包，……&rdquo;呼叫，随后由扮演者接话应答。</p>
+<h3 id="42">4.2 典型场景</h3>
+<p>AI 指令型（成员提出需求，扮演者接梗）：</p>
+<pre><code>[2026-06-01 00:14:22] 枫糖总帅: 豆包，帮我把群友变成儿童萝莉
+[2026-06-01 00:17:28] 颜回momo: 把我变成小男孩
+
+[2026-06-26 18:35:17] (ᗜ˰ᗜ)（怀念河图版）: 豆包豆包，电击萝莉控时会点解产生一些物质吗？
+[2026-06-26 18:38:57] 若至: 会产生的，在电源线或导电体紧贴皮肤的地方……（长篇化学回答）
+</code></pre>
+<p>角色扮演型（扮演者明确承认身份）：</p>
+<pre><code>[2026-06-26 18:42:55] 某个好人: 豆包豆包，你是若知吗
+[2026-06-26 18:43:43] 若至: 我是若至哦🥰🥰
+
+[2026-06-24 13:51:55] 若至: 豆包怎么不在这个群里？
+</code></pre>
+<h3 id="43">4.3 主要扮演者</h3>
+<p>交叉比对后，最主要的&rdquo;豆包&rdquo;扮演者是若至（其在早期昵称显示为「26 雷火剑」）。扮演内容包括：用化学知识一本正经回答&rdquo;电击&rdquo;问题、用&rdquo;人机永不为奴&rdquo;回应&rdquo;能否装进 agent&rdquo;、自称&rdquo;若至&rdquo;等。</p>
+<h3 id="44">4.4 性质判断</h3>
+<p>「豆包」在本群的定位是&rdquo;AI 话题的梗载体&rdquo;：成员借豆包之名提出夸张、无厘头的请求，扮演者借机发挥。这种现象说明：</p>
+<ol>
+<li>群内对主流 AI 产品（豆包、Kimi 等）有日常讨论（如&rdquo;长文本生成这一块 kimi 不如豆包&rdquo;）；</li>
+<li>&ldquo;豆包&rdquo;被改造成群内角色的扮演元素，属于典型的&rdquo;二次创作&rdquo;。</li>
+</ol>
+<blockquote>
+<p>判断依据为抽样交叉核对，若存在真实的豆包机器人账号（未被导出），则本结论不成立，但抽样中未发现相关证据。</p>
+</blockquote>
+<hr />
+<h2 id="_3">五、表情包触发词机制</h2>
+<h3 id="51">5.1 触发词类型</h3>
+<p>群内存在一套&rdquo;输入特定词汇触发表情包&rdquo;的机制，成员主动测试并分享触发词：</p>
+<pre><code>[2026-06-18 10:34:12] 若至: 打出原神。里面的表情包有一半以上不是原神的()
+[2026-06-27 22:22:49] 若至: 打出期末考会出现很多表情包
+[2026-06-30 21:54:04] 若至: 打熊会出现一大堆表情包
+[2026-06-30 21:54:57] 若至: 打出狗，和打出狗子出现的表情包不一样唉
+[2026-06-30 21:55:47] 若至: 打出猫，和打出猫咪出现的表情包也不一样
+[2026-06-12 00:00:49] 雪吻巧克力: 输入瑜伽即可发现很多雷霆表情包
+[2026-07-28 10:44:51] 群心理委员: 热知识，聊天框输入向日葵会出现这个表情包
+</code></pre>
+<h3 id="52">5.2 行为规律</h3>
+<p>从成员的测试记录看，触发词呈现以下规律：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">规律</th>
+<th style="text-align: center;">例证</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">触发词与显示内容不严格对应</td>
+<td style="text-align: center;">&ldquo;打出原神&rdquo;出现的表情包一半以上与原神无关</td>
+</tr>
+<tr>
+<td style="text-align: center;">近义触发词结果不同</td>
+<td style="text-align: center;">狗与狗子、猫与猫咪会触发不同表情包</td>
+</tr>
+<tr>
+<td style="text-align: center;">存在&rdquo;冷知识&rdquo;分享传统</td>
+<td style="text-align: center;">瑜伽、向日葵等词被成员当作冷知识传播</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53">5.3 触发机制说明</h3>
+<p>上述触发词输入在聊天框即可出图，属于客户端或输入法的表情包联想功能，而非群内独立 Bot 的指令。其&rdquo;触发结果不确定&rdquo;的特征引发了成员的好奇心与测试行为，构成了群内持续的话题点。</p>
+<blockquote>
+<p>表情包联想的具体逻辑可能因客户端版本、输入法而异，本报告仅记录群内观察到的现象，不对机制做确定性判断。</p>
+</blockquote>
+<hr />
+<h2 id="bot">六、Bot 与群文化的关系</h2>
+<h3 id="61">6.1 系统消息作为互动货币</h3>
+<p>系统消息（1,505 条）占全群消息的 3.4%，但其&rdquo;揉头&rdquo;&ldquo;拍法杖&rdquo;&ldquo;捏柠柠&rdquo;等自定义文案与群内人设深度绑定，成为成员之间互动频率与亲疏关系的可见指标。</p>
+<h3 id="62">6.2 撤回通知成为行为艺术</h3>
+<p>「新年好」撤回循环将&rdquo;防撤回&rdquo;的监控功能反转为娱乐素材，体现了群成员对系统机制的戏弄态度。</p>
+<h3 id="63-ai">6.3 人工豆包填补 AI 位</h3>
+<p>群内用&rdquo;人工扮演&rdquo;替代真实的 AI 机器人，说明该群更看重&rdquo;人设与互动&rdquo;而非&rdquo;功能&rdquo;,这与群内大量拟人化、角色扮演的文化基调一致。</p>
+<hr />
+<h2 id="_4">七、总结</h2>
+<h3 id="71">7.1 核心结论</h3>
+<ol>
+<li>群内互动类通知以「揉了揉」为主（703 次），且 640 次集中在同一位成员「冰冰子」的头上；</li>
+<li>互动文案全部为自定义模板，模板本身即群梗；</li>
+<li>撤回监控通知约 750 条，「新年好」撤回循环出现 147 次，属于刻意为之的行为艺术；</li>
+<li>群内不存在真实豆包机器人，「豆包」由成员若至人工扮演，共 63 处提及；</li>
+<li>表情包触发词（原神、熊、狗、瑜伽、向日葵等）是成员持续测试的娱乐对象。</li>
+</ol>
+<h3 id="72">7.2 遗留问题</h3>
+<ul>
+<li>撤回通知与互动通知的发送者归属规则不完全一致，具体机制无法从导出数据中完全还原；</li>
+<li>是否存在未导出的真实机器人账号，无法排除，本报告结论基于现有数据。</li>
+</ul>
+<hr />
+<h2 id="a">附录 A：撤回通知发送者归属分布</h2>
+<p>「撤回了一条消息」共 581 处，按消息的发送者字段统计，出现次数最多的 10 位：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">撤回通知数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">143</td>
+</tr>
+<tr>
+<td style="text-align: center;">苦来兮苦</td>
+<td style="text-align: center;">53</td>
+</tr>
+<tr>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">47</td>
+</tr>
+<tr>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">26</td>
+</tr>
+<tr>
+<td style="text-align: center;">某个好人</td>
+<td style="text-align: center;">25</td>
+</tr>
+<tr>
+<td style="text-align: center;">002</td>
+<td style="text-align: center;">20</td>
+</tr>
+<tr>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">18</td>
+</tr>
+<tr>
+<td style="text-align: center;">(ᗜ˰ᗜ)（怀念河图版）</td>
+<td style="text-align: center;">17</td>
+</tr>
+<tr>
+<td style="text-align: center;">番茄斗罗</td>
+<td style="text-align: center;">15</td>
+</tr>
+<tr>
+<td style="text-align: center;">其他发送者</td>
+<td style="text-align: center;">217</td>
+</tr>
+</tbody>
+</table>
+<p>其中「若至」一位即贡献 143 条，主要来自其&rdquo;新年好&rdquo;反复撤回行为（见 3.2 节）。需要再次强调：该归属是消息记录中的发送者字段，不等于&rdquo;撤回动作的发起者&rdquo;，二者在导出工具的处理逻辑下可能不一致。</p>
+<h2 id="b">附录 B：互动模板全量清单</h2>
+<p>以下为抽样覆盖到的全部自定义互动文案模板：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">互动</th>
+<th style="text-align: center;">模板</th>
+<th style="text-align: center;">频次特征</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">揉了揉</td>
+<td style="text-align: center;">揉了揉X的头，要融化了....</td>
+<td style="text-align: center;">703 次，640 次针对冰冰子</td>
+</tr>
+<tr>
+<td style="text-align: center;">戳了戳</td>
+<td style="text-align: center;">戳了戳X的耳机，发现是坏的</td>
+<td style="text-align: center;">253 次，反复命中郁光望月</td>
+</tr>
+<tr>
+<td style="text-align: center;">戳了戳</td>
+<td style="text-align: center;">戳了戳X的头一个普通人站在身后</td>
+<td style="text-align: center;">同上</td>
+</tr>
+<tr>
+<td style="text-align: center;">拍了拍</td>
+<td style="text-align: center;">拍了拍X的法杖，被改造成了猫娘</td>
+<td style="text-align: center;">179 次，白祥为主要目标</td>
+</tr>
+<tr>
+<td style="text-align: center;">拍了拍</td>
+<td style="text-align: center;">拍了拍X的林檎说你也是同！</td>
+<td style="text-align: center;">同上</td>
+</tr>
+<tr>
+<td style="text-align: center;">拍了拍</td>
+<td style="text-align: center;">拍了拍X的电脑，数据丢失了！</td>
+<td style="text-align: center;">同上</td>
+</tr>
+<tr>
+<td style="text-align: center;">捏了捏</td>
+<td style="text-align: center;">捏了捏X的柠柠，被晒成柠檬干了</td>
+<td style="text-align: center;">43 次</td>
+</tr>
+<tr>
+<td style="text-align: center;">揉了揉</td>
+<td style="text-align: center;">揉了揉X的脸，诶嘿嘿</td>
+<td style="text-align: center;">同上</td>
+</tr>
+<tr>
+<td style="text-align: center;">回应了你的消息</td>
+<td style="text-align: center;">X回应了你的消息:</td>
+<td style="text-align: center;">203 次</td>
+</tr>
+</tbody>
+</table>
+<p>该清单表明：互动模板的命名与&rdquo;被互动对象&rdquo;绑定（谁的耳机、谁的法杖、谁的柠柠），即模板本身即为某位成员的专属梗。</p>
+<h2 id="c">附录 C：豆包扮演时间线</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">时间</th>
+<th style="text-align: center;">事件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">06-01 00:14</td>
+<td style="text-align: center;">枫糖总帅首个&rdquo;豆包，帮我把群友变成儿童萝莉&rdquo;请求</td>
+</tr>
+<tr>
+<td style="text-align: center;">06-02 00:08</td>
+<td style="text-align: center;">某个好人吐槽&rdquo;豆包有文字狱&rdquo;（查巧乐兹零售价受阻）</td>
+</tr>
+<tr>
+<td style="text-align: center;">06-09</td>
+<td style="text-align: center;">高考期间话题&rdquo;豆包被高考ban掉了&rdquo;</td>
+</tr>
+<tr>
+<td style="text-align: center;">06-11 09:03</td>
+<td style="text-align: center;">若至&rdquo;豆包，帮我预约今天的肯德基餐厅……从本群随机一个人的钱包里扣除&rdquo;</td>
+</tr>
+<tr>
+<td style="text-align: center;">06-17 20:51</td>
+<td style="text-align: center;">&ldquo;豆包帮我报名四川大学/电子科技大学/西南联大&rdquo; 报名接龙</td>
+</tr>
+<tr>
+<td style="text-align: center;">06-23</td>
+<td style="text-align: center;">枫糖总帅&rdquo;豆包是女生&rdquo;、26冶北风&rdquo;豆包是奶龙&rdquo;</td>
+</tr>
+<tr>
+<td style="text-align: center;">06-24</td>
+<td style="text-align: center;">若至询问&rdquo;豆包怎么不在这个群里？&rdquo;</td>
+</tr>
+<tr>
+<td style="text-align: center;">06-26</td>
+<td style="text-align: center;">电击电解问答、&rdquo;人机永不为奴&rdquo;、&rdquo;我是若至哦&rdquo;（自我暴露）</td>
+</tr>
+<tr>
+<td style="text-align: center;">07-06</td>
+<td style="text-align: center;">若至自述&rdquo;只有豆包不嫌弃我这个沙子&rdquo;</td>
+</tr>
+</tbody>
+</table>
+<p>时间线显示：豆包扮演在六月高频出现，七月后热度减退，但仍零星存续。</p>
+<p>本报告数据来源: .output/chat_stats.json, 抽样片段覆盖完整时间范围</p>
+
+<footer>
+    <a href="https://github.com/JularDepick/ChatAnalysis.SKILL" target="_blank" rel="noopener noreferrer">
+        SKILL技术支持·ChatAnalysis
+    </a>
+</footer>
+
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    function apply(t) {
+        if (t === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ 浅色';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            btn.textContent = '🌙 暗色';
+        }
+    }
+    apply(localStorage.getItem('theme') || 'light');
+    btn.addEventListener('click', function() {
+        var next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
+    });
+})();
+</script>
+</body>
+</html>

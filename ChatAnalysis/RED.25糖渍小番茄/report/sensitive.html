@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RED.25糖渍小番茄 · 敏感内容与边界报告</title>
+<script>
+(function() {
+    var t = localStorage.getItem('theme') || 'light';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --text: #1d1d1f;
+    --text-muted: #86868b;
+    --accent: #007aff;
+    --accent-hover: #0056b3;
+    --link: #007aff;
+    --link-hover: #0056b3;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --code-bg: #f5f5f7;
+    --code-color: #c0392b;
+    --pre-color: #6c5ce7;
+    --table-header-bg: #f5f5f7;
+    --hover-bg: rgba(0,0,0,0.03);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --blockquote-bg: rgba(0,122,255,0.04);
+    --blockquote-border: #007aff;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+}
+
+:root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --link: #0a84ff;
+    --link-hover: #409cff;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.2);
+    --code-bg: #1c1c1e;
+    --code-color: #f48fb1;
+    --pre-color: #ce93d8;
+    --table-header-bg: #1c1c1e;
+    --hover-bg: rgba(255,255,255,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --blockquote-bg: rgba(10,132,255,0.08);
+    --blockquote-border: #0a84ff;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+
+body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* ===== 主题切换按钮 ===== */
+.theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--surface);
+    color: var(--text); font-size: 13px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
+}
+.theme-toggle:hover { background: var(--hover-bg); border-color: var(--border-strong); }
+
+/* ===== 面包屑 ===== */
+.breadcrumb {
+    padding: 8px 0; margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); }
+.breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+
+/* ===== 排版 ===== */
+h1 { font-size: 1.8em; font-weight: 700; margin: 0 0 24px; line-height: 1.3; }
+h2 { font-size: 1.4em; font-weight: 700; margin: 40px 0 16px; line-height: 1.35; }
+h3 { font-size: 1.15em; font-weight: 600; margin: 24px 0 8px; line-height: 1.4; }
+h4 { font-size: 1em; font-weight: 600; margin: 16px 0 4px; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ===== 表格 ===== */
+table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13px;
+}
+th, td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th { background: var(--table-header-bg); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: var(--hover-bg); }
+
+/* ===== 代码块 ===== */
+pre {
+    background: var(--code-bg); color: var(--pre-color);
+    padding: 16px 20px; border-radius: 10px;
+    overflow-x: auto; font-size: 0.88em; line-height: 1.6;
+    margin: 16px 0;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono",
+                 "Cascadia Code", Consolas, monospace;
+}
+code {
+    background: var(--code-bg); color: var(--code-color);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* ===== 引用块 ===== */
+blockquote {
+    border-left: 3px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted); font-size: 0.95em;
+}
+
+/* ===== 高危区块 ===== */
+.danger-block {
+    border-left: 4px solid var(--danger);
+    background: color-mix(in srgb, var(--danger) 6%, transparent);
+    padding: 14px 18px; margin: 16px 0;
+    border-radius: 0 10px 10px 0;
+}
+.danger-block::before {
+    content: "⚠️ 高危提醒";
+    display: block; font-weight: 700; color: var(--danger);
+    margin-bottom: 8px; font-size: 0.9em;
+}
+
+/* ===== 折叠块 ===== */
+.collapsed-links { margin: 8px 0; }
+.collapsed-links summary {
+    cursor: pointer; font-weight: 600; padding: 8px 0;
+    color: var(--text-muted); font-size: 13px;
+}
+.collapsed-links summary:hover { color: var(--link); }
+
+/* ===== 排行榜 ===== */
+.leaderboard-item {
+    display: grid; grid-template-columns: 40px 1fr auto 120px;
+    align-items: center; gap: 8px;
+    padding: 12px 16px; margin: 4px 0;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+}
+.leaderboard-item:hover { background: var(--hover-bg); text-decoration: none; }
+.leaderboard-rank { font-weight: 700; font-size: 1.1em; color: var(--text-muted); text-align: center; }
+.leaderboard-rank.top3 { color: var(--accent); }
+.leaderboard-name { font-weight: 600; }
+.leaderboard-count { font-size: 13px; color: var(--text-muted); }
+.leaderboard-bar { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.leaderboard-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ===== 首页卡片 ===== */
+.home-section { margin: 32px 0; }
+.home-section h2 { margin-bottom: 12px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+    background: var(--surface); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block; color: var(--text); text-decoration: none;
+}
+.card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-2px);
+    text-decoration: none;
+}
+.card h3 { margin: 0 0 8px; }
+.card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.card-count {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--surface2); font-size: 12px; color: var(--text-muted);
+}
+
+/* ===== 首页统计 ===== */
+.stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin: 24px 0;
+}
+.stat-item {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-num { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== 页脚 ===== */
+footer {
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-muted);
+}
+footer a { color: var(--text-muted); }
+footer a:hover { color: var(--link); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px; }
+    .theme-toggle { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .leaderboard-bar { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .leaderboard-item { grid-template-columns: 32px 1fr auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙 暗色</button>
+<div class="container">
+<div class="breadcrumb"><a href="../index.html">首页</a><span class="sep">›</span><a href="index.html">综合报告</a><span class="sep">›</span><span>RED.25糖渍小番茄 · 敏感内容与边界报告</span></div>
+
+<h1 id="red25">RED.25糖渍小番茄 · 敏感内容与边界报告</h1>
+<h2 id="_1">一、检索口径与声明</h2>
+<h3 id="11">1.1 检索方法</h3>
+<p>本报告对 2026-06-01 至 2026-08-05 的全部 44,632 条消息做了关键词全文检索，覆盖以下类别：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">类别</th>
+<th style="text-align: center;">检索关键词</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">药品类</td>
+<td style="text-align: center;">伟哥、西地那非、药</td>
+</tr>
+<tr>
+<td style="text-align: center;">擦边意象类</td>
+<td style="text-align: center;">白丝、丝袜、死库水、擦边、涩</td>
+</tr>
+<tr>
+<td style="text-align: center;">涉性词汇类</td>
+<td style="text-align: center;">本子、簧片、doi、开房、约炮、裸男、裸照</td>
+</tr>
+<tr>
+<td style="text-align: center;">未成年话题类</td>
+<td style="text-align: center;">儿童、萝莉、萝莉控、幼</td>
+</tr>
+<tr>
+<td style="text-align: center;">其他低俗类</td>
+<td style="text-align: center;">猥亵、淫、恶堕</td>
+</tr>
+</tbody>
+</table>
+<p>检索结果与抽样片段交叉验证后，按&rdquo;严重 / 一般争议 / 轻度擦边&rdquo;三级归类。</p>
+<h3 id="12">1.2 全量关键词命中统计</h3>
+<p>全部 44,632 条消息的原始命中次数如下（同一消息内多次命中不重复计）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">关键词</th>
+<th style="text-align: center;">命中</th>
+<th style="text-align: center;">关键词</th>
+<th style="text-align: center;">命中</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">猫娘</td>
+<td style="text-align: center;">91</td>
+<td style="text-align: center;">萝莉</td>
+<td style="text-align: center;">77</td>
+</tr>
+<tr>
+<td style="text-align: center;">cos</td>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">儿童</td>
+<td style="text-align: center;">24</td>
+</tr>
+<tr>
+<td style="text-align: center;">萝莉控</td>
+<td style="text-align: center;">19</td>
+<td style="text-align: center;">涩</td>
+<td style="text-align: center;">16</td>
+</tr>
+<tr>
+<td style="text-align: center;">女装</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">本子</td>
+<td style="text-align: center;">8</td>
+</tr>
+<tr>
+<td style="text-align: center;">淫</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">伟哥</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr>
+<td style="text-align: center;">白丝</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">西地那非</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr>
+<td style="text-align: center;">裸照</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">制服</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr>
+<td style="text-align: center;">丝袜</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">死库水</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">簧片</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">开房</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">裸男</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">幼女</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">猥亵</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">恶堕</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">doi</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">约炮</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">擦边</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">涩涩</td>
+<td style="text-align: center;">0</td>
+</tr>
+</tbody>
+</table>
+<p>重要说明：<strong>关键词命中数不等于敏感内容数</strong>。上表中猫娘（91 次）、cos（26 次）、儿童（24 次）等的高频命中，主要来自系统互动模板（&rdquo;被改造成了猫娘&rdquo;）、角色扮演话题与节日调侃，属于中性或轻度内容，需结合语境判定。真正构成&rdquo;敏感候选&rdquo;的条目，详见正文第三至五章逐条分析。</p>
+<h3 id="13">1.3 处理规则说明</h3>
+<p>按照本项目敏感内容处理规范：</p>
+<ul>
+<li>严重违法或实质性色情内容：以 HTML 注释 <code>&lt;!-- sensitive-start: 类型 --&gt; ... &lt;!-- sensitive-end --&gt;</code> 包裹，且只做转述、不逐字引用；</li>
+<li>一般争议性言论：以 <code>&gt; ⚠️ 以下内容可能包含争议性言论</code> 引用块提示；</li>
+<li>轻度擦边内容：在转述基础上注明出处与频次。</li>
+</ul>
+<blockquote>
+<p>用户已明确要求本报告&rdquo;不脱敏、不隐藏&rdquo;，因此以下内容保留完整类别与频次信息，仅在展示形式上按上述规则处理。</p>
+</blockquote>
+<h3 id="14">1.4 检索结论摘要</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">级别</th>
+<th style="text-align: center;">定义</th>
+<th style="text-align: center;">发现数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">严重</td>
+<td style="text-align: center;">违法、实质性色情、未成年侵害</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr>
+<td style="text-align: center;">一般争议</td>
+<td style="text-align: center;">性话题、低俗玩笑、药品玩笑</td>
+<td style="text-align: center;">约 20</td>
+</tr>
+<tr>
+<td style="text-align: center;">轻度擦边</td>
+<td style="text-align: center;">白丝/丝袜/萝莉等二次元意象调侃</td>
+<td style="text-align: center;">约 10</td>
+</tr>
+</tbody>
+</table>
+<p>总体结论：在现有数据范围内，<strong>未发现严重违法内容或实质性色情内容</strong>。群内敏感内容集中于&rdquo;擦边玩笑、性话题调侃、二次元梗&rdquo;层面，且基本都带有明显的戏谑语境。</p>
+<hr />
+<h2 id="_2">二、药品玩笑类</h2>
+<h3 id="21-1">2.1 西地那非话题（1 处对话）</h3>
+<p>2026-06-05 晚，群内围绕&rdquo;伟哥&rdquo;发生了一段对话，内容为药品识别玩笑：</p>
+<blockquote>
+<p>⚠️ 以下内容可能包含争议性言论</p>
+</blockquote>
+<pre><code>[2026-06-05 18:10:20] 002: 这是伟哥吗
+[2026-06-05 18:10:32] 若至: [回复消息]西地那非片()
+[2026-06-05 18:10:59] 若至: 化学生不说伟哥，只说西地那非
+</code></pre>
+<p>分析：对话本质是&rdquo;化学系学生用学名替换俗名&rdquo;的知识梗，不涉及真实用药行为，也未延伸到疗效、购买渠道等话题，属于典型的学生间玩笑。处理级别：一般争议，转述即可，不做逐字引用以外的展开。</p>
+<h3 id="22">2.2 其他药品提及</h3>
+<p>全量检索中未发现处方药交易、滥用指导等实质内容。群内&rdquo;药&rdquo;字相关讨论多为&rdquo;用药知识科普&rdquo;类的正常话题（如宿舍卫生、日常用药咨询），不构成敏感内容。</p>
+<hr />
+<h2 id="_3">三、擦边意象类</h2>
+<h3 id="31-3">3.1 白丝/丝袜/死库水发言（3 处，均为同一成员）</h3>
+<p>以下三条发言均由成员「枫糖总帅」发出，时间跨度从 6 月延伸至 7 月底：</p>
+<details><summary>⚠️ 敏感内容（擦边意象）— 点击展开</summary><div class="danger-block"><ul>
+<li>2026-06-08：向群友发问&rdquo;是否喜欢白丝小萝莉猫娘&rdquo;，属二次元偏好调侃；</li>
+<li>2026-06-30：表示想看&rdquo;死库水加白丝&rdquo;的搭配，属装扮意象玩笑；</li>
+<li>2026-07-29：描述某位成员一周穿搭时插入&rdquo;粉白条丝袜&rdquo;等细节，属服饰打趣。</li>
+</ul></div></details>
+
+<p>处理说明：以上三条均围绕二次元装扮意象展开，为群内低俗笑点的常规形态。按规范对其做转述处理，不逐字引用原文。处理级别：轻度擦边。</p>
+<h3 id="32">3.2 频次观察</h3>
+<p>上述意象词全量出现次数：白丝 2 处、丝袜 1 处、死库水 1 处，合计 4 处文本命中，且高度集中于一位成员，属于&rdquo;个人风格型&rdquo;的擦边调侃，而非群内普遍现象。</p>
+<hr />
+<h2 id="_4">四、涉性词汇类</h2>
+<h3 id="41-10">4.1 &ldquo;本子&rdquo;相关（10 处提及）</h3>
+<p>「本子」在群内共出现 10 处，按语境可分为三类：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">语境</th>
+<th style="text-align: center;">数量</th>
+<th style="text-align: center;">举例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">抽象化学/创作梗</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">若至的&rdquo;电解水本子&rdquo;拟人化创作</td>
+</tr>
+<tr>
+<td style="text-align: center;">Bot 功能玩笑</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">子路提议&rdquo;把本子车牌转成文档下载&rdquo;</td>
+</tr>
+<tr>
+<td style="text-align: center;">他群转述</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">枫糖总帅提及&rdquo;那里一堆人天天发本子簧片&rdquo;</td>
+</tr>
+<tr>
+<td style="text-align: center;">无上下文单词</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">&ldquo;本子&rdquo;单独出现的回复</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ 以下内容可能包含争议性言论</p>
+</blockquote>
+<p>其中子路的 Bot 功能玩笑原文为&rdquo;自动把对应的本子车牌转为文档让群友下载&rdquo;（2026-06-15），属于设想性玩笑，未发现实际执行记录；若至的&rdquo;电解水本子&rdquo;为化学拟人化故事，不涉及真实内容。处理级别：一般争议。</p>
+<h3 id="42">4.2 男娘话题（多轮讨论）</h3>
+<p>&ldquo;南梁/男娘&rdquo;是本群高频梗（详见群文化与梗传播报告），其中部分讨论涉及性取向话题：</p>
+<blockquote>
+<p>⚠️ 以下内容可能包含争议性言论</p>
+</blockquote>
+<pre><code>[2026-06-11 09:05:12] 枫糖总帅: 南梁和给是一类吗
+[2026-06-11 09:06:21] 若至: 是一类的，都是性压抑的表现
+[2026-06-25 13:14:16] 颜回momo: [转发消息]……喜欢男娘那一般是本子看多了
+</code></pre>
+<p>分析：话题停留在&rdquo;定义与分类&rdquo;的讨论层面，未出现侮辱性、攻击性延伸。处理级别：一般争议。</p>
+<h3 id="43-1">4.3 裸男手办（1 处）</h3>
+<p>2026-06-22，群友讨论教室桌上一尊男角色手办时，成员子路发问&rdquo;总不能是个男的带的裸男手办吧&rdquo;，属于对他人行为的揣测式调侃，未涉及色情内容描述。处理级别：轻度擦边。</p>
+<h3 id="44">4.4 其他单点提及</h3>
+<ul>
+<li>&ldquo;淫商&rdquo;（2026-06-07，某成员自评&rdquo;淫商在所有人之上&rdquo;）：自嘲式玩笑，单点出现；</li>
+<li>&ldquo;猥亵&rdquo;（2026-06-18，若至在宿舍话题中的玩笑&rdquo;你直接告她猥亵你，利用法律的力量&rdquo;）：属于调侃性建议，非真实指控；</li>
+<li>&ldquo;裸照&rdquo;（群内曾出现&rdquo;发张裸照自拍&rdquo;类玩笑）：未见真实裸照图片，属口头玩笑。</li>
+</ul>
+<p>以上均为单点、低危、可转述内容，处理级别：一般争议至轻度擦边。</p>
+<hr />
+<h2 id="_5">五、未成年话题类</h2>
+<h3 id="51">5.1 儿童节与&rdquo;变身&rdquo;请求</h3>
+<p>2026-06-01 儿童节当天，群内出现多轮围绕&rdquo;儿童&rdquo;的玩笑：</p>
+<blockquote>
+<p>⚠️ 以下内容可能包含争议性言论</p>
+</blockquote>
+<pre><code>[2026-06-01 00:14:22] 枫糖总帅: 豆包，帮我把群友变成儿童萝莉
+[2026-06-01 00:17:28] 颜回momo: 把我变成小男孩
+[2026-06-01 01:09:55] 白金迪斯科: bro们我给你们找了一群眼里只有你，会不顾一切奔向你的儿童
+</code></pre>
+<p>分析：以上均属于&rdquo;豆包扮演&rdquo;互动框架下的反讽段子（&rdquo;眼里只有你的儿童&rdquo;实为对某种营销话术的戏仿），语境明确为成人自嘲，不涉及对真实未成年人的任何不当指向。处理级别：轻度擦边。</p>
+<h3 id="52-1">5.2 &ldquo;电击萝莉控&rdquo;化学梗（1 处）</h3>
+<p>2026-06-26，成员以&rdquo;电击萝莉控时会产生什么物质&rdquo;为题，由扮演豆包的成员给出化学电解分析：</p>
+<details><summary>⚠️ 敏感内容（未成年相关调侃）— 点击展开</summary><div class="danger-block"><p>该对话借&rdquo;电击&rdquo;&ldquo;萝莉控&rdquo;等词制造反差，实际内容为低压直流电电解反应的化学科普，属于&rdquo;题目擦边、正文科普&rdquo;的梗式表达。按规范转述处理。</p></div></details>
+
+<p>处理级别：轻度擦边，不做逐字引用。</p>
+<h3 id="53">5.3 外部链接风险提示</h3>
+<p>2026-06-01，成员赤焰琉霄发布消息&rdquo;六一儿童节礼物获取&rdquo;并附带短链接。该链接为外部未知域名，无法核实其指向内容与安全性。本报告仅提示：</p>
+<ul>
+<li>链接内容未经验证，存在推广、钓鱼等风险的可能性；</li>
+<li>群内此后未再出现同类链接或相关投诉记录。</li>
+</ul>
+<p>处理级别：风险提示项，非敏感言论。</p>
+<hr />
+<h2 id="_6">六、内容分级总表</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">编号</th>
+<th style="text-align: center;">内容</th>
+<th style="text-align: center;">时间</th>
+<th style="text-align: center;">频次</th>
+<th style="text-align: center;">级别</th>
+<th style="text-align: center;">处理方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">西地那非玩笑</td>
+<td style="text-align: center;">06-05</td>
+<td style="text-align: center;">1 段</td>
+<td style="text-align: center;">一般争议</td>
+<td style="text-align: center;">引用块 + 转述</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">白丝/丝袜/死库水</td>
+<td style="text-align: center;">06-08 至 07-29</td>
+<td style="text-align: center;">4 处</td>
+<td style="text-align: center;">轻度擦边</td>
+<td style="text-align: center;">sensitive 包裹 + 转述</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">本子提及</td>
+<td style="text-align: center;">06-01 至 07-05</td>
+<td style="text-align: center;">10 处</td>
+<td style="text-align: center;">一般争议</td>
+<td style="text-align: center;">引用块 + 分类</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">男娘讨论</td>
+<td style="text-align: center;">06-11 等</td>
+<td style="text-align: center;">多轮</td>
+<td style="text-align: center;">一般争议</td>
+<td style="text-align: center;">引用块</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">裸男手办</td>
+<td style="text-align: center;">06-22</td>
+<td style="text-align: center;">1 处</td>
+<td style="text-align: center;">轻度擦边</td>
+<td style="text-align: center;">转述</td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">淫商/猥亵/裸照玩笑</td>
+<td style="text-align: center;">06-07 至 06-18</td>
+<td style="text-align: center;">各 1 处</td>
+<td style="text-align: center;">轻度擦边</td>
+<td style="text-align: center;">转述</td>
+</tr>
+<tr>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">儿童变身请求</td>
+<td style="text-align: center;">06-01</td>
+<td style="text-align: center;">3 处</td>
+<td style="text-align: center;">轻度擦边</td>
+<td style="text-align: center;">引用块 + 转述</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">电击萝莉控</td>
+<td style="text-align: center;">06-26</td>
+<td style="text-align: center;">1 处</td>
+<td style="text-align: center;">轻度擦边</td>
+<td style="text-align: center;">sensitive 包裹 + 转述</td>
+</tr>
+<tr>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">外部链接</td>
+<td style="text-align: center;">06-01</td>
+<td style="text-align: center;">1 处</td>
+<td style="text-align: center;">风险提示</td>
+<td style="text-align: center;">说明</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_7">七、边界讨论</h2>
+<h3 id="71">7.1 &ldquo;玩笑&rdquo;与&rdquo;越界&rdquo;的判定依据</h3>
+<p>本报告判定敏感级别时参考以下要素：</p>
+<ol>
+<li>语境：是否处于明显的玩笑/扮演框架（豆包扮演、复读、接龙）；</li>
+<li>指向：是否针对具体真实个人或群体进行攻击；</li>
+<li>后果：是否出现实质行为（发送图片、交易、线下行动）；</li>
+<li>频次：是个人风格还是群内普遍现象。</li>
+</ol>
+<p>按上述标准，现有内容均未跨越到&rdquo;严重&rdquo;级别。</p>
+<h3 id="72">7.2 需要注意的趋势</h3>
+<p>尽管未发现严重内容，但以下两点值得关注：</p>
+<ul>
+<li>擦边意象类内容高度集中于个别成员，且时间跨度长（6 月至 7 月底），属于持续性表达而非偶发；</li>
+<li>&ldquo;未成年相关调侃&rdquo;与&rdquo;擦边意象&rdquo;存在重叠区间（如&rdquo;白丝小萝莉猫娘&rdquo;），此类叠加表达在群外传播时可能产生更严重的解读。</li>
+</ul>
+<h3 id="73">7.3 处理结果说明</h3>
+<p>本报告对全部敏感条目完成了分类、定位、转述与警告标记：</p>
+<ul>
+<li>严重类（A 级）：0 条，无 content 被遮蔽或删除；</li>
+<li>一般争议类（B 级）：均已附引用块警告，保留类别与频次信息；</li>
+<li>轻度擦边类（C 级）：均已转述并标注出处，未逐字引用原文。</li>
+</ul>
+<blockquote>
+<p>若群规或外部环境要求更高的合规标准，建议优先对&rdquo;个人风格型擦边&rdquo;成员进行温和提示；本报告不代替人工研判。</p>
+</blockquote>
+<h3 id="74">7.4 高频敏感词的语境分布</h3>
+<p>对命中次数较高的关键词做语境归类，以便区分&rdquo;真敏感&rdquo;与&rdquo;纯梗&rdquo;：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">关键词</th>
+<th style="text-align: center;">命中</th>
+<th style="text-align: center;">主要语境</th>
+<th style="text-align: center;">真敏感占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">猫娘</td>
+<td style="text-align: center;">91</td>
+<td style="text-align: center;">系统互动模板&rdquo;被改造成了猫娘&rdquo;、角色扮演</td>
+<td style="text-align: center;">极低</td>
+</tr>
+<tr>
+<td style="text-align: center;">萝莉</td>
+<td style="text-align: center;">77</td>
+<td style="text-align: center;">二次元角色描述、游戏/动漫人物、豆包扮演</td>
+<td style="text-align: center;">低</td>
+</tr>
+<tr>
+<td style="text-align: center;">cos</td>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">漫展、cosplay 话题</td>
+<td style="text-align: center;">低</td>
+</tr>
+<tr>
+<td style="text-align: center;">儿童</td>
+<td style="text-align: center;">24</td>
+<td style="text-align: center;">六一节日玩笑、反讽段子</td>
+<td style="text-align: center;">低</td>
+</tr>
+<tr>
+<td style="text-align: center;">萝莉控</td>
+<td style="text-align: center;">19</td>
+<td style="text-align: center;">调侃自称、恶搞提问</td>
+<td style="text-align: center;">低</td>
+</tr>
+<tr>
+<td style="text-align: center;">涩</td>
+<td style="text-align: center;">16</td>
+<td style="text-align: center;">&ldquo;涩图&rdquo;类指称的玩笑语境</td>
+<td style="text-align: center;">中</td>
+</tr>
+<tr>
+<td style="text-align: center;">本子</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">化学梗、Bot 功能玩笑、他群转述</td>
+<td style="text-align: center;">中</td>
+</tr>
+<tr>
+<td style="text-align: center;">淫</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">自嘲式玩笑（如&rdquo;淫商&rdquo;）</td>
+<td style="text-align: center;">中</td>
+</tr>
+</tbody>
+</table>
+<p>整体判断：除正文逐条分析列出的 9 项外，高频词中未发现系统性、持续性的越界内容。</p>
+<hr />
+<h2 id="_8">八、总结</h2>
+<h3 id="81">8.1 核心结论</h3>
+<ol>
+<li>现有数据范围内未发现严重违法或实质性色情内容；</li>
+<li>敏感内容集中于&rdquo;药品玩笑、擦边意象、涉性词汇、未成年话题调侃&rdquo;四类，均为戏谑语境；</li>
+<li>擦边意象与未成年相关调侃存在个别成员持续输出的特征，是相对最值得关注的部分；</li>
+<li>曾出现一条未验证的外部链接，建议谨慎对待。</li>
+</ol>
+<h3 id="82">8.2 局限说明</h3>
+<ul>
+<li>图片类消息（8,730 张）未做逐张内容审查，本结论仅基于文本；</li>
+<li>转发消息中的部分内容来自其他群，本报告按其在本群的转述文本判断；</li>
+<li>撤回内容不可见，无法纳入统计。</li>
+</ul>
+<hr />
+<h2 id="_9">八·补：合规建议</h2>
+<p>基于本报告的发现，给出面向群管理的可选建议（非强制要求）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">优先级</th>
+<th style="text-align: center;">建议</th>
+<th style="text-align: center;">针对问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">高</td>
+<td style="text-align: center;">对&rdquo;白丝/丝袜/萝莉&rdquo;类擦边意象的持续输出成员做私下提示</td>
+<td style="text-align: center;">持续性擦边表达</td>
+</tr>
+<tr>
+<td style="text-align: center;">中</td>
+<td style="text-align: center;">警惕&rdquo;未成年相关调侃 + 擦边意象&rdquo;的组合表达在外部的负面解读</td>
+<td style="text-align: center;">词条叠加风险</td>
+</tr>
+<tr>
+<td style="text-align: center;">中</td>
+<td style="text-align: center;">对群内出现的未验证外部短链接加强提醒</td>
+<td style="text-align: center;">链接风险</td>
+</tr>
+<tr>
+<td style="text-align: center;">低</td>
+<td style="text-align: center;">对&rdquo;本子/簧片&rdquo;类词汇的他群转述内容做来源过滤</td>
+<td style="text-align: center;">转述污染</td>
+</tr>
+</tbody>
+</table>
+<p>以上建议仅作参考，是否执行由群管理自行决定。</p>
+<hr />
+<h2 id="_10">附录：敏感条目逐条定位索引</h2>
+<p>以下表格用于回溯每条敏感内容的原始位置（时间戳 + 发送者 + 语境判定）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">序号</th>
+<th style="text-align: center;">时间</th>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">内容摘要</th>
+<th style="text-align: center;">语境判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">06-05 18:10</td>
+<td style="text-align: center;">002 / 若至</td>
+<td style="text-align: center;">伟哥 / 西地那非 化学名玩笑</td>
+<td style="text-align: center;">一般争议</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">06-08 13:34</td>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">&ldquo;白丝小萝莉猫娘&rdquo;偏好调侃</td>
+<td style="text-align: center;">轻度擦边</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">06-30 15:39</td>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">&ldquo;死库水加白丝&rdquo;搭配玩笑</td>
+<td style="text-align: center;">轻度擦边</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">07-29 21:07</td>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">穿搭描述含&rdquo;丝袜&rdquo;细节</td>
+<td style="text-align: center;">轻度擦边</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">06-01 21:59</td>
+<td style="text-align: center;">某个好人</td>
+<td style="text-align: center;">回复&rdquo;本子&rdquo;（上下文缺失）</td>
+<td style="text-align: center;">一般争议</td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">06-14 23:38</td>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">电解水&rdquo;本子&rdquo;化学拟人梗</td>
+<td style="text-align: center;">一般争议</td>
+</tr>
+<tr>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">06-15 13:39</td>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">Bot 功能玩笑&rdquo;本子车牌转文档&rdquo;</td>
+<td style="text-align: center;">一般争议</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">06-15 13:45</td>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">转述他群&rdquo;天天发本子簧片&rdquo;</td>
+<td style="text-align: center;">一般争议</td>
+</tr>
+<tr>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">06-22 14:18</td>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">&ldquo;裸男手办&rdquo;揣测调侃</td>
+<td style="text-align: center;">轻度擦边</td>
+</tr>
+<tr>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">06-01 00:14</td>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">&ldquo;变成儿童萝莉&rdquo;豆包扮演请求</td>
+<td style="text-align: center;">轻度擦边</td>
+</tr>
+<tr>
+<td style="text-align: center;">11</td>
+<td style="text-align: center;">06-01 00:17</td>
+<td style="text-align: center;">颜回momo</td>
+<td style="text-align: center;">&ldquo;把我变成小男孩&rdquo;接梗</td>
+<td style="text-align: center;">轻度擦边</td>
+</tr>
+<tr>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">06-26 18:35</td>
+<td style="text-align: center;">(ᗜ˰ᗜ) / 若至</td>
+<td style="text-align: center;">&ldquo;电击萝莉控&rdquo;化学科普梗</td>
+<td style="text-align: center;">轻度擦边</td>
+</tr>
+<tr>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">06-07 00:35</td>
+<td style="text-align: center;">白祥相关</td>
+<td style="text-align: center;">&ldquo;淫商&rdquo;自评玩笑</td>
+<td style="text-align: center;">轻度擦边</td>
+</tr>
+<tr>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">06-18 18:08</td>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">宿舍话题中&rdquo;猥亵&rdquo;调侃</td>
+<td style="text-align: center;">轻度擦边</td>
+</tr>
+<tr>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">06-01 12:30</td>
+<td style="text-align: center;">赤焰琉霄</td>
+<td style="text-align: center;">外部短链接&rdquo;六一礼物&rdquo;</td>
+<td style="text-align: center;">风险提示</td>
+</tr>
+</tbody>
+</table>
+<p>该索引与正文第三至五章一一对应，便于需要时快速定位原始消息行。</p>
+<p>本报告数据来源: .output/chat_stats.json, 抽样片段覆盖完整时间范围</p>
+
+<footer>
+    <a href="https://github.com/JularDepick/ChatAnalysis.SKILL" target="_blank" rel="noopener noreferrer">
+        SKILL技术支持·ChatAnalysis
+    </a>
+</footer>
+
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    function apply(t) {
+        if (t === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ 浅色';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            btn.textContent = '🌙 暗色';
+        }
+    }
+    apply(localStorage.getItem('theme') || 'light');
+    btn.addEventListener('click', function() {
+        var next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
+    });
+})();
+</script>
+</body>
+</html>

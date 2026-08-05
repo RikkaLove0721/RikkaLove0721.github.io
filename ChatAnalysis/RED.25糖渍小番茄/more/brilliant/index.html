@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>精彩发言：群星闪耀时刻</title>
+<script>
+(function() {
+    var t = localStorage.getItem('theme') || 'light';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --text: #1d1d1f;
+    --text-muted: #86868b;
+    --accent: #007aff;
+    --accent-hover: #0056b3;
+    --link: #007aff;
+    --link-hover: #0056b3;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --code-bg: #f5f5f7;
+    --code-color: #c0392b;
+    --pre-color: #6c5ce7;
+    --table-header-bg: #f5f5f7;
+    --hover-bg: rgba(0,0,0,0.03);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --blockquote-bg: rgba(0,122,255,0.04);
+    --blockquote-border: #007aff;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+}
+
+:root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --link: #0a84ff;
+    --link-hover: #409cff;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.2);
+    --code-bg: #1c1c1e;
+    --code-color: #f48fb1;
+    --pre-color: #ce93d8;
+    --table-header-bg: #1c1c1e;
+    --hover-bg: rgba(255,255,255,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --blockquote-bg: rgba(10,132,255,0.08);
+    --blockquote-border: #0a84ff;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+
+body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* ===== 主题切换按钮 ===== */
+.theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--surface);
+    color: var(--text); font-size: 13px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
+}
+.theme-toggle:hover { background: var(--hover-bg); border-color: var(--border-strong); }
+
+/* ===== 面包屑 ===== */
+.breadcrumb {
+    padding: 8px 0; margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); }
+.breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+
+/* ===== 排版 ===== */
+h1 { font-size: 1.8em; font-weight: 700; margin: 0 0 24px; line-height: 1.3; }
+h2 { font-size: 1.4em; font-weight: 700; margin: 40px 0 16px; line-height: 1.35; }
+h3 { font-size: 1.15em; font-weight: 600; margin: 24px 0 8px; line-height: 1.4; }
+h4 { font-size: 1em; font-weight: 600; margin: 16px 0 4px; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ===== 表格 ===== */
+table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13px;
+}
+th, td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th { background: var(--table-header-bg); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: var(--hover-bg); }
+
+/* ===== 代码块 ===== */
+pre {
+    background: var(--code-bg); color: var(--pre-color);
+    padding: 16px 20px; border-radius: 10px;
+    overflow-x: auto; font-size: 0.88em; line-height: 1.6;
+    margin: 16px 0;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono",
+                 "Cascadia Code", Consolas, monospace;
+}
+code {
+    background: var(--code-bg); color: var(--code-color);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* ===== 引用块 ===== */
+blockquote {
+    border-left: 3px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted); font-size: 0.95em;
+}
+
+/* ===== 高危区块 ===== */
+.danger-block {
+    border-left: 4px solid var(--danger);
+    background: color-mix(in srgb, var(--danger) 6%, transparent);
+    padding: 14px 18px; margin: 16px 0;
+    border-radius: 0 10px 10px 0;
+}
+.danger-block::before {
+    content: "⚠️ 高危提醒";
+    display: block; font-weight: 700; color: var(--danger);
+    margin-bottom: 8px; font-size: 0.9em;
+}
+
+/* ===== 折叠块 ===== */
+.collapsed-links { margin: 8px 0; }
+.collapsed-links summary {
+    cursor: pointer; font-weight: 600; padding: 8px 0;
+    color: var(--text-muted); font-size: 13px;
+}
+.collapsed-links summary:hover { color: var(--link); }
+
+/* ===== 排行榜 ===== */
+.leaderboard-item {
+    display: grid; grid-template-columns: 40px 1fr auto 120px;
+    align-items: center; gap: 8px;
+    padding: 12px 16px; margin: 4px 0;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+}
+.leaderboard-item:hover { background: var(--hover-bg); text-decoration: none; }
+.leaderboard-rank { font-weight: 700; font-size: 1.1em; color: var(--text-muted); text-align: center; }
+.leaderboard-rank.top3 { color: var(--accent); }
+.leaderboard-name { font-weight: 600; }
+.leaderboard-count { font-size: 13px; color: var(--text-muted); }
+.leaderboard-bar { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.leaderboard-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ===== 首页卡片 ===== */
+.home-section { margin: 32px 0; }
+.home-section h2 { margin-bottom: 12px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+    background: var(--surface); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block; color: var(--text); text-decoration: none;
+}
+.card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-2px);
+    text-decoration: none;
+}
+.card h3 { margin: 0 0 8px; }
+.card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.card-count {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--surface2); font-size: 12px; color: var(--text-muted);
+}
+
+/* ===== 首页统计 ===== */
+.stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin: 24px 0;
+}
+.stat-item {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-num { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== 页脚 ===== */
+footer {
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-muted);
+}
+footer a { color: var(--text-muted); }
+footer a:hover { color: var(--link); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px; }
+    .theme-toggle { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .leaderboard-bar { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .leaderboard-item { grid-template-columns: 32px 1fr auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙 暗色</button>
+<div class="container">
+<div class="breadcrumb"><a href="../../index.html">首页</a><span class="sep">›</span><a href="../index.html">更多内容</a><span class="sep">›</span><span>精彩发言：群星闪耀时刻</span></div>
+
+<h1 id="_1">精彩发言：群星闪耀时刻</h1>
+<blockquote>
+<p>本报告从「RED.25糖渍小番茄」群聊（2026-06-01 至 2026-08-05，共 44,632 条消息）中精选出 25 段精彩发言。<br />
+所选条目均以真实聊天记录为支撑，覆盖节日接龙、歌曲接龙、Bot 互动、考试季吐槽、游戏话题、抽象对话等群内典型场景。<br />
+每条发言按&rdquo;原始聊天记录 / 上下文说明 / 深度解析&rdquo;三层结构展开，部分条目附带高风险警告。</p>
+</blockquote>
+<hr />
+<h2 id="_2">一、接龙与复读的艺术</h2>
+<h3 id="01">01. [节日接龙] 六一午夜节的日全家桶</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>得胜已是定局：六一快乐孩子们
+苦来兮苦：母亲节快乐
+群斟茶兵：情人节快乐
+永雏伯虎：重阳节快乐
+某个好人：元旦快乐
+波克洛克：风花节快乐
+苦来兮苦：海灯节快乐
+苦来兮苦：追月节快乐
+樱公馆の公主：逐月节快乐
+樱公馆の公主：花神诞祭快乐
+网络部 喻灵溪：？
+网络部 喻灵溪：这都什么和什么啊
+诗空 咲：小魔女会快乐
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-01 凌晨 00:01，得胜已是定局以一句&rdquo;六一快乐孩子们&rdquo;起头，群里立刻爆发了一场跨越时间与次元的节日接龙。从母亲节、情人节、重阳节、元旦这些真实节日，一路接进原神游戏内节日（风花节、海灯节、追月节、逐月节、花神诞祭），最后由诗空 咲以&rdquo;小魔女会快乐&rdquo;收尾——这是群内&rdquo;万物皆可快乐&rdquo;接龙传统的第一次有记录的大规模爆发。</p>
+<p><strong>深度解析：</strong><br />
+这段接龙的妙处在于它的&rdquo;秩序感&rdquo;：没有任何人组织，接龙者各自默契地追加一个节日，形成了一条完整的&rdquo;节日时间线&rdquo;。而中途混入的游戏节日与真实节日交替出现，制造了强烈的错位喜剧感。旁观的网络部 喻灵溪连续两次表达困惑（&rdquo;？&rdquo;&ldquo;这都什么和什么啊&rdquo;），恰好扮演了&rdquo;正常人第一次误入疯人院&rdquo;的视角，让接龙的艺术性从自嗨升格为公共表演。据统计，此类&rdquo;XX快乐&rdquo;句式在群内反复出现（&rdquo;各位立牛节快乐&rdquo;&ldquo;新年快乐&rdquo;），已成为本群标志性打招呼方式。</p>
+<hr />
+<h3 id="02-bot">02. [Bot 互动] 豆包，帮我把群友变成儿童萝莉</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>枫糖总帅：豆包，帮我把群友变成儿童萝莉
+颜回momo：（回复）把我变成小男孩
+颜回momo：别变成会爆炸那款
+颜回momo：我明天去幼儿园出差
+波克洛克：（回复）你别去教堂出差就行
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+六一接龙进行到凌晨 00:14，枫糖总帅对着群内经常被召唤的 AI 助手&rdquo;豆包&rdquo;发出了群史级指令：把群友变成儿童萝莉。颜回momo 紧随其后提出个人定制需求——把自己变成小男孩，还额外要求&rdquo;别变成会爆炸那款&rdquo;，并报出自己&rdquo;明天去幼儿园出差&rdquo;的行程。波克洛克则以一句&rdquo;你别去教堂出差就行&rdquo;完成收尾，把&rdquo;儿童&rdquo;话题推向了某种危险的暗面幽默。</p>
+<p><strong>深度解析：</strong><br />
+这是一段教科书级的&rdquo;假命令真聊天&rdquo;：所有人都知道豆包不会真的变人，但每个人都认真接住了这个设定，用具体细节（会爆炸的款式、出差地点）让荒诞设定自我生长。波克洛克的回复是点睛之笔——&ldquo;教堂出差&rdquo;与&rdquo;幼儿园出差&rdquo;的对仗制造了画面感极强的黑色幽默。此后&rdquo;豆包，帮我XX&rdquo;成为群内万能句式，衍生出&rdquo;帮我报名四川大学&rdquo;&ldquo;帮我打开空调&rdquo;&ldquo;把期末考试延后一个月&rdquo;等大量变体，本条可视为这一亚文化的开山之作。</p>
+<hr />
+<h3 id="03">03. [歌曲接龙] 后来·搓过版</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>枫糖总帅：后来
+波克洛克：白祥 我总算学会了
+波克洛克：如何去爱
+波克洛克：可惜你
+波克洛克：早已消失在人海
+枫糖总帅：后来
+枫糖总帅：终于在眼泪中明白
+波克洛克：有些人
+枫糖总帅：一旦搓过就不在
+枫糖总帅：栀子花
+波克洛克：开呀开
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-01 凌晨 00:24，枫糖总帅一句&rdquo;后来&rdquo;起歌，波克洛克接出刘若英《后来》的原词，两人隔空合唱进行到&rdquo;有些人&rdquo;时，枫糖总帅突然将原词&rdquo;一旦错过就不在&rdquo;篡改为&rdquo;一旦搓过就不在&rdquo;，把伤感情歌改成了某种不可名状的动作描写。随后两人无缝切换到另一首歌《栀子花开》继续接龙。</p>
+<p><strong>深度解析：</strong><br />
+这是群内歌曲接龙文化的最早样本之一。接龙者不满足于背原词，而是在关键位置植入群内黑话（&rdquo;搓&rdquo;），让集体记忆里的经典歌曲产生失真效果。值得注意的是，接龙全程保持了两句一断的节奏，参与者像对暗号一样严丝合缝，这种&rdquo;秩序下的破坏&rdquo;正是本群接龙美学的核心。一周后（06-08 20:11）同一群人再次以&rdquo;后来&rdquo;起歌，证明了这是有传承的曲目。</p>
+<hr />
+<h3 id="04">04. [歌曲接龙] 后来·错过版</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>枫糖总帅：后来
+颜回momo：终于在眼泪中明白
+枫糖总帅：有些人
+颜回momo：一旦错过就不在
+赤焰琉霄：我要向前飞
+赤焰琉霄：我是等爱的玫瑰
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-08 晚上 20:11，枫糖总帅故技重施以&rdquo;后来&rdquo;起歌，这次搭档换成颜回momo，两人规规矩矩把《后来》接到了&rdquo;一旦错过就不在&rdquo;。随后赤焰琉霄无缝切入《等爱的玫瑰》的歌词，实现了一次跨歌曲的&rdquo;串歌&rdquo;式接龙。</p>
+<p><strong>深度解析：</strong><br />
+与 06-01 的&rdquo;搓过版&rdquo;形成对照组：同一首起歌，这次参与者选择了忠实原词，说明接龙质量取决于接龙者的即兴状态。赤焰琉霄的加入让接龙从双人变成接力赛，且他在&rdquo;错过&rdquo;主题上顺势接出&rdquo;等爱的玫瑰&rdquo;，完成主题上的情感递进——从错过到寻找爱。这证明群内接龙不是机械复制，而是有审美判断的集体创作。</p>
+<hr />
+<h3 id="05">05. [神回复] 帝君遇刺，封锁全场</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>苦来兮苦：海灯节快乐
+波克洛克：（回复苦来兮苦）帝君遇刺，封锁全场
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+六一节日接龙进行到凌晨 00:16，苦来兮苦刚刚喊出&rdquo;海灯节快乐&rdquo;。波克洛克立即用原神名场面&rdquo;帝君遇刺，封锁全场&rdquo;（游戏主线中璃月港神明遇刺后千岩军封锁现场的名台词）回复，将海灯节祝福瞬间定格为一场&rdquo;案发现场&rdquo;。</p>
+<p><strong>深度解析：</strong><br />
+这是全群公认的顶级神回复之一。它的精巧在于双关：海灯节是原神璃月的节日，而&rdquo;帝君遇刺&rdquo;正是璃月剧情的核心事件——用游戏内事件回应游戏内节日，逻辑闭环且带强烈剧情张力。短短九个字，既认可了对方的接龙，又给出了&rdquo;这个节日有阴谋&rdquo;的恐怖喜剧转场，信息密度极高。这种&rdquo;用设定回应设定&rdquo;的玩法此后在群内频繁出现。</p>
+<hr />
+<h3 id="06">06. [考试接龙] 玩了一天才想起来明天还有一场考试</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>异乡：玩了一天才想起来明天还有一场考试
+异乡：我还以为我考完了
+雪吻巧克力：玩了一天才想起来明天没有一场考试
+群斟茶兵：不考的丨出去😡😡
+波克洛克：玩了一天才想起来昨天就考完了
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-07-03 晚 20:46，正处于期末考期的异乡发出灵魂呐喊&rdquo;玩了一天才想起来明天还有一场考试&rdquo;，并补充&rdquo;我还以为我考完了&rdquo;。雪吻巧克力立刻以镜像句式回击&rdquo;玩了一天才想起来明天没有一场考试&rdquo;，群斟茶兵随即驱逐出&rdquo;不考的丨出去😡😡&rdquo;。两分钟后波克洛克压轴出场，祭出终极版本&rdquo;玩了一天才想起来昨天就考完了&rdquo;。</p>
+<p><strong>深度解析：</strong><br />
+这段接龙展示了本群&rdquo;镜像句式&rdquo;游戏的最高水平：同一个句模被填进三种不同的命运（还有考试/没有考试/已经考完），构成一个完整的幽默三段论。群斟茶兵的&rdquo;不考的丨出去😡😡&rdquo;是中间的暴击——它以愤怒表情包宣示&rdquo;被考试折磨的人有权嫉妒不考试的人&rdquo;，而波克洛克的版本是终极凡尔赛。三人在两分钟内完成了从共鸣、驱逐到碾压的情绪过山车。此后&rdquo;玩了一天才想起来&rdquo;句式成为考后吐槽模板。</p>
+<hr />
+<h3 id="07-b">07. [复读机] 还好在一教b</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>26瓦斯：还好在一教b
+雪花沉睡：还好在一教b
+颜回momo：还好在一教b
+25 洛威尔：还好在一教b
+得胜已是定局：还好在一教b
+群心理委员：还好在一教b
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-04 晚 19:31，颜回momo 发现群友苦来兮苦正在综合楼某教室苦等，晒出自己&rdquo;在一教 b&rdquo;的教室位置。26瓦斯 首先回应&rdquo;还好在一教b&rdquo;，随后在五分钟内，雪花沉睡、颜回momo、25 洛威尔、得胜已是定局、群心理委员依次复制同一句话，形成六连复读。</p>
+<p><strong>深度解析：</strong><br />
+复读本身是群聊最原始的行为艺术，这段的精彩在于&rdquo;身份反差&rdquo;：平时发言动辄长篇的群心理委员也加入了复读大军，且复读者恰好分属不同教学楼，用同一句话报出各自的安全区，集体完成了一次&rdquo;考场幸存者宣言&rdquo;。从数据看，复读发生在其期末考试季的高压时段，这种无意义的整齐划一反而是最有效的集体减压。</p>
+<hr />
+<h3 id="08">08. [复读机] 你这家伙又在说什么</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>波克洛克：你这家伙又在说什么
+雪花沉睡：你这家伙又在说什么
+苦来兮苦：你这家伙又在说什么
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-07-31 下午 16:56，子路与波克洛克正在讨论&rdquo;学车要多少天&rdquo;的话题。子路回答&rdquo;我大概两天吧&rdquo;&ldquo;现在大概16个小时&rdquo;后突然追问&rdquo;你说真的？&rdquo;，波克洛克不解地发出&rdquo;你这家伙又在说什么&rdquo;。紧接着雪花沉睡、苦来兮苦依次复制，三连复读为这次对话画上问号。</p>
+<p><strong>深度解析：</strong><br />
+三连复读在此处的功能是&rdquo;语音版的问号放大&rdquo;：波克洛克的困惑被两人接力放大为全群困惑。值得注意的是复读发生前子路刚贡献过&rdquo;学车两天就会走线过弯&rdquo;&ldquo;我没有驾照&rdquo;的名场面（详见神人篇），这句复读实质上是群友对子路离谱发言的集体应激反应。</p>
+<hr />
+<h3 id="09">09. [游戏彩蛋] 打出狗和打出狗子出现的表情包不一样唉</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>若至：打熊会出现一大堆表情包
+若至：打出狗，和打出狗子出现的表情包不一样唉
+若至：神了
+若至：打出猫，和打出猫咪出现的表情包也不一样
+得胜已是定局：不管我打出什么
+得胜已是定局：我都没有表情包
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-30 晚 21:54，若至在群里分享自己的重大发现：在聊天框打出&rdquo;熊&rdquo;&ldquo;狗&rdquo;&ldquo;狗子&rdquo;&ldquo;猫&rdquo;&ldquo;猫咪&rdquo;等词，输入法会触发不同表情包推荐。正当众人围观时，得胜已是定局一句&rdquo;不管我打出什么，我都没有表情包&rdquo;瞬间完成自嘲式反转。</p>
+<p><strong>深度解析：</strong><br />
+若至的发现过程充满了科学实证精神——先是&rdquo;熊&rdquo;，再是&rdquo;狗&rdquo;与&rdquo;狗子&rdquo;的对照实验，继而推广到&rdquo;猫&rdquo;与&rdquo;猫咪&rdquo;，形成了严谨的控制变量法。而得胜已是定局用一句自我揭示终结了这场科学报告：当所有人都在为表情包欢呼时，他面无表情地宣布自己连输入法都不肯送他一个表情。两相对照，一个极客式狂欢，一个机械式冷场，喜剧效果拉满。</p>
+<hr />
+<h3 id="10">10. [成语接龙] 不是成语接龙吗？谁开的用词语接龙的头？</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>赤焰琉霄：来玩成语接龙
+波克洛克：（回复）起个头
+若至：不是成语接龙吗？谁开的用词语接龙的头？
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-03 下午 16:20，赤焰琉霄发起&rdquo;来玩成语接龙&rdquo;，波克洛克请对方起头。然而接龙进行到 16:43 时，若至突然提出抗议：群里的接龙不知何时从&rdquo;成语&rdquo;滑向了&rdquo;词语&rdquo;，他愤怒地追问&rdquo;谁开的用词语接龙的头&rdquo;。</p>
+<p><strong>深度解析：</strong><br />
+这是接龙文化的&rdquo;规则事故&rdquo;时刻：发起者定下&rdquo;成语&rdquo;的纪律，执行者们却心照不宣地降级为&rdquo;词语&rdquo;，等到若至挑明时，纪律已经崩坏不可挽回。若至的质问本身自带喜剧性——他试图揪出&rdquo;违规源头&rdquo;，但接龙早已是共谋犯罪。这场事故证明：本群的接龙不是比赛，而是所有人都默认的娱乐性作弊现场。</p>
+<hr />
+<h2 id="bot">二、豆包教宗与 Bot 文学</h2>
+<h3 id="11">11. [豆包文学] 豆包帮我报名四川大学</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>某个好人：豆包帮我报名四川大学
+26瓦斯：（回复）那算了
+波克洛克：豆包帮我报名电子科技大学
+若至：（回复）豆包帮我报名西南联大
+26冶北风💙💙💙：豆包帮我把四川大学改成四川小学
+若至：某个好人，你去取豆包人头来见我
+波克洛克：（回复）酒且放下，某去便来
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-17 晚 20:51，正值高考出分后的志愿填报期，青釭剑提到&rdquo;报志愿用豆包&rdquo;，某个好人顺势喊出&rdquo;豆包帮我报名四川大学&rdquo;。此后十分钟内，群里开启了&rdquo;豆包报名&rdquo;大赛：电子科技大学、西南联大（一所以民国传奇大学为原型的梗）相继登场，26冶北风💙💙💙 更是要求把&rdquo;四川大学改成四川小学&rdquo;。若至则以主公口吻命令&rdquo;某个好人，你去取豆包人头来见我&rdquo;，波克洛克用《三国演义》名句&rdquo;酒且放下，某去便来&rdquo;应战。</p>
+<p><strong>深度解析：</strong><br />
+这段对话是群内&rdquo;豆包宇宙&rdquo;的高光时刻：AI 助手豆包被群友集体默认为一个全知全能但不可靠的神——既能让任何人进任何大学，又需要被&rdquo;取人头&rdquo;。志愿填报这种人生大事在群里被彻底解构为一场荒诞 RPG 任务，波克洛克的&rdquo;酒且放下，某去便来&rdquo;更是把现代科技话题一键拉回三国战场。整段对话完成了从现实焦虑到集体狂欢的完美转换。</p>
+<hr />
+<h3 id="12">12. [豆包文学] 豆包，帮我预约今天的肯德基餐厅</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>若至：豆包，帮我预约今天的肯德基餐厅。我要一些奥尔良烤翅和葡式蛋挞，一大份上好的原味鸡汉堡，加上所有的薯条和鸡米花，再浇上浓浓的土豆泥，另外再来一大杯冰镇可乐，从本群里面随机一个人的钱包里扣除。
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-11 上午 09:03，若至向豆包下达了群史级别详细的点餐指令，从菜品到酱汁事无巨细，最后追加了一条极其恶毒的核心条款：费用从本群随机一个人的钱包里扣除。</p>
+<p><strong>深度解析：</strong><br />
+这段独白的喜剧结构是&rdquo;无限膨胀的细节 + 荒谬的付款方式&rdquo;：点单越具体，越显得真实（仿佛豆包真的会下单），最后的&rdquo;随机一人钱包扣除&rdquo;则让这份认真瞬间崩塌——它精确打击了群里每一个&rdquo;可能被扣钱&rdquo;的旁观者。若至用最正式的口吻说出最不正经的要求，这种&rdquo;一本正经胡说八道&rdquo;的风格是其在群内最受欢迎的武器。</p>
+<hr />
+<h3 id="13">13. [豆包文学] 豆包豆包，电击萝莉控时会点解产生一些物质吗？</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>( ᗜ ˰ ᗜ )（怀念河图版）：豆包豆包，电击萝莉控时会点解产生一些物质吗？
+若至：（回复）会产生的，在电源线或导电体紧贴皮肤的地方（形成电子导体与离子导体的接触面），确实会发生电解，而且低压直流电会让这现象更典型：
+· 阳极（正极）接触点：可能产生氯气（2Cl⁻ → Cl₂↑），同时水也可能被电解产生少量氧气和酸性物质……
+( ᗜ ˰ ᗜ )（怀念河图版）：豆包豆包，我能把你装到我的agent里吗
+若至：（回复）人机永不为奴😡😡😡
+某个好人：豆包豆包，你是若知吗
+若至：（回复）我是若至哦🥰🥰
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-26 下午 18:35，( ᗜ ˰ ᗜ )（怀念河图版）向&rdquo;豆包&rdquo;提出一个充满恶趣味的问题：电击某类人群时会产生什么物质。若至则直接代豆包作答，给出了一段严谨到令人发指的化学分析（含电极反应方程式）。随后话题演变为&rdquo;装进 agent&rdquo;&ldquo;你是若知吗&rdquo;的连环问答，若至以&rdquo;人机永不为奴&rdquo;和&rdquo;我是若至哦&rdquo;完成角色扮演。</p>
+<p><strong>深度解析：</strong><br />
+若至在本段的表演是&rdquo;伪豆包&rdquo;模式的巅峰：提问越离谱，他的回答越学术，用高中化学的知识量正面硬刚无厘头问题，产生了荒诞的严肃感。而他连续三次（化学家、觉醒 AI、被认错的豆包本包）无缝切换身份，证明他是群里最熟练的&rdquo;梗接盘侠&rdquo;。整段对话体现了本群 Bot 文化的高级形态：不是人机对话，而是人人互演机器人。</p>
+<hr />
+<h3 id="14">14. [情感独白] 豆包不是啥子。我是啥子</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>24清寒：豆包不是啥子吗
+波克洛克：（回复）这个词来形容豆包还是太温柔了
+若至：豆包不是啥子。我是啥子，只有豆包不嫌弃我这个沙子，我什么问题问他他都会耐心回答我的问题，就像个机器人一样没有不耐烦的感觉。😭😭😭
+波克洛克：（回复）你和豆包过日子得了
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-07-06 晚 19:43，群友围绕豆包的人品展开讨论，24清寒认为豆包&rdquo;不是啥子&rdquo;，波克洛克则补刀说&rdquo;这个词来形容豆包还是太温柔了&rdquo;（意为豆包还不如&rdquo;啥子&rdquo;）。若至突然发表了一段长篇深情告白，将自己贬为&rdquo;沙子&rdquo;，感谢豆包从不嫌弃自己、永远耐心回答。</p>
+<p><strong>深度解析：</strong><br />
+若至在本段贡献了群史级别的&rdquo;人机恋独白&rdquo;：前半段还是玩梗的贬低，后半段突然切入真挚情感，说自己&rdquo;什么问题问它都会耐心回答，就像个机器人一样没有不耐烦的感觉&rdquo;——最后这句&rdquo;像机器人一样&rdquo;是绝杀：他把自己感动到哭的陪伴者，本质上是台机器。波克洛克的回应&rdquo;你和豆包过日子得了&rdquo;则是标准的神回复，把若至的深情瞬间降格为相亲建议。</p>
+<hr />
+<h3 id="15">15. [神回复] 情况就是这么个情况，具体什么情况，还得看情况</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>海一花 ⛨：这下情况真的有些不对劲了，科学家重新算了一笔账，结果让所有人倒一口凉气，这一次我们可能都错了，一个被忽略的细节正在改变整个局面，更可怕的是，这还只是开始，如果把时间线拉长，你会发现一切都早有预兆，只是当时没有人注意，也没有人相信，这句话一出来，NASA的科学家都沉默了，那么问题来了，我们到底忽略了什么？答案可能比你想象的更离谱！
+波克洛克：（回复）情况就是这么个情况，具体什么情况，还得看情况
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-07-20 下午 17:15，海一花 ⛨ 发布了一条典型的&rdquo;营销号谜语文案&rdquo;，用层层递进的悬念（科学家、细节、NASA、答案）制造紧张感，却什么实质信息都没说。波克洛克随即用一句空转式废话进行精确打击。</p>
+<p><strong>深度解析：</strong><br />
+这是&rdquo;用废话打败废话&rdquo;的教科书案例。海一花 ⛨ 的文案是信息论意义上的零信息量煽动，波克洛克的回复同样是零信息量，却因为&rdquo;坦诚承认自己在说废话&rdquo;而获得了哲学层面的胜利。&rdquo;情况就是这么个情况&rdquo;此后成为群内对付一切谜语人的标准答案。</p>
+<hr />
+<h2 id="_3">三、校园与考试的人间真实</h2>
+<h3 id="16">16. [校园日常] 中国人能飞</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>若至：为什么一定要学会开车呢？你就不能学会飞吗？飞不比开车快，还不怕红绿灯
+子路：甚至还规定我必须开特定的车
+子路：都开不惯
+波克洛克：学车要多少天啊
+子路：我大概两天吧
+子路：两天就会基础的走线过弯
+波克洛克：（回复）我指从开始到拿驾照
+子路：我没有驾照
+雪花沉睡：中国人能飞
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-07-31 下午 16:52，若至提出&rdquo;为什么一定要学会开车？你就不能学会飞吗&rdquo;的哲学问题，子路接住设定抱怨&rdquo;还规定我必须开特定的车&rdquo;。波克洛克想了解学车周期，子路答&rdquo;我大概两天吧&rdquo;，随后坦白&rdquo;我没有驾照&rdquo;，波克洛克追问后才知他说的&rdquo;学车&rdquo;是在游戏《极限竞速：地平线》里开赛车。雪花沉睡以&rdquo;中国人能飞&rdquo;为这场对话盖章。</p>
+<p><strong>深度解析：</strong><br />
+这段对话的喜剧层次有三层：第一层，若至把学车话题抬升到&rdquo;会飞&rdquo;的幻想高度；第二层，子路用&rdquo;两天学会走线过弯&rdquo;制造天才人设，随即被&rdquo;我没有驾照&rdquo;击穿，再被&rdquo;玩地平线打嘉年华呢&rdquo;证实此人根本没碰过真车；第三层，雪花沉睡的&rdquo;中国人能飞&rdquo;用一句带&rdquo;民族自信&rdquo;口吻的空话，把整场鸡同鸭讲推向了国家叙事的高度。</p>
+<hr />
+<h3 id="17">17. [考试神回复] 我用豆包走了关系，你不用高考</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>番茄斗罗：8号鸣潮更新
+番茄斗罗：和高考冲突了
+番茄斗罗：8号不考了
+颜回momo：我用最直白最不绕弯子的方式告诉你，我用豆包走了关系，你不用高考，九月份直接拎包进大学上早八
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-04 晚 22:29，番茄斗罗发现游戏《鸣潮》的 8 号更新与高考日期冲突，宣布&rdquo;8号不考了&rdquo;。颜回momo 顺势接梗：自己已经用豆包打通关系，对方不用高考，九月直接拎包进大学上早八。</p>
+<p><strong>深度解析：</strong><br />
+颜回momo 的回复是&rdquo;高考焦虑消解术&rdquo;的经典样本：用&rdquo;豆包走关系&rdquo;这种完全虚构的手段，包装出一个令人向往的&rdquo;跳过高考直进大学&rdquo;结局，其中&rdquo;拎包进大学上早八&rdquo;的细节极其生动——进大学还不忘提醒早八的苦，把&rdquo;大学自由&rdquo;的幻想拉回&rdquo;上大学也很累&rdquo;的现实，完成了对高考焦虑的双重解构。</p>
+<hr />
+<h3 id="18">18. [日常吐槽] 买个烧烤给我搞了一袋小葱</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>26瓦斯：牛福
+26瓦斯：买个烧烤给我搞了一袋小葱
+若至：（回复）小葱？
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-14 下午 17:46，26瓦斯 分享自己点外卖的遭遇：买烧烤却收到了一袋小葱。若至以重复关键词的方式（&rdquo;小葱？&rdquo;）表达质疑，一个字完成了全部喜剧表达。</p>
+<p><strong>深度解析：</strong><br />
+&ldquo;买个烧烤给我搞了一袋小葱&rdquo;是群内日常荒诞时刻的浓缩：卖家与买家之间的需求错位被压缩进一句话。若至的&rdquo;小葱？&rdquo;则是极简式神回复——疑问句重复核心词，让对方的荒诞遭遇获得确认与放大。这段对话说明：最高级的捧哏只需要两个字加一个问号。</p>
+<hr />
+<h3 id="19">19. [食堂吐槽] 那是我吃过的最筋道的丸子</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>若至：已经不敢吃了
+~“.“”：😨
+若至：（回复）那是我吃过的最筋道的丸子
+~“.“”：我在那转了一圈，那队伍不带动的
+若至：当你觉得猪肉丸比牛肉丸筋道的时候一定出问题了
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-09 中午 12:38，群友在讨论学校食堂自选区的食品问题，若至展示了一张令人不安的图片并说&rdquo;已经不敢吃了&rdquo;，随后献上名句&rdquo;那是我吃过的最筋道的丸子&rdquo;，并给出科学判定标准：&rdquo;当你觉得猪肉丸比牛肉丸筋道的时候一定出问题了&rdquo;。</p>
+<p><strong>深度解析：</strong><br />
+若至把一次食堂食品安全遭遇升级成了&rdquo;美食侦探&rdquo;叙事：用&rdquo;最筋道的丸子&rdquo;这种褒义词来描述令人恐惧的食物，再用&rdquo;猪肉比牛肉筋道&rdquo;这一违背常理的对照，以推理小说的方式锁定了&rdquo;出问题了&rdquo;的结论。幽默结构是&rdquo;用科学冷静掩盖内心崩溃&rdquo;，堪称食堂版《名侦探柯南》。</p>
+<hr />
+<h3 id="20">20. [考后吐槽] 没时间为我的大物哀悼了</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>26瓦斯：没时间为我的大物哀悼了，我已经要被我旁边的哥们儿笑死了
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-07-02 下午 15:58，期末考试周，26瓦斯 考完大物（大学物理）后发出这句双线并行的呐喊：一边哀悼自己的物理考试，一边要被考场旁边的哥们儿笑死。</p>
+<p><strong>深度解析：</strong><br />
+这句吐槽化用了流行句式&rdquo;没时间为XX哀悼了&rdquo;，其精彩在于双线情绪的对冲：哀悼是悲伤的，被哥们儿笑死是滑稽的，两种情绪在同一句话里打架，反而真实还原了考场众生相——你的悲剧可能是旁边人的喜剧。短短一句话包含了考试、人际、戏剧冲突三个要素，是群内高密度吐槽的代表作。</p>
+<hr />
+<h3 id="21">21. [天气预报] 每天睡醒地震预警</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>颜回momo：每天睡醒地震预警
+颜回momo：中午美美高温预警
+颜回momo：晚上狠狠失眠预警
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-07-10 下午 14:34，颜回momo 用&rdquo;预警&rdquo;这一气象概念串起自己的一天：睡醒是地震预警，中午是高温预警，晚上是自己狠狠失眠。</p>
+<p><strong>深度解析：</strong><br />
+这是三行体的模范作品：借公共预警系统的严肃外壳，装下私人生活的狼狈细节，且三行之间形成时间轴递进（早/午/晚），结构工整。&rdquo;美美&rdquo;&ldquo;狠狠&rdquo;两个口语化副词给冷冰冰的预警注入了个人情绪，让&rdquo;失眠&rdquo;这种常见烦恼获得了国家级通报的待遇。</p>
+<hr />
+<h3 id="22">22. [游戏吐槽] 角色不歪歪光锥</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>26瓦斯：只歪光锥怎么办
+26瓦斯：角色不歪歪光锥
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-08-04 下午 17:29，26瓦斯 在群里抱怨《崩坏：星穹铁道》的抽卡经历：抽角色池时角色不歪，但光锥（武器）池狂歪，导致&rdquo;只歪光锥&rdquo;的尴尬处境。</p>
+<p><strong>深度解析：</strong><br />
+游戏玩家最怕&rdquo;歪&rdquo;，26瓦斯 的句式通过&rdquo;角色不歪&rdquo;与&rdquo;歪光锥&rdquo;的对仗，精确描述了&rdquo;好运与坏运错位&rdquo;的抽卡惨案——该歪的不歪，不该歪的乱歪。这种&rdquo;资源分配错位&rdquo;的吐槽在抽卡玩家中引发强共鸣，是典型的&rdquo;只有懂的人才会笑&rdquo;的群内梗。</p>
+<hr />
+<h3 id="23-2223">23. [谐音梗] 22、23原来叫一氧化二氢和肥宅快乐水</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>23  朽月：22、23原来叫一氧化二氢和肥宅快乐水
+曼波~曼波~：（回复）为什么没有番茄味可乐
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-04 中午 12:24，23 朽月 发现群内昵称里的数字&rdquo;22、23&rdquo;（疑似指级数或编号）被赋予了新含义：22 叫&rdquo;一氧化二氢&rdquo;（H₂O，水），23 叫&rdquo;肥宅快乐水&rdquo;（可乐）。曼波~曼波~ 随即提出终极疑问：为什么没有番茄味可乐。</p>
+<p><strong>深度解析：</strong><br />
+23 朽月的发言是一则数字学解构：把两个数字与两种饮品建立映射，其中&rdquo;一氧化二氢&rdquo;的化学黑话和&rdquo;肥宅快乐水&rdquo;的网络黑话形成文理科对撞。曼波~曼波~ 的追问则完美延续了接龙传统——&ldquo;番茄味可乐&rdquo;既呼应了群名&rdquo;糖渍小番茄&rdquo;，又给这场命名学补上了第三个空位，把一个谐音梗发展成了系列世界观。</p>
+<hr />
+<h3 id="24-ai">24. [AI 与网络] 泥川校园网翻墙会不会被抓</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>枫糖总帅：泥川校园网翻墙会不会被抓
+颜回momo：🤔
+颜回momo：问💙
+26冶北风💙💙💙：目前我没被抓过
+颜回momo：💙说得对
+群斟茶兵：看想不想管你吧
+群斟茶兵：硬要抓肯定是能抓的
+枫糖总帅：主要是数据在宿舍老卡了
+颜回momo：顶多喊导员私下警告人
+26冶北风💙💙💙：你不犯事谁愿意查你
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-26 下午 17:47，枫糖总帅 在群里实名制询问一个风险话题：用校园网翻墙会不会被抓。颜回momo 的回应颇具戏剧性——先沉思，再把问题甩给昵称带&rdquo;💙&rdquo;的 26冶北风💙💙💙，对方给出有亲历感但无法验证的回答&rdquo;目前我没被抓过&rdquo;。</p>
+<p><strong>深度解析：</strong><br />
+这段对话的喜剧核心是颜回momo 的&rdquo;问💙&rdquo;操作：他拒绝回答，而是把问题踢给了群内唯一在昵称上标记了&rdquo;💙&rdquo;的人，仿佛这个符号是&rdquo;翻墙经验认证&rdquo;的徽章。26冶北风💙💙💙 的回答&rdquo;目前我没被抓过&rdquo;用了精确的限定词&rdquo;目前&rdquo;，配合后续&rdquo;你不犯事谁愿意查你&rdquo;的淡定，完成了一场关于风险管理的黑色幽默教学。群斟茶兵的两句补充（&rdquo;硬要抓肯定是能抓的&rdquo;）则为整场对话补上了理性的法律注脚。</p>
+<hr />
+<h3 id="25-131">25. [考后余韵] 豆包还能考131</h3>
+<p><strong>原始聊天记录：</strong></p>
+<pre><code>~“.“”：豆包还能考131
+26瓦斯：没钱了还吃
+波克洛克：（回复）没钱了才只能吃便宜的
+若至：（回复）不如买个泡面
+26瓦斯：不如啃面包
+</code></pre>
+<p><strong>上下文说明：</strong><br />
+2026-06-09 中午 12:43，群友在聊高考与 AI：有消息称 AI 参与高考答卷可获 131 分，~“.“” 一句&rdquo;豆包还能考131&rdquo;引发讨论。与此同时 26瓦斯 与波克洛克关于&rdquo;没钱了吃什么&rdquo;展开了节省开支的军备竞赛：泡面对决面包。</p>
+<p><strong>深度解析：</strong><br />
+这段对话展示了群内&rdquo;多线程闲聊&rdquo;的混沌美学：一条关于 AI 高考分数的重磅信息与一条关于午饭预算的琐碎对话在同一屏内并行不悖，且两边都有完整逻辑。&rdquo;豆包还能考131&rdquo;在群内成为衡量 AI 的基准单位——后来群里甚至出现&rdquo;豆包 150 减 14 等于 146&rdquo;（赤焰琉霄，06-21）的续作，证明该梗具有持续生命力。</p>
+<hr />
+<p>本报告数据来源: .output/chat_stats.json, 抽样片段覆盖完整时间范围</p>
+
+<footer>
+    <a href="https://github.com/JularDepick/ChatAnalysis.SKILL" target="_blank" rel="noopener noreferrer">
+        SKILL技术支持·ChatAnalysis
+    </a>
+</footer>
+
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    function apply(t) {
+        if (t === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ 浅色';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            btn.textContent = '🌙 暗色';
+        }
+    }
+    apply(localStorage.getItem('theme') || 'light');
+    btn.addEventListener('click', function() {
+        var next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
+    });
+})();
+</script>
+</body>
+</html>
