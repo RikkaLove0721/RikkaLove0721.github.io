@@ -1320,8 +1320,9 @@
       tpEl.style.left = savedX + "px";
       tpEl.style.top = savedY + "px";
     } else {
-      tpEl.style.left = "50px";
-      tpEl.style.top = "50px";
+      tpEl.style.left = "50%";
+      tpEl.style.top = "50%";
+      tpEl.style.transform = "translate(-50%, -50%)";
     }
   }
 
@@ -1378,10 +1379,14 @@
   }
 
   tpEl.addEventListener("pointerdown", function (event) {
+    const rect = tpEl.getBoundingClientRect();
+    tpEl.style.transform = "none";
+    tpEl.style.left = rect.left + "px";
+    tpEl.style.top = rect.top + "px";
     dragging = true;
     moved = false;
-    dragOffsetX = event.clientX - tpEl.offsetLeft;
-    dragOffsetY = event.clientY - tpEl.offsetTop;
+    dragOffsetX = event.clientX - rect.left;
+    dragOffsetY = event.clientY - rect.top;
     tpEl.setPointerCapture(event.pointerId);
   });
 
