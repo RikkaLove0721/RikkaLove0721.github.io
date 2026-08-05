@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>厕所</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    width: 90%;
+    max-width: 360px;
+  }
+  .emoji {
+    font-size: 90px;
+    line-height: 1.2;
+    animation: bounce 1.5s infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  h1 { color: #00695c; margin: 10px 0; }
+  p { color: #607d8b; margin-bottom: 20px; }
+  .status {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background: #26a69a;
+  }
+  .status.occupied { background: #ef5350; }
+  .btn {
+    margin-top: 20px;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    background: #26a69a;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background .3s;
+  }
+  .btn:hover { background: #00897b; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="emoji">🚽</div>
+    <h1>厕所状态</h1>
+    <p>有空位的厕所，放心使用</p>
+    <div id="status" class="status">🟢 空闲</div>
+    <br>
+    <button class="btn" onclick="toggle()">切换占用/空闲</button>
+  </div>
+
+<script>
+  let occupied = false;
+  function toggle() {
+    occupied = !occupied;
+    const el = document.getElementById('status');
+    if (occupied) {
+      el.textContent = '🔴 有人';
+      el.className = 'status occupied';
+    } else {
+      el.textContent = '🟢 空闲';
+      el.className = 'status';
+    }
+  }
+</script>
+</body>
+</html>
