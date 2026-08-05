@@ -4,11 +4,41 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="author" content="RikkaLove0721">
-<title>厕所状态</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-<style>
+  <title>排便模拟器</title>
+  <style>
+  /* Inter 字体本地化,相对路径引入,不依赖在线资源 */
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('fonts/inter-400.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('fonts/inter-500.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('fonts/inter-600.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('fonts/inter-700.woff2') format('woff2');
+  }
+
   /* 全局变量与基础样式 */
   :root {
     --color-primary: #18181B;
@@ -45,27 +75,135 @@
     min-height: 100vh;
     min-height: 100dvh;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 24px 16px;
+    flex-direction: column;
   }
 
-  .card {
-    position: relative;
+  /* 站点头部与面包屑 */
+  .site-header {
+    background: var(--color-primary);
+  }
+
+  .breadcrumb ol {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    font-size: 14px;
+  }
+
+  .breadcrumb .icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 4px;
+    vertical-align: -4px;
+  }
+
+  .crumb-link {
+    display: inline-flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .crumb-link:hover {
+    color: #FFFFFF;
+    text-decoration: none;
+  }
+
+  .breadcrumb li + li::before {
+    content: "/";
+    margin-right: 8px;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .breadcrumb li[aria-current="page"] {
+    color: #FFFFFF;
+    font-weight: 600;
+  }
+
+  /* 主体布局,不受单一卡片限制 */
+  .layout {
+    flex: 1;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .panel {
     background: #FFFFFF;
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    padding: 40px 32px 28px;
-    width: 100%;
-    max-width: 380px;
+    padding: 28px 24px;
+  }
+
+  .control-panel {
+    flex: 1 1 360px;
+    max-width: 440px;
+    text-align: center;
+    position: relative;
+  }
+
+  .stats-panel {
+    flex: 1 1 320px;
+    min-width: 280px;
+    max-width: 440px;
+  }
+
+  .tutorial-panel {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .tutorial-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--color-secondary);
+    text-align: left;
+  }
+
+  .tutorial-list {
+    margin: 10px 0 0;
+    padding-left: 20px;
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--color-secondary);
+  }
+
+  .tutorial-list li {
+    margin-bottom: 4px;
+  }
+
+  @media (max-width: 820px) {
+    .layout {
+      flex-direction: column;
+    }
+
+    .control-panel, .stats-panel {
+      width: 100%;
+      max-width: 440px;
+    }
   }
 
   .card-icon {
-    width: 56px;
-    height: 56px;
-    color: var(--color-accent);
+    display: inline-block;
+    font-size: 56px;
+    line-height: 1;
+  }
+
+  .card-icon.active {
     animation: bounce 1.5s infinite;
   }
 
@@ -124,6 +262,22 @@
 
   .timer-num.tick {
     animation: timer-tick .3s ease-out;
+  }
+
+  .session-weight {
+    margin-top: 4px;
+    min-height: 20px;
+    font-size: 13px;
+    color: var(--color-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bowel-mystery {
+    margin-top: 10px;
+    min-height: 20px;
+    font-size: 13px;
+    color: var(--color-secondary);
+    font-variant-numeric: tabular-nums;
   }
 
   @keyframes timer-tick {
@@ -197,6 +351,15 @@
     background: #000000;
   }
 
+  .btn-push {
+    display: none;
+    background: var(--color-primary);
+  }
+
+  .btn-push:hover {
+    background: #000000;
+  }
+
   .btn-leave {
     background: var(--color-danger);
     margin-top: 14px;
@@ -207,9 +370,16 @@
     transform: scale(1.06);
   }
 
-  .btn-confirm {
+  .btn-confirm,
+  .btn-confirm:hover {
     background: var(--color-danger-dark);
     animation: pulse .5s infinite alternate;
+    transform: none;
+  }
+
+  .btn-restart {
+    display: block;
+    margin: 16px auto 0;
   }
 
   @keyframes pulse {
@@ -217,45 +387,40 @@
     to { transform: scale(1.06); }
   }
 
+  .stats-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--color-secondary);
+    text-align: left;
+  }
+
   .stats-table {
     width: 100%;
-    margin-top: 24px;
-    border-collapse: collapse;
-    font-size: 14px;
+    margin-top: 10px;
+    border-collapse: separate;
+    border-spacing: 8px;
     text-align: center;
   }
 
-  .stats-table th {
-    background: var(--color-muted);
-    color: var(--color-secondary);
-    font-weight: 600;
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--color-border);
-  }
-
   .stats-table td {
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--color-border);
-    color: var(--color-foreground);
+    width: 50%;
+    background: var(--color-muted);
+    border-radius: 10px;
+    padding: 10px 8px;
   }
 
-  .stats-table th:first-child {
-    border-radius: 10px 0 0 10px;
-  }
-
-  .stats-table th:last-child {
-    border-radius: 0 10px 10px 0;
-  }
-
-  .stats-table tbody tr:last-child td {
-    border-bottom: none;
-  }
-
-  .stats-table .stat-label {
+  .stat-label {
+    display: block;
+    font-size: 12px;
     color: var(--color-secondary);
+    margin-bottom: 4px;
   }
 
-  .stats-table .stat-value {
+  .stat-value {
+    display: block;
+    font-size: 16px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
   }
@@ -266,8 +431,17 @@
     color: var(--color-secondary);
   }
 
+  .author a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .author a:hover {
+    text-decoration: underline;
+  }
+
   .notice {
-    margin-top: 8px;
+    margin-top: 2px;
     min-height: 20px;
     font-size: 12px;
     color: var(--color-danger);
@@ -276,6 +450,19 @@
 
   .notice.pop {
     animation: notice-pop .6s ease-out;
+  }
+
+  .notice-num {
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .notice-num.tick {
+    animation: notice-pop .6s ease-out;
+  }
+
+  .notice.hidden {
+    display: none;
   }
 
   @keyframes notice-pop {
@@ -335,71 +522,137 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .card-icon { animation: none; }
+    .card-icon, .card-icon.active { animation: none; }
     .flush-wave.flushing { animation: none; opacity: 0; }
     .notice.pop { animation: none; }
+    .notice-num.tick { animation: none; }
     .timer-num.tick { animation: none; }
     .btn, .btn-confirm { animation: none; transition: none; }
   }
 </style>
 </head>
 <body>
-  <div class="card">
-    <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <rect x="7" y="2" width="10" height="5" rx="1.5"/>
-      <path d="M5.5 7h13v6.5a6.5 6.5 0 0 1-13 0z"/>
-      <path d="M10 17.5h4V21h-4z"/>
-    </svg>
-    <h1>厕所状态</h1>
-    <p id="desc" class="desc">有空位的厕所，放心使用</p>
-    <div id="status" class="status">
-      <span class="status-dot"></span>
-      <span id="status-text">空闲</span>
-    </div>
-    <div class="flush-wave" id="flush-wave"></div>
-    <p id="timer" class="timer"></p>
-    <div class="btn-group">
-      <button class="btn" id="toggle-btn">切换占用/空闲</button>
-      <button class="btn btn-secondary" id="flush-btn">冲水</button>
-    </div>
-    <table class="stats-table">
-      <thead>
-        <tr>
-          <th>统计项</th>
-          <th>累计</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="stat-label">如厕次数</td>
-          <td class="stat-value" id="stat-count">0 次</td>
-        </tr>
-        <tr>
-          <td class="stat-label">累计时长</td>
-          <td class="stat-value" id="stat-duration">0 秒</td>
-        </tr>
-        <tr>
-          <td class="stat-label">最长时长</td>
-          <td class="stat-value" id="stat-max">--</td>
-        </tr>
-        <tr>
-          <td class="stat-label">最短时长</td>
-          <td class="stat-value" id="stat-min">--</td>
-        </tr>
-        <tr>
-          <td class="stat-label">冲水次数</td>
-          <td class="stat-value" id="stat-flush">0 次</td>
-        </tr>
-        <tr>
-          <td class="stat-label">抽纸次数</td>
-          <td class="stat-value" id="stat-pulls">0 次</td>
-        </tr>
-      </tbody>
-    </table>
-    <button class="btn btn-leave" id="leave-btn">离开厕所</button>
-    <p class="author">作者:<span id="site-author">RikkaLove0721</span></p>
-    <p id="notice" class="notice" role="status"></p>
-  </div>
+  <header class="site-header">
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <ol>
+        <li>
+          <a class="crumb-link" href="../">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span>首页</span>
+          </a>
+        </li>
+        <li aria-current="page"><span>排便模拟器</span></li>
+      </ol>
+    </nav>
+  </header>
+
+  <main class="layout">
+    <section class="panel control-panel">
+      <span class="card-icon" role="img" aria-label="马桶">🚽</span>
+      <h1>排便模拟器</h1>
+      <p id="desc" class="desc">有空位的厕所，放心使用</p>
+      <div id="status" class="status">
+        <span class="status-dot"></span>
+        <span id="status-text">空闲</span>
+      </div>
+      <div class="flush-wave" id="flush-wave"></div>
+      <p id="timer" class="timer"></p>
+      <p id="session-weight" class="session-weight"></p>
+      <p id="bowel-weight" class="session-weight"></p>
+      <p id="bowel-mystery" class="bowel-mystery"></p>
+      <div class="btn-group">
+        <button class="btn" id="toggle-btn">切换占用/空闲</button>
+        <button class="btn btn-secondary" id="flush-btn">冲水</button>
+        <button class="btn btn-push" id="push-btn">加把劲</button>
+      </div>
+      <button class="btn btn-leave" id="leave-btn">离开厕所</button>
+      <p id="notice" class="notice" role="status"></p>
+      <p id="tp-notice" class="notice"></p>
+      <p id="mystery-notice" class="notice"></p>
+      <p id="notice-extra-1" class="notice reserved hidden"></p>
+      <p id="notice-extra-2" class="notice reserved hidden"></p>
+      <p class="author">
+        作者:
+        <a href="https://github.com/RikkaLove0721" id="site-author" target="_blank" rel="noopener noreferrer">RikkaLove0721</a>,
+        <a href="https://github.com/JularDepick" id="author-extra" target="_blank" rel="noopener noreferrer">JularDepick</a>
+      </p>
+    </section>
+
+    <section class="panel stats-panel" aria-labelledby="stats-title">
+      <h2 class="stats-title" id="stats-title">数据统计</h2>
+      <table class="stats-table">
+        <tbody>
+          <tr>
+            <td>
+              <span class="stat-label">累计排便次数</span>
+              <span class="stat-value" id="stat-count">0 次</span>
+            </td>
+            <td>
+              <span class="stat-label">累计排便时长</span>
+              <span class="stat-value" id="stat-duration">0 秒</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class="stat-label">累计排便重量</span>
+              <span class="stat-value" id="stat-total-weight">0 克</span>
+            </td>
+            <td>
+              <span class="stat-label">排射神秘液体</span>
+              <span class="stat-value" id="stat-mystery">0 毫升</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class="stat-label">最长排便时长</span>
+              <span class="stat-value" id="stat-max">0 秒</span>
+            </td>
+            <td>
+              <span class="stat-label">最短排便时长</span>
+              <span class="stat-value" id="stat-min">0 秒</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class="stat-label">排便最多记录</span>
+              <span class="stat-value" id="stat-max-weight">0 克</span>
+            </td>
+            <td>
+              <span class="stat-label">排便最少记录</span>
+              <span class="stat-value" id="stat-min-weight">0 克</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span class="stat-label">累计抽纸次数</span>
+              <span class="stat-value" id="stat-pulls">0 次</span>
+            </td>
+            <td>
+              <span class="stat-label">累计冲水次数</span>
+              <span class="stat-value" id="stat-flush">0 次</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn btn-secondary btn-restart" id="restart-btn">重开</button>
+    </section>
+
+    <section class="panel tutorial-panel" aria-labelledby="tutorial-title">
+      <h2 class="tutorial-title" id="tutorial-title">游戏教程</h2>
+      <ul class="tutorial-list">
+        <li>开始排便:点击"开始排便"进入排便状态,马桶自动按秒排出粪便,排量随时间递减,到 51 秒后停止</li>
+        <li>加把劲:排便中点按"加把劲"立即排出更多粪便,排量同样随时间递减,到 205 秒后无效</li>
+        <li>卷纸:可拖动卷纸改变位置;排便中点击卷纸抽取一格,擦完屁股后 2 秒内不再自动排便</li>
+        <li>神秘液体:空闲时抽纸会偶然向厕所排射神秘液体;马桶内有任何残留物时都无法开始排便,请先冲水</li>
+        <li>冲水:点击"冲水"清空马桶内的粪便与神秘液体,并计入累计冲水次数</li>
+        <li>结束排便:须在最后一次抽纸后没有新的粪便排入,且马桶内粪便已冲净,再点击"结束排便"</li>
+        <li>数据统计:累计数据保存在浏览器本地,点击"重开"可清空全部数据重新开始</li>
+      </ul>
+    </section>
+  </main>
 
   <div class="toilet-paper" id="toilet-paper" role="button" aria-label="卷纸,拖动移动位置,点击抽取一格">
     <svg class="tp-full" viewBox="0 0 64 80" aria-hidden="true">
@@ -421,21 +674,25 @@
 <script>
   /* 站点作者信息常量,开发者修改此处即可全局替换作者信息 */
   const SITE_AUTHOR = "RikkaLove0721";
+  const SITE_AUTHOR_EXTRA = "JularDepick";
+  const SITE_AUTHOR_URL = "https://github.com/" + SITE_AUTHOR;
+  const SITE_AUTHOR_EXTRA_URL = "https://github.com/" + SITE_AUTHOR_EXTRA;
 
   /* 存储键前缀,统一使用 wc_test 避免污染同域名其他页面 */
-  const STORAGE_PREFIX = "wc_test";
-  const KEY_OCCUPIED = STORAGE_PREFIX + "_occupied";
-  const KEY_SINCE = STORAGE_PREFIX + "_occupied_since";
-  const KEY_ACTIVE = STORAGE_PREFIX + "_occupied_active";
+  const STORAGE_PREFIX = "wc_game";
   const KEY_STATS = STORAGE_PREFIX + "_stats";
   const KEY_TP_X = STORAGE_PREFIX + "_tp_x";
   const KEY_TP_Y = STORAGE_PREFIX + "_tp_y";
   const KEY_TP_LEFT = STORAGE_PREFIX + "_tp_left";
   const KEY_FLUSH = STORAGE_PREFIX + "_flush_count";
   const KEY_TP_PULLS = STORAGE_PREFIX + "_tp_pulls";
+  const KEY_MYSTERY = STORAGE_PREFIX + "_mystery_ml";
+  const KEY_SESSION_ELAPSED = STORAGE_PREFIX + "_session_elapsed";
+  const KEY_SESSION_WEIGHT = STORAGE_PREFIX + "_session_weight";
 
   const OVERDUE_SECONDS = 600;
   const TP_TOTAL = 20;
+  const TP_FREEZE_MS = 2000;
 
   /* 存储读写封装,不可用时静默降级 */
   function storageGet(key) {
@@ -463,7 +720,7 @@
   }
 
   /* 清空本页会话数据,保留累积统计与剩余纸张 */
-  const KEEP_KEYS = [KEY_STATS, KEY_FLUSH, KEY_TP_PULLS, KEY_TP_LEFT];
+  const KEEP_KEYS = [KEY_STATS, KEY_FLUSH, KEY_TP_PULLS, KEY_TP_LEFT, KEY_MYSTERY];
 
   function clearWcTestData() {
     try {
@@ -478,13 +735,27 @@
     }
   }
 
-  /* 状态数据 */
-  let occupied = storageGet(KEY_OCCUPIED) === "true";
-  let since = Number(storageGet(KEY_SINCE) || 0);
-  let activeSeconds = Number(storageGet(KEY_ACTIVE) || 0);
-  let stats = { count: 0, totalSeconds: 0, maxSeconds: 0, minSeconds: 0 };
+  /* 清空所有带厕所变量前缀的储存数据 */
+  function clearAllWcGameData() {
+    try {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key && key.indexOf(STORAGE_PREFIX) === 0) {
+          localStorage.removeItem(key);
+        }
+      }
+    } catch (error) {
+      /* 存储不可用时静默失败,不影响页面使用 */
+    }
+  }
+
+  /* 状态数据,占用状态不持久化,刷新页面即解除占用 */
+  let occupied = false;
+  let since = 0;
+  let stats = { count: 0, totalSeconds: 0, maxSeconds: 0, minSeconds: 0, totalWeight: 0, maxWeight: 0, minWeight: 0 };
   let flushCount = Number(storageGet(KEY_FLUSH) || 0);
   let tpPulls = Number(storageGet(KEY_TP_PULLS) || 0);
+  let mysteryMl = Number(storageGet(KEY_MYSTERY) || 0);
   let tpLeft = Number(storageGet(KEY_TP_LEFT));
   if (!(tpLeft >= 0)) {
     tpLeft = TP_TOTAL;
@@ -507,24 +778,81 @@
     if (saved && typeof saved.minSeconds === "number") {
       stats.minSeconds = saved.minSeconds;
     }
+    if (saved && typeof saved.totalWeight === "number") {
+      stats.totalWeight = saved.totalWeight;
+    }
+    if (saved && typeof saved.maxWeight === "number") {
+      stats.maxWeight = saved.maxWeight;
+    }
+    if (saved && typeof saved.minWeight === "number") {
+      stats.minWeight = saved.minWeight;
+    }
   } catch (error) {
     /* 统计解析失败时使用默认值 */
   }
 
-  /* 提示输出到作者信息下方固定区域 */
-  let noticeTimer = null;
+  /* 刷新遗留的未结算会话:结算进统计后清除,视为已结束排便并离开厕所 */
+  const pendingElapsedRaw = storageGet(KEY_SESSION_ELAPSED);
+  if (pendingElapsedRaw !== null) {
+    const pendingElapsed = Number(pendingElapsedRaw) || 0;
+    const pendingWeight = Number(storageGet(KEY_SESSION_WEIGHT) || 0);
+    if (pendingElapsed > 0 || pendingWeight > 0) {
+      stats.count += 1;
+      stats.totalSeconds += pendingElapsed;
+      if (stats.maxSeconds === 0 || pendingElapsed > stats.maxSeconds) {
+        stats.maxSeconds = pendingElapsed;
+      }
+      if (stats.minSeconds === 0 || pendingElapsed < stats.minSeconds) {
+        stats.minSeconds = pendingElapsed;
+      }
+      stats.totalWeight += pendingWeight;
+      if (stats.maxWeight === 0 || pendingWeight > stats.maxWeight) {
+        stats.maxWeight = pendingWeight;
+      }
+      if (stats.minWeight === 0 || pendingWeight < stats.minWeight) {
+        stats.minWeight = pendingWeight;
+      }
+      storageSet(KEY_STATS, JSON.stringify(stats));
+    }
+    storageRemove(KEY_SESSION_ELAPSED);
+    storageRemove(KEY_SESSION_WEIGHT);
+  }
 
-  function setNotice(message) {
-    const notice = document.getElementById("notice");
-    notice.textContent = message;
-    notice.classList.remove("pop");
-    void notice.offsetWidth;
-    notice.classList.add("pop");
-    clearTimeout(noticeTimer);
-    noticeTimer = setTimeout(function () {
-      notice.textContent = "";
-      notice.classList.remove("pop");
+  /* 通用跳动提示,支持预留多个提示槽位,各槽位互不影响;临时提示区默认整条弹跳,numOnly 时仅数字部分弹跳,其余槽位数字部分单独弹跳 */
+  function popNotice(elementId, message, numOnly) {
+    const el = document.getElementById(elementId);
+    el.classList.remove("hidden");
+    el.classList.remove("pop");
+    if (elementId === "notice" && !numOnly) {
+      el.textContent = message;
+      void el.offsetWidth;
+      el.classList.add("pop");
+    } else {
+      el.innerHTML = message.replace(/(\d+)/g, '<span class="notice-num">$1</span>');
+      el.querySelectorAll(".notice-num").forEach(function (numEl) {
+        numEl.classList.remove("tick");
+        void numEl.offsetWidth;
+        numEl.classList.add("tick");
+      });
+    }
+    clearTimeout(el.noticeTimer);
+    el.noticeTimer = setTimeout(function () {
+      el.textContent = "";
+      el.classList.remove("pop");
+      if (el.classList.contains("reserved")) {
+        el.classList.add("hidden");
+      }
     }, 3500);
+  }
+
+  /* 提示输出到临时提示区 */
+  function setNotice(message) {
+    popNotice("notice", message);
+  }
+
+  /* 提示输出到临时提示区,仅数字部分弹跳 */
+  function setNoticeNum(message) {
+    popNotice("notice", message, true);
   }
 
   /* 秒级时长格式化 */
@@ -538,14 +866,100 @@
     return Math.floor(seconds / 3600) + " 小时 " + Math.floor((seconds % 3600) / 60) + " 分";
   }
 
-  /* 统计表格更新 */
-  function updateStatsTable() {
-    document.getElementById("stat-count").textContent = stats.count + " 次";
-    document.getElementById("stat-duration").textContent = formatSeconds(stats.totalSeconds);
-    document.getElementById("stat-max").textContent = stats.maxSeconds > 0 ? formatSeconds(stats.maxSeconds) : "--";
-    document.getElementById("stat-min").textContent = stats.minSeconds > 0 ? formatSeconds(stats.minSeconds) : "--";
+  /* 统计表格时间数据更新,每秒刷新 */
+  function updateStatsTime() {
+    const elapsed = occupied ? Math.max(0, Math.floor((Date.now() - since) / 1000)) : 0;
+    let count = stats.count;
+    let totalSeconds = stats.totalSeconds;
+    let maxSeconds = stats.maxSeconds;
+    let minSeconds = stats.minSeconds;
+    if (occupied) {
+      count += 1;
+      totalSeconds += elapsed;
+      if (maxSeconds === 0 || elapsed > maxSeconds) {
+        maxSeconds = elapsed;
+      }
+      if (elapsed > 0 && (minSeconds === 0 || elapsed < minSeconds)) {
+        minSeconds = elapsed;
+      }
+    }
+    document.getElementById("stat-count").textContent = count + " 次";
+    document.getElementById("stat-duration").textContent = formatSeconds(totalSeconds);
+    document.getElementById("stat-max").textContent = maxSeconds > 0 ? formatSeconds(maxSeconds) : "0 秒";
+    document.getElementById("stat-min").textContent = minSeconds > 0 ? formatSeconds(minSeconds) : "0 秒";
+  }
+
+  /* 统计表格动作类数据更新,动作触发时刷新;占用中仅预览最大记录,最少记录待结束结算后更新 */
+  function updateStatsAction() {
+    const previewWeight = occupied ? sessionWeight : 0;
+    const totalWeight = stats.totalWeight + previewWeight;
+    let maxWeight = stats.maxWeight;
+    if (occupied && (maxWeight === 0 || previewWeight > maxWeight)) {
+      maxWeight = previewWeight;
+    }
+    document.getElementById("stat-total-weight").textContent = totalWeight + " 克";
+    document.getElementById("stat-max-weight").textContent = maxWeight > 0 ? maxWeight + " 克" : "0 克";
+    document.getElementById("stat-min-weight").textContent = stats.minWeight > 0 ? stats.minWeight + " 克" : "0 克";
     document.getElementById("stat-flush").textContent = flushCount + " 次";
     document.getElementById("stat-pulls").textContent = tpPulls + " 次";
+    document.getElementById("stat-mystery").textContent = mysteryMl + " 毫升";
+  }
+
+  /* 读秒排便量公式 f(x)=floor(120/log2(x+2)-20)+随机[-2,2],低于 0 取 0,到第 51 秒后不再读秒排便 */
+  const AUTO_STOP_SECONDS = 51;
+  /* 加把劲排便量公式 g(x)=floor(300/log2(x+2)-38)+随机[-2,2],低于 0 取 0,到第 205 秒后不再排便 */
+  const PUSH_STOP_SECONDS = 205;
+
+  function autoGain(elapsed) {
+    if (elapsed >= AUTO_STOP_SECONDS) {
+      return 0;
+    }
+    return Math.max(0, Math.floor(120 / Math.log2(elapsed + 2) - 20) + Math.floor(Math.random() * 5) - 2);
+  }
+
+  function pushGain(elapsed) {
+    if (elapsed >= PUSH_STOP_SECONDS) {
+      return 0;
+    }
+    return Math.max(0, Math.floor(300 / Math.log2(elapsed + 2) - 38) + Math.floor(Math.random() * 5) - 2);
+  }
+
+  let sessionWeight = 0;
+  let bowelWeight = 0;
+  let bowelMysteryMl = 0;
+  let sessionPulls = 0;
+  let sessionFlushes = 0;
+  let lastPullSnapshot = 0;
+  let frozenUntil = 0;
+
+  /* 单次累计排便显示 */
+  function updateSessionWeight() {
+    const el = document.getElementById("session-weight");
+    if (occupied) {
+      el.textContent = "本次累计排便: " + sessionWeight + " 克";
+    } else {
+      el.textContent = "";
+    }
+  }
+
+  /* 马桶内粪便显示,读秒与加把劲累加,冲水归零 */
+  function updateBowelWeight() {
+    const el = document.getElementById("bowel-weight");
+    if (occupied) {
+      el.textContent = "马桶内粪便: " + bowelWeight + " 克";
+    } else {
+      el.textContent = "";
+    }
+  }
+
+  /* 厕所内神秘液体显示,未排便时显示,排便中隐藏 */
+  function updateBowelMystery() {
+    const el = document.getElementById("bowel-mystery");
+    if (occupied) {
+      el.textContent = "";
+    } else {
+      el.textContent = "厕所内神秘液体: " + bowelMysteryMl + " 毫升";
+    }
   }
 
   /* 状态渲染 */
@@ -554,17 +968,40 @@
     const statusText = document.getElementById("status-text");
     const descEl = document.getElementById("desc");
     const timerEl = document.getElementById("timer");
+    const pushBtn = document.getElementById("push-btn");
+    const toggleBtn = document.getElementById("toggle-btn");
+    const sessionWeightEl = document.getElementById("session-weight");
+    const bowelWeightEl = document.getElementById("bowel-weight");
+    const bowelMysteryEl = document.getElementById("bowel-mystery");
+    const cardIconEl = document.querySelector(".card-icon");
     if (occupied) {
       statusText.textContent = "有人";
       statusEl.className = "status occupied";
-      descEl.textContent = "厕所暂被占用，请稍候";
+      descEl.textContent = "正在排便，请安心使用";
+      cardIconEl.classList.add("active");
+      pushBtn.style.display = "inline-block";
+      toggleBtn.textContent = "结束排便";
+      sessionWeightEl.style.display = "block";
+      bowelWeightEl.style.display = "block";
+      bowelMysteryEl.style.display = "none";
     } else {
       statusText.textContent = "空闲";
       statusEl.className = "status";
       descEl.textContent = "有空位的厕所，放心使用";
+      cardIconEl.classList.remove("active");
+      pushBtn.style.display = "none";
+      toggleBtn.textContent = "开始排便";
+      sessionWeightEl.style.display = "none";
+      bowelWeightEl.style.display = "none";
+      bowelMysteryEl.style.display = "block";
     }
     renderTimer(timerEl);
-    updateStatsTable();
+    updateSessionWeight();
+    updateBowelWeight();
+    updateBowelMystery();
+    updateFixedNotice(occupied ? Math.floor((Date.now() - since) / 1000) : 0);
+    updateStatsTime();
+    updateStatsAction();
   }
 
   let lastElapsedSeconds = -1;
@@ -576,7 +1013,7 @@
 
   function renderTimer(timerEl) {
     if (occupied) {
-      const elapsed = activeSeconds + Math.floor((Date.now() - since) / 1000);
+      const elapsed = Math.floor((Date.now() - since) / 1000);
       timerEl.innerHTML = "已占用 " + formatSecondsHtml(elapsed);
       if (elapsed !== lastElapsedSeconds) {
         lastElapsedSeconds = elapsed;
@@ -594,7 +1031,7 @@
   /* 超时提醒检查 */
   function checkOverdue() {
     if (occupied && !reminded) {
-      const elapsed = activeSeconds + Math.floor((Date.now() - since) / 1000);
+      const elapsed = Math.floor((Date.now() - since) / 1000);
       if (elapsed >= OVERDUE_SECONDS) {
         reminded = true;
         setNotice("已占用超过 " + Math.floor(OVERDUE_SECONDS / 60) + " 分钟,小心腿麻");
@@ -602,20 +1039,119 @@
     }
   }
 
-  /* 占用会话结算 */
-  function settleActive() {
+  /* 超时提醒:按超时区间分段展示,同一超时时刻只展示一个 */
+  function updateFixedNotice(elapsed) {
+    const extra1 = document.getElementById("notice-extra-1");
+    const extra2 = document.getElementById("notice-extra-2");
+    let text = "";
+    let target = null;
     if (occupied) {
-      activeSeconds += Math.floor((Date.now() - since) / 1000);
-      since = Date.now();
-      storageSet(KEY_ACTIVE, activeSeconds);
-      storageSet(KEY_SINCE, since);
+      if (elapsed >= PUSH_STOP_SECONDS) {
+        text = "已经无便可排了,建议结束本次厕所占用";
+        target = extra2;
+      } else if (elapsed >= AUTO_STOP_SECONDS) {
+        text = "排便已经差不多了,如果要继续排便请加把劲";
+        target = extra1;
+      }
     }
+    if (target === extra1) {
+      hideExtraSlot(extra2);
+      showExtraSlot(extra1, text);
+    } else if (target === extra2) {
+      hideExtraSlot(extra1);
+      showExtraSlot(extra2, text);
+    } else {
+      hideExtraSlot(extra1);
+      hideExtraSlot(extra2);
+    }
+  }
+
+  /* 超时槽展示:文本变化时弹跳一次并保持显示 */
+  function showExtraSlot(el, text) {
+    if (el.textContent !== text) {
+      el.textContent = text;
+      el.classList.remove("hidden");
+      el.classList.remove("pop");
+      void el.offsetWidth;
+      el.classList.add("pop");
+    }
+  }
+
+  /* 超时槽隐藏 */
+  function hideExtraSlot(el) {
+    if (!el.classList.contains("hidden")) {
+      el.textContent = "";
+      el.classList.remove("pop");
+      el.classList.add("hidden");
+    }
+  }
+
+  /* 每秒自动累积排泄重量 */
+  function autoGainWeight() {
+    if (!occupied) {
+      return;
+    }
+    const elapsed = Math.max(1, Math.floor((Date.now() - since) / 1000));
+    /* 抽纸后 2 秒内读秒排便量强制为 0,公式照常计算,冻结期过后恢复 */
+    const gain = Date.now() < frozenUntil ? 0 : autoGain(elapsed);
+    if (gain > 0) {
+      sessionWeight += gain;
+      bowelWeight += gain;
+      storageSet(KEY_SESSION_WEIGHT, sessionWeight);
+      updateBowelWeight();
+      updateStatsAction();
+    }
+    updateSessionWeight();
+    updateFixedNotice(elapsed);
+  }
+
+  /* 加把劲:手动累积排泄重量 */
+  function push() {
+    if (!occupied) {
+      return;
+    }
+    const elapsed = Math.max(1, Math.floor((Date.now() - since) / 1000));
+    const gain = pushGain(elapsed);
+    if (gain > 0) {
+      sessionWeight += gain;
+      bowelWeight += gain;
+      storageSet(KEY_SESSION_WEIGHT, sessionWeight);
+      updateBowelWeight();
+      updateStatsAction();
+    }
+    updateSessionWeight();
+    setNoticeNum("加把劲!本次排出 " + gain + " 克");
+  }
+
+  /* 保存当前会话数据,页面隐藏或关闭时调用,刷新后据此结算,避免丢失 */
+  function saveSession() {
+    if (!occupied) {
+      return;
+    }
+    storageSet(KEY_SESSION_ELAPSED, Math.floor((Date.now() - since) / 1000));
+    storageSet(KEY_SESSION_WEIGHT, sessionWeight);
   }
 
   /* 切换占用状态 */
   function toggle() {
     if (occupied) {
-      const sessionSeconds = activeSeconds + Math.floor((Date.now() - since) / 1000);
+      /* 结束条件:本次排便过程中,最后一次抽纸后不再有新的排便量进入马桶,且马桶内粪便量为 0 */
+      const noNewExcreta = sessionWeight <= lastPullSnapshot;
+      const bowlOk = bowelWeight === 0;
+      if (!noNewExcreta || !bowlOk) {
+        let msg = "";
+        if (sessionPulls < 1) {
+          msg = "结束排便前需要先抽纸";
+        } else if (sessionWeight > lastPullSnapshot) {
+          msg = "擦完屁股后又排便了,请再抽纸擦干净";
+        } else {
+          msg = "马桶内还有粪便,请先冲水";
+        }
+        setNotice(msg);
+        return;
+      }
+      const sessionSeconds = Math.floor((Date.now() - since) / 1000);
+      const sessionExcreta = sessionWeight;
       stats.count += 1;
       stats.totalSeconds += sessionSeconds;
       if (stats.maxSeconds === 0 || sessionSeconds > stats.maxSeconds) {
@@ -624,21 +1160,36 @@
       if (stats.minSeconds === 0 || sessionSeconds < stats.minSeconds) {
         stats.minSeconds = sessionSeconds;
       }
+      stats.totalWeight += sessionExcreta;
+      if (stats.maxWeight === 0 || sessionExcreta > stats.maxWeight) {
+        stats.maxWeight = sessionExcreta;
+      }
+      if (stats.minWeight === 0 || sessionExcreta < stats.minWeight) {
+        stats.minWeight = sessionExcreta;
+      }
       storageSet(KEY_STATS, JSON.stringify(stats));
-      activeSeconds = 0;
+      storageRemove(KEY_SESSION_ELAPSED);
+      storageRemove(KEY_SESSION_WEIGHT);
+      sessionWeight = 0;
+      bowelWeight = 0;
+      updateBowelWeight();
       occupied = false;
-      storageSet(KEY_OCCUPIED, "false");
-      storageRemove(KEY_SINCE);
-      storageRemove(KEY_ACTIVE);
       reminded = false;
-      setNotice("本次如厕 " + formatSeconds(sessionSeconds) + " 记录已更新");
+      setNotice("本次如厕 " + formatSeconds(sessionSeconds) + ",排出 " + sessionExcreta + " 克,记录已更新");
     } else {
+      if (bowelMysteryMl > 0) {
+        setNotice("马桶不干净,请先冲水");
+        return;
+      }
       occupied = true;
       since = Date.now();
-      activeSeconds = 0;
-      storageSet(KEY_OCCUPIED, "true");
-      storageSet(KEY_SINCE, since);
-      storageRemove(KEY_ACTIVE);
+      sessionWeight = 0;
+      bowelWeight = 0;
+      sessionPulls = 0;
+      sessionFlushes = 0;
+      lastPullSnapshot = 0;
+      frozenUntil = 0;
+      updateBowelWeight();
       reminded = false;
     }
     render();
@@ -647,12 +1198,23 @@
   /* 冲水 */
   function flush() {
     flushCount += 1;
+    if (occupied) {
+      sessionFlushes += 1;
+    }
     storageSet(KEY_FLUSH, flushCount);
+    if (bowelWeight > 0) {
+      bowelWeight = 0;
+      updateBowelWeight();
+    }
+    if (bowelMysteryMl > 0) {
+      bowelMysteryMl = 0;
+      updateBowelMystery();
+    }
     const wave = document.getElementById("flush-wave");
     wave.classList.remove("flushing");
     void wave.offsetWidth;
     wave.classList.add("flushing");
-    updateStatsTable();
+    updateStatsAction();
   }
 
   /* 离开厕所:清空会话数据并返回主页 */
@@ -671,6 +1233,10 @@
   }
 
   leaveBtn.addEventListener("click", function () {
+    if (occupied) {
+      setNotice("请先结束排便,再离开厕所");
+      return;
+    }
     if (leaveBtn.classList.contains("btn-confirm")) {
       clearTimeout(leaveConfirmTimer);
       leave();
@@ -680,6 +1246,50 @@
     leaveBtn.classList.add("btn-confirm");
     clearTimeout(leaveConfirmTimer);
     leaveConfirmTimer = setTimeout(resetLeaveBtn, 3000);
+  });
+
+  /* 重开:清空所有带前缀的储存数据并重置页面状态 */
+  function restart() {
+    clearAllWcGameData();
+    stats = { count: 0, totalSeconds: 0, maxSeconds: 0, minSeconds: 0, totalWeight: 0, maxWeight: 0, minWeight: 0 };
+    flushCount = 0;
+    tpPulls = 0;
+    mysteryMl = 0;
+    tpLeft = TP_TOTAL;
+    sessionWeight = 0;
+    bowelWeight = 0;
+    bowelMysteryMl = 0;
+    sessionPulls = 0;
+    sessionFlushes = 0;
+    lastPullSnapshot = 0;
+    frozenUntil = 0;
+    occupied = false;
+    reminded = false;
+    updateTPBadge();
+    render();
+    setNotice("已重置,重新开始");
+  }
+
+  /* 重开按钮:先替换为确认按钮,3 秒内点击确认,超时回归初始状态 */
+  const restartBtn = document.getElementById("restart-btn");
+  let restartConfirmTimer = null;
+
+  function resetRestartBtn() {
+    restartBtn.textContent = "重开";
+    restartBtn.classList.remove("btn-confirm");
+  }
+
+  restartBtn.addEventListener("click", function () {
+    if (restartBtn.classList.contains("btn-confirm")) {
+      clearTimeout(restartConfirmTimer);
+      resetRestartBtn();
+      restart();
+      return;
+    }
+    restartBtn.textContent = "确认重开?";
+    restartBtn.classList.add("btn-confirm");
+    clearTimeout(restartConfirmTimer);
+    restartConfirmTimer = setTimeout(resetRestartBtn, 3000);
   });
 
   /* 卷纸:拖动与抽纸 */
@@ -702,8 +1312,8 @@
       tpEl.style.left = savedX + "px";
       tpEl.style.top = savedY + "px";
     } else {
-      tpEl.style.left = (window.innerWidth - 110) + "px";
-      tpEl.style.top = "120px";
+      tpEl.style.left = "50px";
+      tpEl.style.top = "50px";
     }
   }
 
@@ -712,24 +1322,50 @@
     tpEl.classList.toggle("empty", tpLeft <= 0);
   }
 
+  /* 抽纸状态提示,独立显示与消失,不受取值提示影响 */
+  function setTpNotice(message) {
+    popNotice("tp-notice", message);
+  }
+
+  /* 神秘液体:空闲时抽纸随机累加 [0,10] 毫升,按取值区间跳动提示 */
+  function gainMysteryMl() {
+    const gain = Math.floor(Math.random() * 11);
+    mysteryMl += gain;
+    bowelMysteryMl += gain;
+    storageSet(KEY_MYSTERY, mysteryMl);
+    updateBowelMystery();
+    if (gain === 0) {
+      setNotice("身体虚弱,别再抽纸了");
+    } else if (gain <= 5) {
+      setNotice("这么虚,去医院检查检查吧");
+    } else {
+      setNotice("哦齁齁齁齁齁齁齁");
+    }
+    popNotice("mystery-notice", "本次排出 " + gain + " 毫升神秘液体");
+  }
+
   function pullPaper() {
     if (tpLeft > 0) {
       tpLeft -= 1;
       tpPulls += 1;
+      if (occupied) {
+        sessionPulls += 1;
+        lastPullSnapshot = sessionWeight;
+        frozenUntil = Date.now() + TP_FREEZE_MS;
+        setNotice("擦完屁股赶紧冲水结束排便吧");
+      } else {
+        gainMysteryMl();
+      }
       storageSet(KEY_TP_LEFT, tpLeft);
       storageSet(KEY_TP_PULLS, tpPulls);
       updateTPBadge();
-      updateStatsTable();
-      if (tpLeft <= 0) {
-        setNotice("纸抽完了,只剩纸筒,点击纸筒换新卷");
-      } else {
-        setNotice("抽走一格纸,还剩 " + tpLeft + " 格");
-      }
+      updateStatsAction();
+      setTpNotice(tpLeft <= 0 ? "纸抽完了,只剩纸筒,点击纸筒换新卷" : "抽走一格纸,还剩 " + tpLeft + " 格");
     } else {
       tpLeft = TP_TOTAL;
       storageSet(KEY_TP_LEFT, tpLeft);
       updateTPBadge();
-      setNotice("换上了新卷");
+      setTpNotice("换上了新卷");
     }
   }
 
@@ -763,26 +1399,34 @@
     }
   });
 
-  /* 页面隐藏或关闭时结算当前占用时长,避免丢失 */
+  /* 页面隐藏或关闭时保存当前会话数据,刷新后结算,避免丢失 */
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) {
-      settleActive();
+      saveSession();
     }
   });
-  window.addEventListener("pagehide", settleActive);
+  window.addEventListener("pagehide", saveSession);
 
   /* 页面主体初始化 */
   document.getElementById("toggle-btn").addEventListener("click", toggle);
   document.getElementById("flush-btn").addEventListener("click", flush);
+  document.getElementById("push-btn").addEventListener("click", push);
   document.getElementById("site-author").textContent = SITE_AUTHOR;
+  document.getElementById("site-author").href = SITE_AUTHOR_URL;
+  document.getElementById("author-extra").textContent = SITE_AUTHOR_EXTRA;
+  document.getElementById("author-extra").href = SITE_AUTHOR_EXTRA_URL;
   loadTPPosition();
   updateTPBadge();
   render();
   checkOverdue();
   setInterval(function () {
     if (occupied) {
+      const elapsed = Math.floor((Date.now() - since) / 1000);
+      storageSet(KEY_SESSION_ELAPSED, elapsed);
       renderTimer(document.getElementById("timer"));
       checkOverdue();
+      autoGainWeight();
+      updateStatsTime();
     }
   }, 1000);
 </script>

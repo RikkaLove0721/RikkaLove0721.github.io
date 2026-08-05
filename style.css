@@ -185,16 +185,6 @@ a:hover {
   margin-bottom: 20px;
 }
 
-.category-title-link {
-  color: var(--color-secondary);
-  transition: color 0.2s;
-}
-
-.category-title-link:hover {
-  color: var(--color-accent);
-  text-decoration: none;
-}
-
 /* 卡片网格 */
 .card-grid {
   display: grid;
