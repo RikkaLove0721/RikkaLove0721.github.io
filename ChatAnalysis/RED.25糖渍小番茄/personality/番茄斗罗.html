@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>人格画像：番茄斗罗</title>
+<script>
+(function() {
+    var t = localStorage.getItem('theme') || 'light';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --text: #1d1d1f;
+    --text-muted: #86868b;
+    --accent: #007aff;
+    --accent-hover: #0056b3;
+    --link: #007aff;
+    --link-hover: #0056b3;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --code-bg: #f5f5f7;
+    --code-color: #c0392b;
+    --pre-color: #6c5ce7;
+    --table-header-bg: #f5f5f7;
+    --hover-bg: rgba(0,0,0,0.03);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --blockquote-bg: rgba(0,122,255,0.04);
+    --blockquote-border: #007aff;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+}
+
+:root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --link: #0a84ff;
+    --link-hover: #409cff;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.2);
+    --code-bg: #1c1c1e;
+    --code-color: #f48fb1;
+    --pre-color: #ce93d8;
+    --table-header-bg: #1c1c1e;
+    --hover-bg: rgba(255,255,255,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --blockquote-bg: rgba(10,132,255,0.08);
+    --blockquote-border: #0a84ff;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+
+body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* ===== 主题切换按钮 ===== */
+.theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--surface);
+    color: var(--text); font-size: 13px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
+}
+.theme-toggle:hover { background: var(--hover-bg); border-color: var(--border-strong); }
+
+/* ===== 面包屑 ===== */
+.breadcrumb {
+    padding: 8px 0; margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); }
+.breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+
+/* ===== 排版 ===== */
+h1 { font-size: 1.8em; font-weight: 700; margin: 0 0 24px; line-height: 1.3; }
+h2 { font-size: 1.4em; font-weight: 700; margin: 40px 0 16px; line-height: 1.35; }
+h3 { font-size: 1.15em; font-weight: 600; margin: 24px 0 8px; line-height: 1.4; }
+h4 { font-size: 1em; font-weight: 600; margin: 16px 0 4px; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ===== 表格 ===== */
+table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13px;
+}
+th, td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th { background: var(--table-header-bg); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: var(--hover-bg); }
+
+/* ===== 代码块 ===== */
+pre {
+    background: var(--code-bg); color: var(--pre-color);
+    padding: 16px 20px; border-radius: 10px;
+    overflow-x: auto; font-size: 0.88em; line-height: 1.6;
+    margin: 16px 0;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono",
+                 "Cascadia Code", Consolas, monospace;
+}
+code {
+    background: var(--code-bg); color: var(--code-color);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* ===== 引用块 ===== */
+blockquote {
+    border-left: 3px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted); font-size: 0.95em;
+}
+
+/* ===== 高危区块 ===== */
+.danger-block {
+    border-left: 4px solid var(--danger);
+    background: color-mix(in srgb, var(--danger) 6%, transparent);
+    padding: 14px 18px; margin: 16px 0;
+    border-radius: 0 10px 10px 0;
+}
+.danger-block::before {
+    content: "⚠️ 高危提醒";
+    display: block; font-weight: 700; color: var(--danger);
+    margin-bottom: 8px; font-size: 0.9em;
+}
+
+/* ===== 折叠块 ===== */
+.collapsed-links { margin: 8px 0; }
+.collapsed-links summary {
+    cursor: pointer; font-weight: 600; padding: 8px 0;
+    color: var(--text-muted); font-size: 13px;
+}
+.collapsed-links summary:hover { color: var(--link); }
+
+/* ===== 排行榜 ===== */
+.leaderboard-item {
+    display: grid; grid-template-columns: 40px 1fr auto 120px;
+    align-items: center; gap: 8px;
+    padding: 12px 16px; margin: 4px 0;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+}
+.leaderboard-item:hover { background: var(--hover-bg); text-decoration: none; }
+.leaderboard-rank { font-weight: 700; font-size: 1.1em; color: var(--text-muted); text-align: center; }
+.leaderboard-rank.top3 { color: var(--accent); }
+.leaderboard-name { font-weight: 600; }
+.leaderboard-count { font-size: 13px; color: var(--text-muted); }
+.leaderboard-bar { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.leaderboard-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ===== 首页卡片 ===== */
+.home-section { margin: 32px 0; }
+.home-section h2 { margin-bottom: 12px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+    background: var(--surface); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block; color: var(--text); text-decoration: none;
+}
+.card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-2px);
+    text-decoration: none;
+}
+.card h3 { margin: 0 0 8px; }
+.card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.card-count {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--surface2); font-size: 12px; color: var(--text-muted);
+}
+
+/* ===== 首页统计 ===== */
+.stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin: 24px 0;
+}
+.stat-item {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-num { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== 页脚 ===== */
+footer {
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-muted);
+}
+footer a { color: var(--text-muted); }
+footer a:hover { color: var(--link); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px; }
+    .theme-toggle { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .leaderboard-bar { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .leaderboard-item { grid-template-columns: 32px 1fr auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙 暗色</button>
+<div class="container">
+<div class="breadcrumb"><a href="../index.html">首页</a><span class="sep">›</span><a href="index.html">人格画像</a><span class="sep">›</span><span>人格画像：番茄斗罗</span></div>
+
+<h1 id="_1">人格画像：番茄斗罗</h1>
+<h2 id="_2">一、基本信息</h2>
+<p>番茄斗罗是群「RED.25糖渍小番茄」中消息总量排名第五的用户，也是本批五份画像中消息量最少的一位，但文本消息 1468 条占比高，是五人中文本比例最高的之一（文本/图片约 4.23:1）。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">项目</th>
+<th style="text-align: center;">数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">群内消息排名</td>
+<td style="text-align: center;">第 5 名</td>
+</tr>
+<tr>
+<td style="text-align: center;">消息总数</td>
+<td style="text-align: center;">2011 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">文本消息</td>
+<td style="text-align: center;">1468 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">图片消息</td>
+<td style="text-align: center;">347 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">活跃天数</td>
+<td style="text-align: center;">66 天（全勤）</td>
+</tr>
+<tr>
+<td style="text-align: center;">平均消息长度</td>
+<td style="text-align: center;">8.3 字</td>
+</tr>
+<tr>
+<td style="text-align: center;">峰值时段</td>
+<td style="text-align: center;">18 时（176 条）、17 时（171 条）、10 时（161 条）</td>
+</tr>
+<tr>
+<td style="text-align: center;">回复速度（中位数）</td>
+<td style="text-align: center;">19 秒（五人中最慢）</td>
+</tr>
+<tr>
+<td style="text-align: center;">回复速度（平均数）</td>
+<td style="text-align: center;">191 秒（五人中最慢，且远高于中位数）</td>
+</tr>
+<tr>
+<td style="text-align: center;">回复事件数</td>
+<td style="text-align: center;">1263 次</td>
+</tr>
+</tbody>
+</table>
+<p>回复速度中位数 19 秒为五人中最慢，平均数更是高达 191 秒（约为中位数的 10 倍），说明其回复分布中存在大量长时间后才回的间隔，属于「非即时响应」型参与者，多数情况下不急于立刻接话。活跃时段中 10 时成为第三高峰，是其独有的上午活跃特征。</p>
+<h2 id="_3">二、语言风格</h2>
+<p>从文本抽样中可以观察到，番茄斗罗的语言风格具有以下特征：</p>
+<ul>
+<li><strong>短句为主、间有长段自述</strong>：日常多为 1-20 字短句（合计 1391 条），但偶尔出现较长叙述（如专业课作业吐槽），也有 100 字以上长消息 2 条。</li>
+<li><strong>直白口语</strong>：语气直接，常用「我日了」「我草」「可恶」等口语化表达。</li>
+<li><strong>分享链接</strong>：会往群里分享 B 站视频链接，并附简短评价。</li>
+<li><strong>自我吐槽</strong>：对作业、复习、学车等事务性压力以自嘲式吐槽输出。</li>
+<li><strong>简洁回应</strong>：面对他人邀约或询问，常用「可以」等简短应答。</li>
+</ul>
+<p>示例引用（从聊天记录中抽样）：</p>
+<pre><code>[2026-06-01 08:33:15] 番茄斗罗: 【考场八分作文《！？区区？！》！...】bilibili链接（视频分享）
+[2026-06-01 08:33:47] 番茄斗罗: ！？区区！？
+[2026-06-01 08:33:59] 番茄斗罗: 我草写的有点nb
+</code></pre>
+<pre><code>[2026-06-01 10:28:42] 番茄斗罗: 我日了专业课作业快给我写死了
+[2026-06-01 10:29:03] 番茄斗罗: 两大张纸写的密密麻麻的
+[2026-06-01 10:29:41] 番茄斗罗: 大约用了9h
+</code></pre>
+<pre><code>[2026-06-01 11:10:12] 番茄斗罗: 你是区
+[2026-06-01 11:41:33] 番茄斗罗: 确实迷你
+[2026-06-01 13:29:07] 番茄斗罗: 那个号不用了，现在加这个
+[2026-06-01 16:40:22] 番茄斗罗: 豪到我了
+</code></pre>
+<pre><code>[2026-06-04 17:32:09] 番茄斗罗: 我去幸好看到了
+[2026-06-04 17:32:35] 番茄斗罗: 可恶
+[2026-06-04 17:35:11] 番茄斗罗: 挑食就别吃
+</code></pre>
+<pre><code>[2026-06-26 18:14:33] 番茄斗罗: 不想复习。
+[2026-06-30 21:59:41] 番茄斗罗: 这个可以关掉
+[2026-07-10 14:27:52] 番茄斗罗: 我不知道（）
+</code></pre>
+<pre><code>[2026-07-31 17:10:24] 番茄斗罗: 难开是正常的
+[2026-07-31 17:11:12] 番茄斗罗: 离合踩不动的，驾驶座放脚的垫子卡脚的
+[2026-07-31 17:12:05] 番茄斗罗: 离合下面的垫子被磨破，踩下离合脚被卡住，释怀地笑了
+</code></pre>
+<pre><code>[2026-06-22 14:18:47] 番茄斗罗: 性别正确
+[2026-08-04 14:00:19] 番茄斗罗: [回复消息]@25骆驼 可以
+</code></pre>
+<p>从消息长度分布来看，番茄斗罗 1-5 字 703 条、6-20 字 688 条、21-50 字 62 条、51-100 字 13 条、100 字以上 2 条，短句为主体。</p>
+<h2 id="_4">三、沟通策略</h2>
+<ul>
+<li><strong>非即时响应</strong>：回复速度中位数 19 秒、平均数 191 秒，回复事件 1263 次（约占总消息量 63%，五人中占比最低），说明其相当一部分消息是主动发言而非即时接话，且部分回复存在明显间隔，符合其「想到才说」的参与节奏。</li>
+<li><strong>响应时间分布</strong>：中位数与平均数差距极大，提示回复间隔分布长尾明显——存在大量快速回复的同时，也存在极少数间隔很长的回复。</li>
+<li><strong>消息密度</strong>：18 时 176 条、17 时 171 条、10 时 161 条，除晚高峰外上午 10 时也较为活跃，是五人中独有的上午输出高峰。</li>
+<li><strong>消息类型偏好</strong>：文本 1468 条为主，图片 347 条用于配图与表情包。</li>
+<li><strong>话题参与</strong>：对作业、考试、学车、看视频等话题有明确参与，回应他人时用词简短（「可以」「可恶」）。</li>
+</ul>
+<p>模式示例：</p>
+<pre><code>[2026-06-04 17:32:09] 番茄斗罗: 我去幸好看到了
+[2026-06-04 17:32:35] 番茄斗罗: 可恶
+[2026-06-04 17:35:11] 番茄斗罗: 挑食就别吃
+</code></pre>
+<pre><code>[2026-07-31 17:10:24] 番茄斗罗: 难开是正常的
+[2026-07-31 17:11:12] 番茄斗罗: 离合踩不动的，驾驶座放脚的垫子卡脚的
+[2026-07-31 17:12:05] 番茄斗罗: 离合下面的垫子被磨破，踩下离合脚被卡住，释怀地笑了
+</code></pre>
+<h2 id="_5">四、兴趣图谱</h2>
+<p>基于关键词画像（日常生活 69、学业/职场 53、社交/关系 24、娱乐 21、二次元/游戏 16、情绪 9、Bot互动 8、科技/AI 1），结合原文证据，可以观察到以下主要兴趣领域：</p>
+<h3 id="1-53">1. 学业与作业（学业/职场 53 项）</h3>
+<p>专业课作业是其频繁吐槽的对象，且会给出具体细节（时长、纸面、字数）。</p>
+<pre><code>[2026-06-01 10:28:42] 番茄斗罗: 我日了专业课作业快给我写死了
+[2026-06-01 10:29:03] 番茄斗罗: 两大张纸写的密密麻麻的
+[2026-06-01 10:29:41] 番茄斗罗: 大约用了9h
+[2026-06-26 18:14:33] 番茄斗罗: 不想复习。
+</code></pre>
+<h3 id="2-21">2. 视频内容分享（娱乐 21 项）</h3>
+<p>曾分享 B 站考场作文视频，并对内容给出评价，展示出浏览并转发有趣内容的习惯。</p>
+<pre><code>[2026-06-01 08:33:15] 番茄斗罗: 【考场八分作文《！？区区？！》！...】bilibili链接（视频分享）
+[2026-06-01 08:33:47] 番茄斗罗: ！？区区！？
+[2026-06-01 08:33:59] 番茄斗罗: 我草写的有点nb
+</code></pre>
+<h3 id="3-69">3. 学车（日常生活 69 项）</h3>
+<p>观察期末段持续分享学车细节，以自我吐槽的方式叙述遇到的机械问题。</p>
+<pre><code>[2026-07-31 17:10:24] 番茄斗罗: 难开是正常的
+[2026-07-31 17:11:12] 番茄斗罗: 离合踩不动的，驾驶座放脚的垫子卡脚的
+[2026-07-31 17:12:05] 番茄斗罗: 离合下面的垫子被磨破，踩下离合脚被卡住，释怀地笑了
+</code></pre>
+<h3 id="4-24">4. 群内互动与接梗（社交/关系 24 项）</h3>
+<p>参与群内玩梗（「你是区」「确实迷你」「性别正确」），并回应他人邀约。</p>
+<pre><code>[2026-06-01 11:10:12] 番茄斗罗: 你是区
+[2026-06-01 11:41:33] 番茄斗罗: 确实迷你
+[2026-06-22 14:18:47] 番茄斗罗: 性别正确
+[2026-08-04 14:00:19] 番茄斗罗: [回复消息]@25骆驼 可以
+</code></pre>
+<h3 id="5">5. 账号更换记录</h3>
+<p>观察期初曾提示群友更换账号联系方式。</p>
+<pre><code>[2026-06-01 13:29:07] 番茄斗罗: 那个号不用了，现在加这个
+</code></pre>
+<h2 id="_6">五、社交互动</h2>
+<h3 id="top-10">回复目标（观察期内回复次数 Top 10）</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">回复目标</th>
+<th style="text-align: center;">次数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">苦来兮苦</td>
+<td style="text-align: center;">22</td>
+</tr>
+<tr>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">19</td>
+</tr>
+<tr>
+<td style="text-align: center;">25</td>
+<td style="text-align: center;">16</td>
+</tr>
+<tr>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">13</td>
+</tr>
+<tr>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">11</td>
+</tr>
+<tr>
+<td style="text-align: center;">冰冰子</td>
+<td style="text-align: center;">11</td>
+</tr>
+<tr>
+<td style="text-align: center;">26南梁改造工程</td>
+<td style="text-align: center;">6</td>
+</tr>
+<tr>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">6</td>
+</tr>
+<tr>
+<td style="text-align: center;">26冶北风</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr>
+<td style="text-align: center;">某个好人</td>
+<td style="text-align: center;">5</td>
+</tr>
+</tbody>
+</table>
+<p>注：目标「26」「25」可能指代多名昵称以年级数字开头的群友；「冰冰子」「26冶北风」为含表情符号的原始昵称，此处保留原始统计口径。</p>
+<h3 id="_7">社交角色</h3>
+<ul>
+<li><strong>自述型分享者</strong>：乐于在群里描述个人事务（作业、学车）的进展与遭遇，叙述具体、细节丰富。</li>
+<li><strong>短评贡献者</strong>：对分享内容（视频、话题）给出简短评价，语气直接。</li>
+<li><strong>低频回应者</strong>：回复占比在五人中最低，更多按自己的节奏发言而非紧跟对话。</li>
+<li><strong>与苦来兮苦互动较多</strong>：回复目标第一名是苦来兮苦（22 次），是该用户的主要互动对象。</li>
+</ul>
+<h3 id="_8">影响力</h3>
+<p>番茄斗罗 分享的考场作文视频成为群内热点（波克洛克随后在群内粘贴同篇作文全文，子路等人先后惊叹），可观察到其内容分享在群内引发的传播链。</p>
+<h2 id="_9">六、情感表达</h2>
+<ul>
+<li><strong>幽默风格</strong>：以自我处境吐槽为主（作业写死、离合卡脚、不想复习），是一种「生活苦难文学」式的戏谑表达。</li>
+<li><strong>情感范围</strong>：负面情绪多以自嘲出口，正面情绪（对好内容「写的有点nb」）以直接惊叹表达；整体情绪输出较为克制。</li>
+</ul>
+<p>直接或间接示例：</p>
+<pre><code>[2026-06-01 10:28:42] 番茄斗罗: 我日了专业课作业快给我写死了
+[2026-06-26 18:14:33] 番茄斗罗: 不想复习。
+</code></pre>
+<pre><code>[2026-06-01 08:33:59] 番茄斗罗: 我草写的有点nb
+[2026-06-04 17:32:09] 番茄斗罗: 我去幸好看到了
+[2026-06-04 17:32:35] 番茄斗罗: 可恶
+</code></pre>
+<pre><code>[2026-07-31 17:12:05] 番茄斗罗: 离合下面的垫子被磨破，踩下离合脚被卡住，释怀地笑了
+</code></pre>
+<h2 id="bot">七、Bot 互动模式</h2>
+<p>番茄斗罗 与 Bot 的互动以低频使用命令式表情指令为主（Bot互动关键词 8 项），未见高频命令调用记录。</p>
+<p>示例：</p>
+<pre><code>番茄斗罗: /赞
+番茄斗罗: /疑问
+</code></pre>
+<h2 id="_10">八、关键时刻</h2>
+<h3 id="12026-06-01-0833">片段1：考场作文视频分享（2026-06-01 08:33）</h3>
+<pre><code>[2026-06-01 08:33:15] 番茄斗罗: 【考场八分作文《！？区区？！》！...】bilibili链接（视频分享）
+[2026-06-01 08:33:47] 番茄斗罗: ！？区区！？
+[2026-06-01 08:33:59] 番茄斗罗: 我草写的有点nb
+</code></pre>
+<p>分析：观察期内最具传播性的片段之一——番茄斗罗 早上分享考场作文视频并给好评，该内容当天下午被波克洛克以全文形式粘贴进群（15:31），次日引起子路等人的惊叹转发。这一传播链显示其分享习惯能实际带动群内热点。</p>
+<h3 id="22026-06-01-1028-1029">片段2：专业课作业吐槽（2026-06-01 10:28-10:29）</h3>
+<pre><code>[2026-06-01 10:28:42] 番茄斗罗: 我日了专业课作业快给我写死了
+[2026-06-01 10:29:03] 番茄斗罗: 两大张纸写的密密麻麻的
+[2026-06-01 10:29:41] 番茄斗罗: 大约用了9h
+</code></pre>
+<p>分析：上午 10 时段的典型自述，附带工作量细节（两张纸、9 小时），展示出用具体数据包装吐槽的表达习惯，也与 10 时活跃高峰一致。</p>
+<h3 id="32026-06-01-1329">片段3：换号通知（2026-06-01 13:29）</h3>
+<pre><code>[2026-06-01 13:29:07] 番茄斗罗: 那个号不用了，现在加这个
+</code></pre>
+<p>分析：观察期初更换账号并在群内通知，说明其与群友存在群外联系方式往来，且重视群内关系保持。</p>
+<h3 id="42026-06-04-1732-1735">片段4：周末美食话题（2026-06-04 17:32-17:35）</h3>
+<pre><code>[2026-06-04 17:32:09] 番茄斗罗: 我去幸好看到了
+[2026-06-04 17:32:35] 番茄斗罗: 可恶
+[2026-06-04 17:35:11] 番茄斗罗: 挑食就别吃
+</code></pre>
+<p>分析：围绕周末饮食话题连续短句回应，情绪轻快，展示出日常闲聊中的自然互动状态。</p>
+<h3 id="52026-06-26-1814">片段5：期末复习日（2026-06-26 18:14）</h3>
+<pre><code>[2026-06-26 18:14:33] 番茄斗罗: 不想复习。
+</code></pre>
+<p>分析：期末期间极简的情绪表达，句号收尾，是观察期内其情感表达最直白的一刻。</p>
+<h3 id="62026-07-31-1710-1712">片段6：学车连环遭遇（2026-07-31 17:10-17:12）</h3>
+<pre><code>[2026-07-31 17:10:24] 番茄斗罗: 难开是正常的
+[2026-07-31 17:11:12] 番茄斗罗: 离合踩不动的，驾驶座放脚的垫子卡脚的
+[2026-07-31 17:12:05] 番茄斗罗: 离合下面的垫子被磨破，踩下离合脚被卡住，释怀地笑了
+</code></pre>
+<p>分析：学车话题下的经典三段式自述——先定调「难开是正常的」，再描述故障细节，最后用「释怀地笑了」收尾，展示出其将尴尬遭遇叙事化、喜剧化的表达模式。</p>
+<h3 id="72026-08-04-1400">片段7：群内邀约回应（2026-08-04 14:00）</h3>
+<pre><code>[2026-08-04 14:00:19] 番茄斗罗: [回复消息]@25骆驼 可以
+</code></pre>
+<p>分析：观察期末段以单字短语回应群友邀约，延续其全程的简洁应答风格。</p>
+<h3 id="82026-06-22-1418">片段8：性别正确（2026-06-22 14:18）</h3>
+<pre><code>[2026-06-22 14:18:47] 番茄斗罗: 性别正确
+</code></pre>
+<p>分析：在群友讨论中抛出短评「性别正确」，参与方式简洁，含义依赖上下文，体现其「点到即止」的回应风格。</p>
+<h3 id="92026-06-30-2159">片段9：设置建议（2026-06-30 21:59）</h3>
+<pre><code>[2026-06-30 21:59:41] 番茄斗罗: 这个可以关掉
+</code></pre>
+<p>分析：夜间在群友求助（或讨论某功能）时给出操作建议，说明其乐于在能力范围内提供具体帮助。</p>
+<h3 id="102026-07-10-1427">片段10：我不知道（2026-07-10 14:27）</h3>
+<pre><code>[2026-07-10 14:27:52] 番茄斗罗: 我不知道（）
+</code></pre>
+<p>分析：面对群友提问直接承认不知情并以括号结尾，语气松弛，展示出低压力对话状态下的自然回应。</p>
+<h3 id="112026-06-01-1640">片段11：豪到我了（2026-06-01 16:40）</h3>
+<pre><code>[2026-06-01 16:40:22] 番茄斗罗: 豪到我了
+</code></pre>
+<p>分析：对群友晒出的内容（推测为消费或奖励相关）以惊叹短句回应，情绪直白但克制。</p>
+<h2 id="_11">九、局限性声明</h2>
+<p>本报告存在以下根本性局限：</p>
+<ol>
+<li><strong>单一关系视角：</strong> 聊天记录仅展示了番茄斗罗在此群聊中的表现，无法了解其在家庭、其他朋友、恋人、老师等关系中的表现。</li>
+<li><strong>文字沟通局限：</strong> 聊天记录只能反映文字表达，无法观察到语气、表情、肢体语言等非文字信息。</li>
+<li><strong>选择性表达：</strong> 人在不同社交场景中会有不同的自我呈现方式，这段聊天中的番茄斗罗不一定代表其在其他场景中的状态。</li>
+<li><strong>时间范围有限：</strong> 聊天记录仅覆盖2026-06-01至2026-08-05（约66天），无法反映长期人格特征的变化。</li>
+<li><strong>信息不完整：</strong> 聊天记录中的许多信息需要上下文才能准确理解，缺失的上下文可能导致误读。</li>
+<li><strong>群聊特殊性：</strong> 群聊中的表现可能与私聊不同，群体动态会影响个体行为。</li>
+</ol>
+<p>因此，本报告中的所有描述都应被视为&rdquo;在这段特定关系中的可观察行为&rdquo;，而非对番茄斗罗整体人格的判断。</p>
+<h2 id="_12">十、附录</h2>
+<h3 id="_13">消息长度分布</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">长度区间（字）</th>
+<th style="text-align: center;">消息数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1-5</td>
+<td style="text-align: center;">703</td>
+</tr>
+<tr>
+<td style="text-align: center;">6-20</td>
+<td style="text-align: center;">688</td>
+</tr>
+<tr>
+<td style="text-align: center;">21-50</td>
+<td style="text-align: center;">62</td>
+</tr>
+<tr>
+<td style="text-align: center;">51-100</td>
+<td style="text-align: center;">13</td>
+</tr>
+<tr>
+<td style="text-align: center;">100+</td>
+<td style="text-align: center;">2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="top-3">峰值时段（Top 3）</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">时段</th>
+<th style="text-align: center;">消息数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">18 时</td>
+<td style="text-align: center;">176</td>
+</tr>
+<tr>
+<td style="text-align: center;">17 时</td>
+<td style="text-align: center;">171</td>
+</tr>
+<tr>
+<td style="text-align: center;">10 时</td>
+<td style="text-align: center;">161</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_14">关键词画像</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">类别</th>
+<th style="text-align: center;">数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">日常生活</td>
+<td style="text-align: center;">69</td>
+</tr>
+<tr>
+<td style="text-align: center;">学业/职场</td>
+<td style="text-align: center;">53</td>
+</tr>
+<tr>
+<td style="text-align: center;">社交/关系</td>
+<td style="text-align: center;">24</td>
+</tr>
+<tr>
+<td style="text-align: center;">娱乐</td>
+<td style="text-align: center;">21</td>
+</tr>
+<tr>
+<td style="text-align: center;">二次元/游戏</td>
+<td style="text-align: center;">16</td>
+</tr>
+<tr>
+<td style="text-align: center;">情绪</td>
+<td style="text-align: center;">9</td>
+</tr>
+<tr>
+<td style="text-align: center;">Bot互动</td>
+<td style="text-align: center;">8</td>
+</tr>
+<tr>
+<td style="text-align: center;">科技/AI</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_15">消息类型分布</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">类型</th>
+<th style="text-align: center;">数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">文本</td>
+<td style="text-align: center;">1468</td>
+</tr>
+<tr>
+<td style="text-align: center;">图片</td>
+<td style="text-align: center;">347</td>
+</tr>
+<tr>
+<td style="text-align: center;">其余类型（回复、系统、撤回等）</td>
+<td style="text-align: center;">196</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_16">五人画像横向对比（观察期内数据）</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">指标</th>
+<th style="text-align: center;">波克洛克</th>
+<th style="text-align: center;">若至</th>
+<th style="text-align: center;">26瓦斯</th>
+<th style="text-align: center;">子路</th>
+<th style="text-align: center;">番茄斗罗</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">消息总量</td>
+<td style="text-align: center;">3737（第1）</td>
+<td style="text-align: center;">3692（第2）</td>
+<td style="text-align: center;">3375（第3）</td>
+<td style="text-align: center;">2228（第4）</td>
+<td style="text-align: center;">2011（第5）</td>
+</tr>
+<tr>
+<td style="text-align: center;">文本消息</td>
+<td style="text-align: center;">1655</td>
+<td style="text-align: center;">2223</td>
+<td style="text-align: center;">3042</td>
+<td style="text-align: center;">995</td>
+<td style="text-align: center;">1468</td>
+</tr>
+<tr>
+<td style="text-align: center;">图片消息</td>
+<td style="text-align: center;">700</td>
+<td style="text-align: center;">329</td>
+<td style="text-align: center;">211</td>
+<td style="text-align: center;">895</td>
+<td style="text-align: center;">347</td>
+</tr>
+<tr>
+<td style="text-align: center;">平均消息长度</td>
+<td style="text-align: center;">14.7</td>
+<td style="text-align: center;">14.8</td>
+<td style="text-align: center;">8.1</td>
+<td style="text-align: center;">7.2</td>
+<td style="text-align: center;">8.3</td>
+</tr>
+<tr>
+<td style="text-align: center;">回复中位速度</td>
+<td style="text-align: center;">18s</td>
+<td style="text-align: center;">13s</td>
+<td style="text-align: center;">8s</td>
+<td style="text-align: center;">12s</td>
+<td style="text-align: center;">19s</td>
+</tr>
+<tr>
+<td style="text-align: center;">峰值时段</td>
+<td style="text-align: center;">18时</td>
+<td style="text-align: center;">18时</td>
+<td style="text-align: center;">18时</td>
+<td style="text-align: center;">15时</td>
+<td style="text-align: center;">18时</td>
+</tr>
+</tbody>
+</table>
+<p>番茄斗罗 在五人中消息量最低，但其回复速度分布特征最鲜明（中位数 19 秒、平均数 191 秒，为组内最慢），文本占比高（1468/2011）；与子路（同为低消息量、图片优先）相比，番茄斗罗更依赖文字自述而非视觉素材。</p>
+<p>本报告数据来源: .output/chat_stats.json, 抽样片段覆盖完整时间范围</p>
+
+<footer>
+    <a href="https://github.com/JularDepick/ChatAnalysis.SKILL" target="_blank" rel="noopener noreferrer">
+        SKILL技术支持·ChatAnalysis
+    </a>
+</footer>
+
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    function apply(t) {
+        if (t === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ 浅色';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            btn.textContent = '🌙 暗色';
+        }
+    }
+    apply(localStorage.getItem('theme') || 'light');
+    btn.addEventListener('click', function() {
+        var next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
+    });
+})();
+</script>
+</body>
+</html>

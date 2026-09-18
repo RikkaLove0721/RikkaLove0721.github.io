@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>人格画像：苦来兮苦</title>
+<script>
+(function() {
+    var t = localStorage.getItem('theme') || 'light';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --text: #1d1d1f;
+    --text-muted: #86868b;
+    --accent: #007aff;
+    --accent-hover: #0056b3;
+    --link: #007aff;
+    --link-hover: #0056b3;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --code-bg: #f5f5f7;
+    --code-color: #c0392b;
+    --pre-color: #6c5ce7;
+    --table-header-bg: #f5f5f7;
+    --hover-bg: rgba(0,0,0,0.03);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --blockquote-bg: rgba(0,122,255,0.04);
+    --blockquote-border: #007aff;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+}
+
+:root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --link: #0a84ff;
+    --link-hover: #409cff;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.2);
+    --code-bg: #1c1c1e;
+    --code-color: #f48fb1;
+    --pre-color: #ce93d8;
+    --table-header-bg: #1c1c1e;
+    --hover-bg: rgba(255,255,255,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --blockquote-bg: rgba(10,132,255,0.08);
+    --blockquote-border: #0a84ff;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+
+body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* ===== 主题切换按钮 ===== */
+.theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--surface);
+    color: var(--text); font-size: 13px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
+}
+.theme-toggle:hover { background: var(--hover-bg); border-color: var(--border-strong); }
+
+/* ===== 面包屑 ===== */
+.breadcrumb {
+    padding: 8px 0; margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); }
+.breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+
+/* ===== 排版 ===== */
+h1 { font-size: 1.8em; font-weight: 700; margin: 0 0 24px; line-height: 1.3; }
+h2 { font-size: 1.4em; font-weight: 700; margin: 40px 0 16px; line-height: 1.35; }
+h3 { font-size: 1.15em; font-weight: 600; margin: 24px 0 8px; line-height: 1.4; }
+h4 { font-size: 1em; font-weight: 600; margin: 16px 0 4px; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ===== 表格 ===== */
+table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13px;
+}
+th, td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th { background: var(--table-header-bg); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: var(--hover-bg); }
+
+/* ===== 代码块 ===== */
+pre {
+    background: var(--code-bg); color: var(--pre-color);
+    padding: 16px 20px; border-radius: 10px;
+    overflow-x: auto; font-size: 0.88em; line-height: 1.6;
+    margin: 16px 0;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono",
+                 "Cascadia Code", Consolas, monospace;
+}
+code {
+    background: var(--code-bg); color: var(--code-color);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* ===== 引用块 ===== */
+blockquote {
+    border-left: 3px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted); font-size: 0.95em;
+}
+
+/* ===== 高危区块 ===== */
+.danger-block {
+    border-left: 4px solid var(--danger);
+    background: color-mix(in srgb, var(--danger) 6%, transparent);
+    padding: 14px 18px; margin: 16px 0;
+    border-radius: 0 10px 10px 0;
+}
+.danger-block::before {
+    content: "⚠️ 高危提醒";
+    display: block; font-weight: 700; color: var(--danger);
+    margin-bottom: 8px; font-size: 0.9em;
+}
+
+/* ===== 折叠块 ===== */
+.collapsed-links { margin: 8px 0; }
+.collapsed-links summary {
+    cursor: pointer; font-weight: 600; padding: 8px 0;
+    color: var(--text-muted); font-size: 13px;
+}
+.collapsed-links summary:hover { color: var(--link); }
+
+/* ===== 排行榜 ===== */
+.leaderboard-item {
+    display: grid; grid-template-columns: 40px 1fr auto 120px;
+    align-items: center; gap: 8px;
+    padding: 12px 16px; margin: 4px 0;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+}
+.leaderboard-item:hover { background: var(--hover-bg); text-decoration: none; }
+.leaderboard-rank { font-weight: 700; font-size: 1.1em; color: var(--text-muted); text-align: center; }
+.leaderboard-rank.top3 { color: var(--accent); }
+.leaderboard-name { font-weight: 600; }
+.leaderboard-count { font-size: 13px; color: var(--text-muted); }
+.leaderboard-bar { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.leaderboard-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ===== 首页卡片 ===== */
+.home-section { margin: 32px 0; }
+.home-section h2 { margin-bottom: 12px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+    background: var(--surface); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block; color: var(--text); text-decoration: none;
+}
+.card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-2px);
+    text-decoration: none;
+}
+.card h3 { margin: 0 0 8px; }
+.card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.card-count {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--surface2); font-size: 12px; color: var(--text-muted);
+}
+
+/* ===== 首页统计 ===== */
+.stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin: 24px 0;
+}
+.stat-item {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-num { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== 页脚 ===== */
+footer {
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-muted);
+}
+footer a { color: var(--text-muted); }
+footer a:hover { color: var(--link); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px; }
+    .theme-toggle { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .leaderboard-bar { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .leaderboard-item { grid-template-columns: 32px 1fr auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙 暗色</button>
+<div class="container">
+<div class="breadcrumb"><a href="../index.html">首页</a><span class="sep">›</span><a href="index.html">人格画像</a><span class="sep">›</span><span>人格画像：苦来兮苦</span></div>
+
+<h1 id="_1">人格画像：苦来兮苦</h1>
+<h2 id="_2">一、基本信息</h2>
+<p>苦来兮苦是群「RED.25糖渍小番茄」中消息总量排名第七的用户，覆盖了本次数据观察期（2026-06-01 至 2026-08-05，约 66 天）的全部日期，属于全勤级别的活跃成员。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">项目</th>
+<th style="text-align: center;">数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">群内消息排名</td>
+<td style="text-align: center;">第 7 名</td>
+</tr>
+<tr>
+<td style="text-align: center;">消息总数</td>
+<td style="text-align: center;">1834 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">文本消息</td>
+<td style="text-align: center;">1431 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">图片消息</td>
+<td style="text-align: center;">222 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">活跃天数</td>
+<td style="text-align: center;">66 天（全勤）</td>
+</tr>
+<tr>
+<td style="text-align: center;">平均消息长度</td>
+<td style="text-align: center;">8.8 字</td>
+</tr>
+<tr>
+<td style="text-align: center;">峰值时段</td>
+<td style="text-align: center;">18 时（331 条）、17 时（215 条）、20 时（138 条）</td>
+</tr>
+<tr>
+<td style="text-align: center;">回复速度（中位数）</td>
+<td style="text-align: center;">9 秒</td>
+</tr>
+<tr>
+<td style="text-align: center;">回复速度（平均数）</td>
+<td style="text-align: center;">90 秒</td>
+</tr>
+<tr>
+<td style="text-align: center;">回复事件数</td>
+<td style="text-align: center;">1226 次</td>
+</tr>
+</tbody>
+</table>
+<p>从峰值时段可以观察到，苦来兮苦的活跃高峰集中在 17-18 时的傍晚时段，20 时后仍有持续发言。回复中位数仅 9 秒，为五位画像用户中最快，属于几乎实时在线的类型。文本消息占比约 78%，是五人中「纯文字交流」比例最高的一位。</p>
+<p><strong>消息长度分布</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">长度区间</th>
+<th style="text-align: center;">消息数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1-5</td>
+<td style="text-align: center;">500</td>
+</tr>
+<tr>
+<td style="text-align: center;">6-20</td>
+<td style="text-align: center;">848</td>
+</tr>
+<tr>
+<td style="text-align: center;">21-50</td>
+<td style="text-align: center;">81</td>
+</tr>
+<tr>
+<td style="text-align: center;">51-100</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">100+</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
+<p>长度分布以 6-20 字为主（约 59%），1-5 字短句也占约 35%，同时保留了 81 条 21-50 字的中长句，说明其既有快速接话能力，也有完整陈述的意愿。</p>
+<h2 id="_3">二、语言风格</h2>
+<p>从文本抽样中可以观察到，苦来兮苦的语言风格具有以下特征：</p>
+<ul>
+<li><strong>节日祝福控</strong>：每逢节日主动发话，且覆盖多个文化体系的节日（母亲节、海灯节、追月节等），是群内节日氛围的重要来源。</li>
+<li><strong>二次元浓度高</strong>：熟练使用「骗你我是三角初音」「祥子是叫Oblivions」等角色梗，对母鸡卡（MyGO/Ave Mujica）等作品细节掌握深。</li>
+<li><strong>安利型表达</strong>：常用「真心推荐」「孤独摇滚得看啊」等句式向群友推荐番剧与工具，具备传播者特征。</li>
+<li><strong>AI 工具实用派</strong>：实际使用并推荐 kimi、豆包等 AI 工具，甚至对比两者能力差异（「在长文本生成这一块kimi不如豆包」）。</li>
+<li><strong>毒誓担保</strong>：「骗你我是三角初音」这类以角色为赌注的担保句式，是其特有的增强可信度手段。</li>
+<li><strong>自嘲报错</strong>：乐于分享自身乌龙事件（考试时间记错、没吃中饭），以糗事换取互动。</li>
+</ul>
+<p>示例引用（从聊天记录中抽样）：</p>
+<pre><code>[2026-06-01 00:01:51] 苦来兮苦: 母亲节快乐
+[2026-06-01 00:09:35] 苦来兮苦: 海灯节快乐
+[2026-06-01 00:09:45] 苦来兮苦: 追月节快乐
+</code></pre>
+<pre><code>[2026-06-08 17:46:53] 苦来兮苦: 祥子是叫Oblivions
+[2026-06-08 17:46:57] 苦来兮苦: 一个词根
+[2026-06-08 17:47:18] 雪豹: [回复消息]真的吗，知识盲区了
+[2026-06-08 17:47:31] 得胜已是定局: 毋畏遗忘
+</code></pre>
+<pre><code>[2026-06-08 17:49:53] 苦来兮苦: 骗你我是三角初音
+[2026-06-08 17:51:19] 苦来兮苦: 孤独摇滚得看啊
+</code></pre>
+<pre><code>[2026-06-30 17:46:24] 苦来兮苦: 中午考完英语记成2点考近纲
+[2026-06-30 17:46:39] 苦来兮苦: 没吃中饭直接去图书馆待到2点
+[2026-06-30 17:46:05] 苦来兮苦: 我要被饿晕了
+</code></pre>
+<pre><code>[2026-07-01 17:07:47] 苦来兮苦: kimi吗
+[2026-07-01 17:09:36] 苦来兮苦: 在长文本生成这一块kimi不如豆包
+</code></pre>
+<pre><code>[2026-06-23 12:08:57] 苦来兮苦: 第一是冰冰子吗
+[2026-06-30 22:21:03] 苦来兮苦: 冰冰子只是没有碰到我罢了
+[2026-07-14 20:07:24] 苦来兮苦: 冰冰子抱着睡觉是不是很凉快
+</code></pre>
+<h2 id="_4">三、沟通策略</h2>
+<ul>
+<li><strong>实时在线抢答</strong>：回复中位数 9 秒，回复事件 1226 次，逢话可接，是群内响应最快的成员之一。</li>
+<li><strong>节日播报</strong>：在节庆节点率先发声，形成「节日=苦来兮苦会发话」的群内预期。</li>
+<li><strong>主动安利</strong>：对番剧、游戏、AI 工具均有推荐行为，且会给出理由（如「在长文本生成这一块kimi不如豆包」），属于观点输出型安利而非单纯抛梗。</li>
+<li><strong>第三方佐证</strong>：评价课程时引用他人意见增强说服力（「我排球队的学长也说高戈不行」），避免直接下结论。</li>
+<li><strong>玩笑式挑衅与收回</strong>：先抛出挑衅性言论（「冰冰子只是没有碰到我罢了」），随后以玩笑口吻收尾，攻击性较低。</li>
+<li><strong>复读与造梗</strong>：参与群内队形，同时也产出原创梗（「你给新华字典版权费了吗」引发整段讨论）。</li>
+</ul>
+<p>模式示例：</p>
+<pre><code>[2026-06-23 13:24:42] 苦来兮苦: 你不会是高戈的有机实验吧
+[2026-06-23 13:25:14] 波克洛克: 有机化学是他的
+[2026-06-23 13:25:23] 苦来兮苦: [回复消息]@波克洛克 赶紧退
+[2026-06-23 13:25:31] 苦来兮苦: 这玩意不是啥好东西
+</code></pre>
+<pre><code>[2026-07-12 10:01:38] 苦来兮苦: 你的所有字都是新华字典上面的
+[2026-07-12 10:01:47] 苦来兮苦: 你给新华字典版权费了吗
+[2026-07-12 10:03:46] 若至: 我说所有的话都是穷举吧的内容，新华字典给穷举吧版权费了吗？
+[2026-07-12 10:04:24] 苦来兮苦: 对啊，没给
+[2026-07-12 10:04:42] 苦来兮苦: 所以复制粘贴也不需要给（）
+[2026-07-12 10:05:00] 苦来兮苦: 你这不是帮我说话了吗
+</code></pre>
+<h2 id="_5">四、兴趣图谱</h2>
+<p>基于关键词画像（日常生活 71、学业/职场 39、社交/关系 19、娱乐 11、情绪 7、二次元/游戏 5、科技/AI 5、Bot互动 4），结合原文证据，可以观察到以下主要兴趣领域：</p>
+<h3 id="1-71">1. 日常生活（日常生活 71 项）</h3>
+<p>吃饭、睡眠、日常趣事等话题最多，且常与自嘲结合。</p>
+<pre><code>[2026-06-30 17:46:05] 苦来兮苦: 我要被饿晕了
+[2026-06-30 17:46:39] 苦来兮苦: 没吃中饭直接去图书馆待到2点
+</code></pre>
+<h3 id="2-39">2. 学业与课程吐槽（学业/职场 39 项）</h3>
+<p>化学实验、英语考试、近纲等课程话题频繁，对课程质量敢于直言。</p>
+<pre><code>[2026-06-23 13:24:42] 苦来兮苦: 你不会是高戈的有机实验吧
+[2026-06-23 13:25:31] 苦来兮苦: 这玩意不是啥好东西
+[2026-07-02 18:00:37] 苦来兮苦: 高戈的课谁爱上谁上去
+[2026-07-02 18:01:33] 苦来兮苦: 因为退课的全是高戈的学生是吧
+[2026-06-30 17:40:47] 苦来兮苦: 考完近纲的我be like
+</code></pre>
+<h3 id="3-11-5">3. 游戏与二次元（娱乐 11、二次元/游戏 5 项）</h3>
+<p>对游戏有实际参与，且熟悉 ACG 圈层知识。</p>
+<pre><code>[2026-06-09 13:49:06] 苦来兮苦: 来匹配 五排炸高考物化地的来，打不过就对答案
+[2026-06-09 14:57:06] 苦来兮苦: 这jb不是战锤吗
+[2026-07-13 00:29:48] 苦来兮苦: 我在和朋友连麦过mc剧情
+[2026-07-13 00:30:12] 波克洛克: [回复消息]@苦来兮苦 还有这种玩法
+</code></pre>
+<h3 id="4-ai-ai-5">4. 科技/AI 工具（科技/AI 5 项）</h3>
+<p>对 AI 工具有实际使用与对比经验。</p>
+<pre><code>[2026-06-01 22:06:08] 苦来兮苦: kimi
+[2026-06-01 22:07:09] 苦来兮苦: 让kimi直接帮你做
+[2026-07-01 17:09:36] 苦来兮苦: 在长文本生成这一块kimi不如豆包
+</code></pre>
+<h3 id="5-19">5. 群内社交与玩梗（社交/关系 19 项）</h3>
+<p>对群成员昵称（冰冰子）的调侃与节日祝福是其社交表达的主渠道。</p>
+<pre><code>[2026-06-23 12:08:57] 苦来兮苦: 第一是冰冰子吗
+[2026-07-14 20:07:24] 苦来兮苦: 冰冰子抱着睡觉是不是很凉快
+[2026-07-12 10:01:47] 苦来兮苦: 你给新华字典版权费了吗
+</code></pre>
+<h2 id="_6">五、社交互动</h2>
+<h3 id="top-10">回复目标（观察期内回复次数 Top 10）</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">回复目标</th>
+<th style="text-align: center;">次数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">25</td>
+</tr>
+<tr>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">19</td>
+</tr>
+<tr>
+<td style="text-align: center;">苦来兮苦</td>
+<td style="text-align: center;">16</td>
+</tr>
+<tr>
+<td style="text-align: center;">25</td>
+<td style="text-align: center;">14</td>
+</tr>
+<tr>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">10</td>
+</tr>
+<tr>
+<td style="text-align: center;">❄冰冰子💫</td>
+<td style="text-align: center;">8</td>
+</tr>
+<tr>
+<td style="text-align: center;">某个好人</td>
+<td style="text-align: center;">7</td>
+</tr>
+<tr>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">6</td>
+</tr>
+<tr>
+<td style="text-align: center;">26南梁改造工程</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr>
+<td style="text-align: center;">三七开ACGN爱好者请加我</td>
+<td style="text-align: center;">4</td>
+</tr>
+</tbody>
+</table>
+<p>注：目标「26」「25」可能指代多名昵称以年级数字开头的群友，此处保留原始统计口径；「苦来兮苦」出现在自身回复目标列表中，疑似因群内存在昵称相近成员或解析回环，需谨慎看待。</p>
+<h3 id="_7">社交角色</h3>
+<ul>
+<li><strong>话题接续者与情报员</strong>：从节日祝福、课程情报到 AI 工具对比，其发言常起到「提供新信息」的作用。</li>
+<li><strong>快速响应者</strong>：9 秒中位回复，群内逢话可接，是对话持续性的重要维持者。</li>
+<li><strong>梗生产者</strong>：原创过「版权费」等被群友接住的梗，具备一定的造梗能力。</li>
+</ul>
+<h3 id="_8">影响力</h3>
+<p>从聊天记录可观察到，苦来兮苦的发言常被群友回复与接续（回复事件 1226 次），其在课程评价、番剧推荐上的观点会被他人引用（如「我排球队的学长也说高戈不行」这类信息流传播）；活跃 66 天全勤，消息量排名第七，是群内高频互动的核心节点之一。</p>
+<h2 id="_9">六、情感表达</h2>
+<ul>
+<li><strong>幽默风格</strong>：以节日祝福、角色梗、自嘲为主，情绪表达通常借助玩梗完成，几乎不出现直接的负面情绪宣泄。</li>
+<li><strong>情感范围</strong>：对课程的不满（「高戈的课谁爱上谁上去」）以吐槽方式表达；对作品与游戏的高满意度（「老后神了」）直接而热烈；糗事自曝（考试记错时间）时语气轻松，情绪收放较快。</li>
+</ul>
+<p>直接或间接示例：</p>
+<pre><code>[2026-06-23 11:54:55] 苦来兮苦: 老后神了
+</code></pre>
+<pre><code>[2026-06-30 17:46:05] 苦来兮苦: 我要被饿晕了
+[2026-06-30 17:46:24] 苦来兮苦: 中午考完英语记成2点考近纲
+[2026-06-30 17:46:39] 苦来兮苦: 没吃中饭直接去图书馆待到2点
+</code></pre>
+<pre><code>[2026-06-30 22:21:03] 苦来兮苦: 冰冰子只是没有碰到我罢了
+[2026-06-30 22:18:55] 苦来兮苦: 校友卡区了
+[2026-06-30 22:33:57] 苦来兮苦: 华莱士公式硬背就好了
+</code></pre>
+<h2 id="bot">七、Bot 互动模式</h2>
+<p>群内存在系统消息、命令式表情指令（如 <code>/挥手</code> <code>/敲敲</code> <code>/崇拜</code>）等 Bot/自动化机制，苦来兮苦是较活跃的使用者之一，且其 Bot 互动与 AI 工具使用（kimi、豆包）在五位画像用户中风格最「实用主义」。</p>
+<p>示例：</p>
+<pre><code>[2026-06-29 19:06:56] 苦来兮苦: 我@过几次群主了
+[2026-06-29 19:06:58] 苦来兮苦: /挥手
+</code></pre>
+<pre><code>[2026-07-12 10:01:52] 苦来兮苦: /敲敲
+[2026-07-12 10:05:04] 苦来兮苦: /崇拜
+</code></pre>
+<pre><code>[2026-06-01 22:06:08] 苦来兮苦: kimi
+[2026-06-01 22:07:09] 苦来兮苦: 让kimi直接帮你做
+</code></pre>
+<p>观察结论：其对 Bot 指令的使用频率与群内平均水平相当，真正的特色在于将 AI 工具（kimi、豆包）引入群聊作为「作业助手」话题，推动 AI 讨论在群内的扩散。</p>
+<h2 id="_10">八、关键时刻</h2>
+<p>以下片段按时间顺序选取，均为可观察的完整对话场景。</p>
+<h3 id="12026-06-01-0001-0009">片段1：六一凌晨节日接龙（2026-06-01 00:01-00:09）</h3>
+<pre><code>[2026-06-01 00:01:19] 得胜已是定局: 六一快乐孩子们
+[2026-06-01 00:01:51] 苦来兮苦: 母亲节快乐
+[2026-06-01 00:02:22] 群斟茶兵: 情人节快乐
+[2026-06-01 00:08:44] 某个好人: 元旦快乐
+[2026-06-01 00:09:20] 波克洛克: 风花节快乐
+[2026-06-01 00:09:35] 苦来兮苦: 海灯节快乐
+[2026-06-01 00:09:45] 苦来兮苦: 追月节快乐
+</code></pre>
+<p>分析：苦来兮苦在接龙中连续贡献三个节日（母亲节、海灯节、追月节），是接龙中贡献条目最多的成员之一，显示其节日文化知识面广且乐于参与队形。</p>
+<h3 id="22026-06-08-1746-1751">片段2：母鸡卡知识科普（2026-06-08 17:46-17:51）</h3>
+<pre><code>[2026-06-08 17:46:27] 苦来兮苦: 那看过母鸡卡不都知道是遗忘（）
+[2026-06-08 17:46:53] 苦来兮苦: 祥子是叫Oblivions
+[2026-06-08 17:46:57] 苦来兮苦: 一个词根
+[2026-06-08 17:47:18] 雪豹: [回复消息]真的吗，知识盲区了
+[2026-06-08 17:47:31] 得胜已是定局: 毋畏遗忘
+[2026-06-08 17:49:53] 苦来兮苦: 骗你我是三角初音
+[2026-06-08 17:51:19] 苦来兮苦: 孤独摇滚得看啊
+</code></pre>
+<p>分析：在作品知识讨论中担任「科普者」，主动解释词根含义，并以「骗你我是三角初音」担保自己的推荐。展示其 ACG 知识储备与安利热情。</p>
+<h3 id="32026-06-09-1348-1349">片段3：游戏组队邀请（2026-06-09 13:48-13:49）</h3>
+<pre><code>[2026-06-09 13:48:31] 颜回momo: 蓝飘飘
+[2026-06-09 13:48:44] 苦来兮苦: 懒趴趴
+[2026-06-09 13:49:06] 苦来兮苦: 来匹配 五排炸高考物化地的来，打不过就对答案
+[2026-06-09 13:49:42] 颜回momo: 鲜美的抹茶
+</code></pre>
+<p>分析：先参与接龙式玩梗（蓝飘飘-懒趴趴），随即发出游戏组队邀请，并以「打不过就对答案」的调侃消解胜负心，展示其游戏社交中的松弛感。</p>
+<h3 id="42026-06-23-1323-1325">片段4：高戈课程口碑讨论（2026-06-23 13:23-13:25）</h3>
+<pre><code>[2026-06-23 13:23:02] 苦来兮苦: 有实验吗
+[2026-06-23 13:24:21] 波克洛克: 化院的周一第一节到第十二节全是课有感觉吗
+[2026-06-23 13:24:42] 苦来兮苦: 你不会是高戈的有机实验吧
+[2026-06-23 13:25:14] 波克洛克: 有机化学是他的
+[2026-06-23 13:25:23] 苦来兮苦: [回复消息]@波克洛克 赶紧退
+[2026-06-23 13:25:31] 苦来兮苦: 这玩意不是啥好东西
+</code></pre>
+<p>分析：在课程情报讨论中快速判断对方课程，并给出「赶紧退」的直率建议。其「我排球队的学长也说高戈不行」的第三方佐证句式，在此类讨论中反复出现，是其一贯的论证手法。</p>
+<h3 id="52026-06-30-1745-1746">片段5：考试乌龙（2026-06-30 17:45-17:46）</h3>
+<pre><code>[2026-06-30 17:46:05] 苦来兮苦: 我要被饿晕了
+[2026-06-30 17:46:24] 苦来兮苦: 中午考完英语记成2点考近纲
+[2026-06-30 17:46:39] 苦来兮苦: 没吃中饭直接去图书馆待到2点
+[2026-06-30 17:46:49] 26瓦斯: 一样
+[2026-06-30 17:46:54] ( ᗜ ˰ ᗜ )（怀念河图版）: 下学期修36学分考11门什么水平??
+</code></pre>
+<p>分析：以三连句完整叙述考试乌龙事件，细节具体（英语-近纲、2点、图书馆），群友以「一样」表示共鸣。此类糗事自曝是其在群内建立亲近感的主要方式。</p>
+<h3 id="62026-07-12-1001-1005">片段6：版权费之辩（2026-07-12 10:01-10:05）</h3>
+<pre><code>[2026-07-12 09:52:43] 若至: 可恶，你们的版权费呢
+[2026-07-12 10:01:38] 苦来兮苦: 你的所有字都是新华字典上面的
+[2026-07-12 10:01:47] 苦来兮苦: 你给新华字典版权费了吗
+[2026-07-12 10:03:46] 若至: 我说所有的话都是穷举吧的内容，新华字典给穷举吧版权费了吗？
+[2026-07-12 10:04:24] 苦来兮苦: 对啊，没给
+[2026-07-12 10:04:42] 苦来兮苦: 所以复制粘贴也不需要给（）
+[2026-07-12 10:05:00] 苦来兮苦: 你这不是帮我说话了吗
+[2026-07-12 10:05:04] 苦来兮苦: /崇拜
+</code></pre>
+<p>分析：观察期内最具代表性的「造梗成功」场景：以「你给新华字典版权费了吗」反击版权费话题，若至接住并以「穷举吧」回敬，苦来兮苦随即拆解对方逻辑为己所用（「你这不是帮我说话了吗」）。三段式逻辑反转展示其较强的语言组织与临场反应能力。</p>
+<h3 id="82026-06-02-1006-1007">片段8：今日要闻播报（2026-06-02 10:06-10:07）</h3>
+<pre><code>[2026-06-02 10:06:53] 苦来兮苦: [图片]
+[2026-06-02 10:06:53] 苦来兮苦: 今日要闻
+[2026-06-02 10:07:10] 枫糖总帅: 博士，他们进入川大了
+[2026-06-02 10:07:19] 海一花 ⛨: 这一天还是来了
+[2026-06-02 10:07:26] 海一花 ⛨: 去吧，部署好对策
+[2026-06-02 10:07:30] 颜回momo: [回复消息]怎么闻
+[2026-06-02 10:07:40] 苦来兮苦: 猛猛过肺
+</code></pre>
+<p>分析：以「今日要闻」四字为图片配文，疑似模仿新闻播报格式进行群内信息分享，群友随即以「博士，他们进入川大了」「部署好对策」等科幻梗接续，而「猛猛过肺」则是针对「怎么闻」提问的玩笑回答。该片段同时展示其「播报体」发言习惯与快速接梗能力。</p>
+<h3 id="7-mc2026-07-13-0029-0030">片段7：深夜连麦 MC（2026-07-13 00:29-00:30）</h3>
+<pre><code>[2026-07-13 00:29:02] 秋水祀: 打到魔丸了
+[2026-07-13 00:29:48] 苦来兮苦: 我在和朋友连麦过mc剧情
+[2026-07-13 00:30:12] 波克洛克: [回复消息]@苦来兮苦 还有这种玩法
+[2026-07-13 00:30:13] 秋水祀: mc还有剧情
+</code></pre>
+<p>分析：凌晨分享与朋友连麦玩 MC 剧情的经历，引发「还有这种玩法」的惊讶。深夜话题中仍保持内容输出，与其 20 时后持续活跃的时段特征一致。</p>
+<h2 id="_11">九、局限性声明</h2>
+<ul>
+<li>本报告仅基于 2026-06-01 至 2026-08-05 的群聊文本与抽样片段，不含私聊、语音与图片内容解析，画像仅反映群聊公开场景下的行为。</li>
+<li>图片消息 222 条未被解析，部分表达可能依赖图片完成。</li>
+<li>「回复目标」中的「26」「25」等条目疑似 QQ 群内昵称截断导致的显示片段，无法确认具体指代；「苦来兮苦」出现在自身回复目标列表中，疑似昵称相近或解析回环，相关互动结论需谨慎。</li>
+<li>关键词分类基于规则匹配，可能存在误分；所有「疑似」「推测」类结论均为统计分析推断，不构成对真实人格的定论。</li>
+</ul>
+<h2 id="_12">十、附录</h2>
+<ul>
+<li>数据来源：<code>.output/chat_stats.json</code>，抽样片段覆盖完整时间范围（10 个抽样时段，2026-06-01 至 2026-08-04）。</li>
+<li>生成方式：对 44632 条群消息按发送者聚合统计，结合按用户提取的完整文本（1431 条）逐条阅读并选取上下文片段。</li>
+<li>统计口径：回复速度以该用户作为回复方计算；关键词分类基于消息文本规则匹配。</li>
+<li>片段选取原则：优先选择同一时间窗口内的连续对话，人物发言保留原文，图片消息以 <code>[图片]</code> 占位。</li>
+</ul>
+
+<footer>
+    <a href="https://github.com/JularDepick/ChatAnalysis.SKILL" target="_blank" rel="noopener noreferrer">
+        SKILL技术支持·ChatAnalysis
+    </a>
+</footer>
+
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    function apply(t) {
+        if (t === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ 浅色';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            btn.textContent = '🌙 暗色';
+        }
+    }
+    apply(localStorage.getItem('theme') || 'light');
+    btn.addEventListener('click', function() {
+        var next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
+    });
+})();
+</script>
+</body>
+</html>

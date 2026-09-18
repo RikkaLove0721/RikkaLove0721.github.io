@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>内容与语言分析</title>
+<script>
+(function() {
+    var t = localStorage.getItem('theme') || 'light';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --text: #1d1d1f;
+    --text-muted: #86868b;
+    --accent: #007aff;
+    --accent-hover: #0056b3;
+    --link: #007aff;
+    --link-hover: #0056b3;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --code-bg: #f5f5f7;
+    --code-color: #c0392b;
+    --pre-color: #6c5ce7;
+    --table-header-bg: #f5f5f7;
+    --hover-bg: rgba(0,0,0,0.03);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --blockquote-bg: rgba(0,122,255,0.04);
+    --blockquote-border: #007aff;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+}
+
+:root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --link: #0a84ff;
+    --link-hover: #409cff;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.2);
+    --code-bg: #1c1c1e;
+    --code-color: #f48fb1;
+    --pre-color: #ce93d8;
+    --table-header-bg: #1c1c1e;
+    --hover-bg: rgba(255,255,255,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --blockquote-bg: rgba(10,132,255,0.08);
+    --blockquote-border: #0a84ff;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+
+body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* ===== 主题切换按钮 ===== */
+.theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--surface);
+    color: var(--text); font-size: 13px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
+}
+.theme-toggle:hover { background: var(--hover-bg); border-color: var(--border-strong); }
+
+/* ===== 面包屑 ===== */
+.breadcrumb {
+    padding: 8px 0; margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); }
+.breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+
+/* ===== 排版 ===== */
+h1 { font-size: 1.8em; font-weight: 700; margin: 0 0 24px; line-height: 1.3; }
+h2 { font-size: 1.4em; font-weight: 700; margin: 40px 0 16px; line-height: 1.35; }
+h3 { font-size: 1.15em; font-weight: 600; margin: 24px 0 8px; line-height: 1.4; }
+h4 { font-size: 1em; font-weight: 600; margin: 16px 0 4px; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ===== 表格 ===== */
+table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13px;
+}
+th, td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th { background: var(--table-header-bg); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: var(--hover-bg); }
+
+/* ===== 代码块 ===== */
+pre {
+    background: var(--code-bg); color: var(--pre-color);
+    padding: 16px 20px; border-radius: 10px;
+    overflow-x: auto; font-size: 0.88em; line-height: 1.6;
+    margin: 16px 0;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono",
+                 "Cascadia Code", Consolas, monospace;
+}
+code {
+    background: var(--code-bg); color: var(--code-color);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* ===== 引用块 ===== */
+blockquote {
+    border-left: 3px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted); font-size: 0.95em;
+}
+
+/* ===== 高危区块 ===== */
+.danger-block {
+    border-left: 4px solid var(--danger);
+    background: color-mix(in srgb, var(--danger) 6%, transparent);
+    padding: 14px 18px; margin: 16px 0;
+    border-radius: 0 10px 10px 0;
+}
+.danger-block::before {
+    content: "⚠️ 高危提醒";
+    display: block; font-weight: 700; color: var(--danger);
+    margin-bottom: 8px; font-size: 0.9em;
+}
+
+/* ===== 折叠块 ===== */
+.collapsed-links { margin: 8px 0; }
+.collapsed-links summary {
+    cursor: pointer; font-weight: 600; padding: 8px 0;
+    color: var(--text-muted); font-size: 13px;
+}
+.collapsed-links summary:hover { color: var(--link); }
+
+/* ===== 排行榜 ===== */
+.leaderboard-item {
+    display: grid; grid-template-columns: 40px 1fr auto 120px;
+    align-items: center; gap: 8px;
+    padding: 12px 16px; margin: 4px 0;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+}
+.leaderboard-item:hover { background: var(--hover-bg); text-decoration: none; }
+.leaderboard-rank { font-weight: 700; font-size: 1.1em; color: var(--text-muted); text-align: center; }
+.leaderboard-rank.top3 { color: var(--accent); }
+.leaderboard-name { font-weight: 600; }
+.leaderboard-count { font-size: 13px; color: var(--text-muted); }
+.leaderboard-bar { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.leaderboard-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ===== 首页卡片 ===== */
+.home-section { margin: 32px 0; }
+.home-section h2 { margin-bottom: 12px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+    background: var(--surface); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block; color: var(--text); text-decoration: none;
+}
+.card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-2px);
+    text-decoration: none;
+}
+.card h3 { margin: 0 0 8px; }
+.card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.card-count {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--surface2); font-size: 12px; color: var(--text-muted);
+}
+
+/* ===== 首页统计 ===== */
+.stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin: 24px 0;
+}
+.stat-item {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-num { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== 页脚 ===== */
+footer {
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-muted);
+}
+footer a { color: var(--text-muted); }
+footer a:hover { color: var(--link); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px; }
+    .theme-toggle { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .leaderboard-bar { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .leaderboard-item { grid-template-columns: 32px 1fr auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙 暗色</button>
+<div class="container">
+<div class="breadcrumb"><a href="../index.html">首页</a><span class="sep">›</span><a href="index.html">统计分析</a><span class="sep">›</span><span>内容与语言分析</span></div>
+
+<h1 id="_1">内容与语言分析</h1>
+<h2 id="_2">总体说明</h2>
+<p>本报告对 RED.25糖渍小番茄 的消息文本内容进行词频、长度与语言风格分析。中文与英文词频均已从 Bot 互动通知等系统内容中排除部分干扰项，但「撤回/回了/条消息」等词汇仍属于 Bot 互动通知的高频产物，需要单独说明。以下所有数值均来自完整统计数据。</p>
+<p>全期消息 44,632 条，其中文本消息 29,110 条。本报告对文本消息进行分词统计，并结合抽样片段还原群聊的实际语言面貌。</p>
+<h2 id="top50">中文词频 Top50</h2>
+<p>按出现次数排序的中文高频词汇如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">排名</th>
+<th style="text-align: center;">词汇</th>
+<th style="text-align: center;">次数</th>
+<th style="text-align: center;">排名</th>
+<th style="text-align: center;">词汇</th>
+<th style="text-align: center;">次数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">什么</td>
+<td style="text-align: center;">1,009</td>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">已经</td>
+<td style="text-align: center;">270</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">了一</td>
+<td style="text-align: center;">813</td>
+<td style="text-align: center;">27</td>
+<td style="text-align: center;">你们</td>
+<td style="text-align: center;">268</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">撤回</td>
+<td style="text-align: center;">782</td>
+<td style="text-align: center;">28</td>
+<td style="text-align: center;">自己</td>
+<td style="text-align: center;">268</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">回了</td>
+<td style="text-align: center;">780</td>
+<td style="text-align: center;">29</td>
+<td style="text-align: center;">然后</td>
+<td style="text-align: center;">267</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">撤回了</td>
+<td style="text-align: center;">777</td>
+<td style="text-align: center;">30</td>
+<td style="text-align: center;">因为</td>
+<td style="text-align: center;">266</td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">一个</td>
+<td style="text-align: center;">712</td>
+<td style="text-align: center;">31</td>
+<td style="text-align: center;">都是</td>
+<td style="text-align: center;">258</td>
+</tr>
+<tr>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">不是</td>
+<td style="text-align: center;">663</td>
+<td style="text-align: center;">32</td>
+<td style="text-align: center;">我也</td>
+<td style="text-align: center;">240</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">怎么</td>
+<td style="text-align: center;">650</td>
+<td style="text-align: center;">33</td>
+<td style="text-align: center;">我是</td>
+<td style="text-align: center;">238</td>
+</tr>
+<tr>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">这个</td>
+<td style="text-align: center;">637</td>
+<td style="text-align: center;">34</td>
+<td style="text-align: center;">不知</td>
+<td style="text-align: center;">235</td>
+</tr>
+<tr>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">消息</td>
+<td style="text-align: center;">635</td>
+<td style="text-align: center;">35</td>
+<td style="text-align: center;">是我</td>
+<td style="text-align: center;">234</td>
+</tr>
+<tr>
+<td style="text-align: center;">11</td>
+<td style="text-align: center;">没有</td>
+<td style="text-align: center;">635</td>
+<td style="text-align: center;">36</td>
+<td style="text-align: center;">是不</td>
+<td style="text-align: center;">233</td>
+</tr>
+<tr>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">一条</td>
+<td style="text-align: center;">602</td>
+<td style="text-align: center;">37</td>
+<td style="text-align: center;">来了</td>
+<td style="text-align: center;">230</td>
+</tr>
+<tr>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">条消</td>
+<td style="text-align: center;">584</td>
+<td style="text-align: center;">38</td>
+<td style="text-align: center;">为什</td>
+<td style="text-align: center;">224</td>
+</tr>
+<tr>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">条消息</td>
+<td style="text-align: center;">584</td>
+<td style="text-align: center;">39</td>
+<td style="text-align: center;">一下</td>
+<td style="text-align: center;">223</td>
+</tr>
+<tr>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">回了一</td>
+<td style="text-align: center;">582</td>
+<td style="text-align: center;">40</td>
+<td style="text-align: center;">为什么</td>
+<td style="text-align: center;">223</td>
+</tr>
+<tr>
+<td style="text-align: center;">16</td>
+<td style="text-align: center;">了一条</td>
+<td style="text-align: center;">582</td>
+<td style="text-align: center;">41</td>
+<td style="text-align: center;">真的</td>
+<td style="text-align: center;">217</td>
+</tr>
+<tr>
+<td style="text-align: center;">17</td>
+<td style="text-align: center;">一条消</td>
+<td style="text-align: center;">581</td>
+<td style="text-align: center;">42</td>
+<td style="text-align: center;">老师</td>
+<td style="text-align: center;">216</td>
+</tr>
+<tr>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">撤回了一</td>
+<td style="text-align: center;">581</td>
+<td style="text-align: center;">43</td>
+<td style="text-align: center;">不知道</td>
+<td style="text-align: center;">211</td>
+</tr>
+<tr>
+<td style="text-align: center;">19</td>
+<td style="text-align: center;">回了一条</td>
+<td style="text-align: center;">581</td>
+<td style="text-align: center;">44</td>
+<td style="text-align: center;">出来</td>
+<td style="text-align: center;">211</td>
+</tr>
+<tr>
+<td style="text-align: center;">20</td>
+<td style="text-align: center;">了一条消</td>
+<td style="text-align: center;">581</td>
+<td style="text-align: center;">45</td>
+<td style="text-align: center;">的时</td>
+<td style="text-align: center;">203</td>
+</tr>
+<tr>
+<td style="text-align: center;">21</td>
+<td style="text-align: center;">一条消息</td>
+<td style="text-align: center;">581</td>
+<td style="text-align: center;">46</td>
+<td style="text-align: center;">其实</td>
+<td style="text-align: center;">202</td>
+</tr>
+<tr>
+<td style="text-align: center;">22</td>
+<td style="text-align: center;">我们</td>
+<td style="text-align: center;">542</td>
+<td style="text-align: center;">47</td>
+<td style="text-align: center;">高考</td>
+<td style="text-align: center;">195</td>
+</tr>
+<tr>
+<td style="text-align: center;">23</td>
+<td style="text-align: center;">可以</td>
+<td style="text-align: center;">438</td>
+<td style="text-align: center;">48</td>
+<td style="text-align: center;">不会</td>
+<td style="text-align: center;">194</td>
+</tr>
+<tr>
+<td style="text-align: center;">24</td>
+<td style="text-align: center;">现在</td>
+<td style="text-align: center;">424</td>
+<td style="text-align: center;">49</td>
+<td style="text-align: center;">所以</td>
+<td style="text-align: center;">193</td>
+</tr>
+<tr>
+<td style="text-align: center;">25</td>
+<td style="text-align: center;">还有</td>
+<td style="text-align: center;">424</td>
+<td style="text-align: center;">50</td>
+<td style="text-align: center;">有一</td>
+<td style="text-align: center;">190</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，排除 Bot 通知类词汇后，真正属于群成员口语表达的高频词以「什么」「一个」「不是」「怎么」「这个」「没有」为主，均为日常对话中的功能词。疑问、否定、感叹构成了群聊语言的主基调，成员习惯用短句快速接话。</p>
+<h2 id="_3">中文高频词功能分类</h2>
+<p>进一步对高频词进行功能归类，可以观察到群聊语言的构成：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">功能类别</th>
+<th style="text-align: center;">代表词汇（次数）</th>
+<th style="text-align: center;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">疑问类</td>
+<td style="text-align: center;">什么（1,009）、怎么（650）、为什么（223）、有没有（171）</td>
+<td style="text-align: center;">提问频率最高</td>
+</tr>
+<tr>
+<td style="text-align: center;">否定类</td>
+<td style="text-align: center;">不是（663）、没有（635）、不会（194）、不能（170）</td>
+<td style="text-align: center;">否定表达高频</td>
+</tr>
+<tr>
+<td style="text-align: center;">指代类</td>
+<td style="text-align: center;">这个（637）、那个（309）、一个（712）</td>
+<td style="text-align: center;">口语指代丰富</td>
+</tr>
+<tr>
+<td style="text-align: center;">人称类</td>
+<td style="text-align: center;">我们（542）、你们（268）、自己（268）、我的（293）</td>
+<td style="text-align: center;">群体视角突出</td>
+</tr>
+<tr>
+<td style="text-align: center;">语气类</td>
+<td style="text-align: center;">真的（217）、其实（202）、啊啊（180）、我去（179）</td>
+<td style="text-align: center;">感叹语气多样</td>
+</tr>
+<tr>
+<td style="text-align: center;">时间类</td>
+<td style="text-align: center;">现在（424）、已经（270）、今天（183）、小时（171）</td>
+<td style="text-align: center;">时间表达常见</td>
+</tr>
+<tr>
+<td style="text-align: center;">校园类</td>
+<td style="text-align: center;">老师（216）、高考（195）、大学（173）、高中（167）、学期（163）</td>
+<td style="text-align: center;">学业话题密集</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，「我们」（542 次）与「你们」（268 次）的共现说明群聊成员习惯以群体身份进行讨论，代词使用频繁。校园类词汇中「老师」「高考」「大学」「学期」的出现，再次印证了群聊的大学生属性。</p>
+<h2 id="bot">Bot 互动通知带来的高频词</h2>
+<p>「撤回」「回了」「条消息」等词的出现次数集中在 580 至 782 之间，且存在大量连锁组合词（如「回了一条」「撤回了什么」「一条消息」），这是 Bot 互动通知文本被切词后产生的衍生词，并非成员真实表达了「撤回」语义。抽样片段中可以看到此类通知的真实形态：</p>
+<pre><code>002：郁光望月 撤回了一条消息（你猜猜撤回了什么）
+盲目痴愚之区：不知所saying 撤回了一条消息（因为有错别字）
+异乡：异乡 撤回了一条消息
+雪花沉睡：Velkhana 撤回了一条消息（并抱了你一下❤）
+</code></pre>
+<p>从数据中可观察到，Bot 通知高频出现「你猜猜撤回了什么」句式，说明该群配置了猜撤回内容的互动 Bot，成员撤回消息时会触发群内提示。这类通知在词频统计中贡献了大量「撤回/回了/条消息」组合词，需要与群成员的实际发言区分对待。</p>
+<p>词频表内「猜撤」「你猜猜」「猜猜撤」「猜撤回」等组合词均命中 169 次，来自 Bot 通知的固定句式「你猜猜撤回了什么」：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">词汇</th>
+<th style="text-align: center;">次数</th>
+<th style="text-align: center;">来源句式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">猜撤</td>
+<td style="text-align: center;">169</td>
+<td style="text-align: center;">你猜猜撤回了什么</td>
+</tr>
+<tr>
+<td style="text-align: center;">你猜猜</td>
+<td style="text-align: center;">169</td>
+<td style="text-align: center;">你猜猜撤回了什么</td>
+</tr>
+<tr>
+<td style="text-align: center;">猜猜撤</td>
+<td style="text-align: center;">169</td>
+<td style="text-align: center;">你猜猜撤回了什么</td>
+</tr>
+<tr>
+<td style="text-align: center;">猜撤回</td>
+<td style="text-align: center;">169</td>
+<td style="text-align: center;">你猜猜撤回了什么</td>
+</tr>
+<tr>
+<td style="text-align: center;">猜撤回了</td>
+<td style="text-align: center;">169</td>
+<td style="text-align: center;">你猜猜撤回了什么</td>
+</tr>
+<tr>
+<td style="text-align: center;">撤回了什</td>
+<td style="text-align: center;">169</td>
+<td style="text-align: center;">你猜猜撤回了什么</td>
+</tr>
+<tr>
+<td style="text-align: center;">回了什么</td>
+<td style="text-align: center;">169</td>
+<td style="text-align: center;">你猜猜撤回了什么</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">英文词频</h2>
+<p>英文词汇（含缩写、品牌名、专有名词）的词频 Top30 如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">排名</th>
+<th style="text-align: center;">词汇</th>
+<th style="text-align: center;">次数</th>
+<th style="text-align: center;">排名</th>
+<th style="text-align: center;">词汇</th>
+<th style="text-align: center;">次数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">ai</td>
+<td style="text-align: center;">98</td>
+<td style="text-align: center;">16</td>
+<td style="text-align: center;">id</td>
+<td style="text-align: center;">17</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">fm</td>
+<td style="text-align: center;">68</td>
+<td style="text-align: center;">17</td>
+<td style="text-align: center;">zdjd</td>
+<td style="text-align: center;">17</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">qq</td>
+<td style="text-align: center;">56</td>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">mujica</td>
+<td style="text-align: center;">17</td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">https</td>
+<td style="text-align: center;">27</td>
+<td style="text-align: center;">19</td>
+<td style="text-align: center;">com</td>
+<td style="text-align: center;">15</td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">closiv</td>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">20</td>
+<td style="text-align: center;">scu</td>
+<td style="text-align: center;">15</td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">kfc</td>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">21</td>
+<td style="text-align: center;">boss</td>
+<td style="text-align: center;">15</td>
+</tr>
+<tr>
+<td style="text-align: center;">7</td>
+<td style="text-align: center;">you</td>
+<td style="text-align: center;">25</td>
+<td style="text-align: center;">22</td>
+<td style="text-align: center;">vivo</td>
+<td style="text-align: center;">14</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">major</td>
+<td style="text-align: center;">25</td>
+<td style="text-align: center;">23</td>
+<td style="text-align: center;">cs</td>
+<td style="text-align: center;">14</td>
+</tr>
+<tr>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">ppt</td>
+<td style="text-align: center;">21</td>
+<td style="text-align: center;">24</td>
+<td style="text-align: center;">cd</td>
+<td style="text-align: center;">14</td>
+</tr>
+<tr>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">nb</td>
+<td style="text-align: center;">20</td>
+<td style="text-align: center;">25</td>
+<td style="text-align: center;">tv</td>
+<td style="text-align: center;">13</td>
+</tr>
+<tr>
+<td style="text-align: center;">11</td>
+<td style="text-align: center;">onp</td>
+<td style="text-align: center;">19</td>
+<td style="text-align: center;">26</td>
+<td style="text-align: center;">mygo</td>
+<td style="text-align: center;">13</td>
+</tr>
+<tr>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">bro</td>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">27</td>
+<td style="text-align: center;">woc</td>
+<td style="text-align: center;">13</td>
+</tr>
+<tr>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">lin</td>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">28</td>
+<td style="text-align: center;">mc</td>
+<td style="text-align: center;">12</td>
+</tr>
+<tr>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">ok</td>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">29</td>
+<td style="text-align: center;">my</td>
+<td style="text-align: center;">12</td>
+</tr>
+<tr>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">xnn</td>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">30</td>
+<td style="text-align: center;">hyw</td>
+<td style="text-align: center;">12</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">英文高频词主题归类</h2>
+<p>从数据中可观察到，英文词频反映了群聊的多重兴趣维度，可以按主题归类：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">主题</th>
+<th style="text-align: center;">代表词汇</th>
+<th style="text-align: center;">频次合计</th>
+<th style="text-align: center;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">科技/AI</td>
+<td style="text-align: center;">ai、onp、nvidia、rtx、vivo、iqoo</td>
+<td style="text-align: center;">150+</td>
+<td style="text-align: center;">AI 话题与数码产品</td>
+</tr>
+<tr>
+<td style="text-align: center;">校园/专业</td>
+<td style="text-align: center;">major、ppt、scu、id</td>
+<td style="text-align: center;">78+</td>
+<td style="text-align: center;">课程与学习</td>
+</tr>
+<tr>
+<td style="text-align: center;">餐饮/生活</td>
+<td style="text-align: center;">fm、kfc、km、ol</td>
+<td style="text-align: center;">130+</td>
+<td style="text-align: center;">快餐与生活</td>
+</tr>
+<tr>
+<td style="text-align: center;">二次元/游戏</td>
+<td style="text-align: center;">mujica、mygo、boss、mc、niko</td>
+<td style="text-align: center;">70+</td>
+<td style="text-align: center;">动画与游戏</td>
+</tr>
+<tr>
+<td style="text-align: center;">网络用语</td>
+<td style="text-align: center;">nb、woc、byd、bro、ok</td>
+<td style="text-align: center;">70+</td>
+<td style="text-align: center;">拼音与网络梗</td>
+</tr>
+<tr>
+<td style="text-align: center;">平台/链接</td>
+<td style="text-align: center;">qq、https、com、online</td>
+<td style="text-align: center;">110+</td>
+<td style="text-align: center;">链接与平台名</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，「ai」以 98 次高居榜首，与群内讨论人工智能相关话题一致；「fm」「kfc」等餐饮类词汇反映聚餐话题；「mujica」「mygo」为动画企划名，反映二次元讨论；「scu」「major」指向校园与专业；「vivo」「rtx」「nvidia」「iqoo」等为数码产品相关词汇。群内英文使用以缩写和名词为主，整句英文表达较少。抽样中有成员打趣「我猜你是这个群里英文说得最多的」，侧面印证英文词汇在群内的存在感：</p>
+<pre><code>波克洛克：[回复消息]@26南梁改造工程 白祥 我猜你是这个群里英文说得最多的
+</code></pre>
+<p>拼音缩写类词汇在英文词频中也占据一席之地，「nb」（20 次）、「woc」（13 次）、「byd」（11 次）等网络用语反映了群聊的年轻化表达习惯。</p>
+<h2 id="_6">消息长度分布</h2>
+<p>各主要发送者的平均消息长度（按字符统计）如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">平均长度</th>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">平均长度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">14.8</td>
+<td style="text-align: center;">颜回momo</td>
+<td style="text-align: center;">10.5</td>
+</tr>
+<tr>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">14.7</td>
+<td style="text-align: center;">白金迪斯科</td>
+<td style="text-align: center;">10.2</td>
+</tr>
+<tr>
+<td style="text-align: center;">永雏伯虎</td>
+<td style="text-align: center;">16.7</td>
+<td style="text-align: center;">某个好人</td>
+<td style="text-align: center;">10.4</td>
+</tr>
+<tr>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">12.7</td>
+<td style="text-align: center;">赤焰琉霄</td>
+<td style="text-align: center;">10.7</td>
+</tr>
+<tr>
+<td style="text-align: center;">异乡</td>
+<td style="text-align: center;">12.9</td>
+<td style="text-align: center;">得胜已是定局</td>
+<td style="text-align: center;">8.0</td>
+</tr>
+<tr>
+<td style="text-align: center;">雪吻巧克力</td>
+<td style="text-align: center;">10.7</td>
+<td style="text-align: center;">苦来兮苦</td>
+<td style="text-align: center;">8.8</td>
+</tr>
+<tr>
+<td style="text-align: center;">群斟茶兵</td>
+<td style="text-align: center;">8.9</td>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">8.1</td>
+</tr>
+<tr>
+<td style="text-align: center;">雪花沉睡</td>
+<td style="text-align: center;">8.3</td>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">8.2</td>
+</tr>
+<tr>
+<td style="text-align: center;">番茄斗罗</td>
+<td style="text-align: center;">8.3</td>
+<td style="text-align: center;">秋水祀</td>
+<td style="text-align: center;">6.9</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，核心活跃成员的平均消息长度多集中在 8 至 15 字符之间，属于「短句快接」型聊天风格。若至（14.8）、波克洛克（14.7）、枫糖总帅（12.7）等成员的平均长度相对更长，倾向于说完整句子或连续输出多句。</p>
+<h2 id="_7">消息长度区间分布</h2>
+<p>从各发送者的长度区间分布可以进一步看出个体的发言习惯。以几位典型成员为例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">1-5 字符</th>
+<th style="text-align: center;">6-20 字符</th>
+<th style="text-align: center;">21-50 字符</th>
+<th style="text-align: center;">51-100 字符</th>
+<th style="text-align: center;">100+ 字符</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">472</td>
+<td style="text-align: center;">1,029</td>
+<td style="text-align: center;">128</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">23</td>
+</tr>
+<tr>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">450</td>
+<td style="text-align: center;">1,490</td>
+<td style="text-align: center;">238</td>
+<td style="text-align: center;">34</td>
+<td style="text-align: center;">11</td>
+</tr>
+<tr>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">1,158</td>
+<td style="text-align: center;">1,824</td>
+<td style="text-align: center;">57</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">494</td>
+<td style="text-align: center;">461</td>
+<td style="text-align: center;">36</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr>
+<td style="text-align: center;">雪花沉睡</td>
+<td style="text-align: center;">346</td>
+<td style="text-align: center;">443</td>
+<td style="text-align: center;">19</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">4</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，26瓦斯 的 3,375 条消息中 1,158 条落在 1-5 字符区间，1,824 条在 6-20 字符区间，超短消息占比高，属于典型的高频短句刷屏型；波克洛克 有 23 条超过 100 字符的长消息，存在发布长内容的行为；子路 与 雪花沉睡 的短消息占比接近一半，与其图片为主的发言方式一致。若至 的长度分布相对均衡，既有大量短句，也有 45 条超过 51 字符的较长发言。</p>
+<h2 id="_8">极端长度用户</h2>
+<p>部分低频用户的平均长度异常高，属于「潜水长文」型：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">平均长度</th>
+<th style="text-align: center;">消息数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">永世帝位</td>
+<td style="text-align: center;">75.3</td>
+<td style="text-align: center;">35</td>
+</tr>
+<tr>
+<td style="text-align: center;">虞渊</td>
+<td style="text-align: center;">58.0</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">春宵苦短苦来兮</td>
+<td style="text-align: center;">37.0</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">小兔宰治</td>
+<td style="text-align: center;">24.4</td>
+<td style="text-align: center;">19</td>
+</tr>
+<tr>
+<td style="text-align: center;">25 祐</td>
+<td style="text-align: center;">23.1</td>
+<td style="text-align: center;">11</td>
+</tr>
+<tr>
+<td style="text-align: center;">冶北风</td>
+<td style="text-align: center;">21.2</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr>
+<td style="text-align: center;">赤影</td>
+<td style="text-align: center;">25.1</td>
+<td style="text-align: center;">19</td>
+</tr>
+</tbody>
+</table>
+<p>另有一些成员以极短消息为主：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">平均长度</th>
+<th style="text-align: center;">消息数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">雁过也</td>
+<td style="text-align: center;">2.0</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">Napoléon Bonaparte</td>
+<td style="text-align: center;">3.0</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td style="text-align: center;">樱公馆の公主</td>
+<td style="text-align: center;">4.8</td>
+<td style="text-align: center;">16</td>
+</tr>
+<tr>
+<td style="text-align: center;">SDLTF</td>
+<td style="text-align: center;">4.8</td>
+<td style="text-align: center;">15</td>
+</tr>
+<tr>
+<td style="text-align: center;">忘尘</td>
+<td style="text-align: center;">5.0</td>
+<td style="text-align: center;">7</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，消息长度与发送量并无单调关系：26瓦斯 发送量高（3,375 条）但平均长度短（8.1），属于高频短句型；波克洛克发送量同样高（3,737 条）但平均长度长（14.7），偏向完整表达。群聊因此呈现出「刷屏式快接」与「连贯式讨论」并存的混合风格。</p>
+<h2 id="_9">各发送者平均消息长度对比</h2>
+<p>按文本消息数量较多成员细看，可以进一步区分「短平快」与「长论述」两类风格：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">风格类型</th>
+<th style="text-align: center;">代表成员</th>
+<th style="text-align: center;">平均长度</th>
+<th style="text-align: center;">特征</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">长论述</td>
+<td style="text-align: center;">永雏伯虎</td>
+<td style="text-align: center;">16.7</td>
+<td style="text-align: center;">一次说满整句</td>
+</tr>
+<tr>
+<td style="text-align: center;">长论述</td>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">14.8</td>
+<td style="text-align: center;">常补充完整语境</td>
+</tr>
+<tr>
+<td style="text-align: center;">长论述</td>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">14.7</td>
+<td style="text-align: center;">多带连贯上下文</td>
+</tr>
+<tr>
+<td style="text-align: center;">长论述</td>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">12.7</td>
+<td style="text-align: center;">叙事较多</td>
+</tr>
+<tr>
+<td style="text-align: center;">中等</td>
+<td style="text-align: center;">赤焰琉霄</td>
+<td style="text-align: center;">10.7</td>
+<td style="text-align: center;">稳定输出</td>
+</tr>
+<tr>
+<td style="text-align: center;">中等</td>
+<td style="text-align: center;">某个好人</td>
+<td style="text-align: center;">10.4</td>
+<td style="text-align: center;">完整短句</td>
+</tr>
+<tr>
+<td style="text-align: center;">短平快</td>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">8.1</td>
+<td style="text-align: center;">高频短句刷屏</td>
+</tr>
+<tr>
+<td style="text-align: center;">短平快</td>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">8.2</td>
+<td style="text-align: center;">图片配短文字</td>
+</tr>
+<tr>
+<td style="text-align: center;">短平快</td>
+<td style="text-align: center;">番茄斗罗</td>
+<td style="text-align: center;">8.3</td>
+<td style="text-align: center;">简洁回应</td>
+</tr>
+<tr>
+<td style="text-align: center;">短平快</td>
+<td style="text-align: center;">雪花沉睡</td>
+<td style="text-align: center;">8.3</td>
+<td style="text-align: center;">图片为主</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_10">语言风格特点</h2>
+<p>综合词频、长度与抽样内容，群聊语言风格可归纳为以下几点：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">特点</th>
+<th style="text-align: center;">表现</th>
+<th style="text-align: center;">证据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">口语化</td>
+<td style="text-align: center;">疑问与感叹高频</td>
+<td style="text-align: center;">「什么」「怎么」「真的」「啊啊」</td>
+</tr>
+<tr>
+<td style="text-align: center;">接龙文化</td>
+<td style="text-align: center;">同一句式连续多人复读</td>
+<td style="text-align: center;">「还好在一教b」连续六人接龙</td>
+</tr>
+<tr>
+<td style="text-align: center;">谐音梗</td>
+<td style="text-align: center;">故意错字与恶搞</td>
+<td style="text-align: center;">「补药盒我喵」「不知所saying」</td>
+</tr>
+<tr>
+<td style="text-align: center;">多语混用</td>
+<td style="text-align: center;">中英夹杂、拼音缩写</td>
+<td style="text-align: center;">「nb」「woc」「byd」「xnn」</td>
+</tr>
+<tr>
+<td style="text-align: center;">话题切换快</td>
+<td style="text-align: center;">短句多、转场频繁</td>
+<td style="text-align: center;">多轮快接对话</td>
+</tr>
+<tr>
+<td style="text-align: center;">玩梗浓度高</td>
+<td style="text-align: center;">引用番剧、游戏梗</td>
+<td style="text-align: center;">「mujica」「mygo」「帝君遇刺」</td>
+</tr>
+<tr>
+<td style="text-align: center;">亲密称呼</td>
+<td style="text-align: center;">群内昵称化</td>
+<td style="text-align: center;">「老吴」「喝耐耐」「给你喝奶奶」</td>
+</tr>
+</tbody>
+</table>
+<p>抽样中可以看到典型的复读接龙场景，同一句式在短时间内被多人连续使用：</p>
+<pre><code>26瓦斯：还好在一教b
+雪花沉睡：还好在一教b
+颜回momo：还好在一教b
+25 洛威尔：还好在一教b
+得胜已是定局：还好在一教b
+群心理委员：还好在一教b
+</code></pre>
+<p>群聊首日的节日接龙同样是风格典型，成员连续抛出各种节日祝福：</p>
+<pre><code>得胜已是定局：六一快乐孩子们
+苦来兮苦：母亲节快乐
+群斟茶兵：情人节快乐
+永雏伯虎：重阳节快乐
+某个好人：元旦快乐
+波克洛克：风花节快乐
+</code></pre>
+<p>复读行为在抽样中多次出现，例如对同一句吐槽的接力：</p>
+<pre><code>波克洛克：你这家伙又在说什么
+雪花沉睡：你这家伙又在说什么
+苦来兮苦：你这家伙又在说什么
+</code></pre>
+<p>群内也流行将长句拆成多段连续发送的「刷屏式表达」，如群聊首日的歌词接龙：</p>
+<pre><code>波克洛克：[回复消息]@26南梁改造工程 白祥 白祥 我总算学会了
+波克洛克：如何去爱
+波克洛克：可惜你
+波克洛克：早已消失在人海
+枫糖总帅：后来
+枫糖总帅：终于在眼泪中明白
+</code></pre>
+<h2 id="_11">话题表达倾向</h2>
+<p>不同成员的话题侧重存在差异。以关键词分类统计为例，几位核心成员的话题分布如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">日常生活</th>
+<th style="text-align: center;">学业/职场</th>
+<th style="text-align: center;">娱乐</th>
+<th style="text-align: center;">社交/关系</th>
+<th style="text-align: center;">情绪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">152</td>
+<td style="text-align: center;">47</td>
+<td style="text-align: center;">52</td>
+<td style="text-align: center;">37</td>
+<td style="text-align: center;">11</td>
+</tr>
+<tr>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">154</td>
+<td style="text-align: center;">143</td>
+<td style="text-align: center;">39</td>
+<td style="text-align: center;">60</td>
+<td style="text-align: center;">17</td>
+</tr>
+<tr>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">189</td>
+<td style="text-align: center;">66</td>
+<td style="text-align: center;">40</td>
+<td style="text-align: center;">29</td>
+<td style="text-align: center;">22</td>
+</tr>
+<tr>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">34</td>
+<td style="text-align: center;">21</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr>
+<td style="text-align: center;">番茄斗罗</td>
+<td style="text-align: center;">未列明</td>
+<td style="text-align: center;">未列明</td>
+<td style="text-align: center;">未列明</td>
+<td style="text-align: center;">未列明</td>
+<td style="text-align: center;">未列明</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，若至 的学业/职场命中数（143）在核心成员中最高，与其频繁讨论课程、考试的内容一致；26瓦斯 的日常生活命中（189）最高，且情绪类（22）也较多，属于话题覆盖面广的活跃成员；波克洛克 的娱乐类（52）仅次于其日常生活类，反映其休闲话题偏好。</p>
+<h2 id="bot_1">Bot 高频词说明</h2>
+<p>本报告中「撤回/回了/条消息」相关词汇的数据细节如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">词汇</th>
+<th style="text-align: center;">出现次数</th>
+<th style="text-align: center;">性质</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">撤回</td>
+<td style="text-align: center;">782</td>
+<td style="text-align: center;">Bot 通知产物</td>
+</tr>
+<tr>
+<td style="text-align: center;">回了</td>
+<td style="text-align: center;">780</td>
+<td style="text-align: center;">Bot 通知产物</td>
+</tr>
+<tr>
+<td style="text-align: center;">撤回了</td>
+<td style="text-align: center;">777</td>
+<td style="text-align: center;">Bot 通知产物</td>
+</tr>
+<tr>
+<td style="text-align: center;">消息</td>
+<td style="text-align: center;">635</td>
+<td style="text-align: center;">混合（含 Bot 通知）</td>
+</tr>
+<tr>
+<td style="text-align: center;">一条消息</td>
+<td style="text-align: center;">581</td>
+<td style="text-align: center;">Bot 通知固定句式</td>
+</tr>
+<tr>
+<td style="text-align: center;">回了一条</td>
+<td style="text-align: center;">581</td>
+<td style="text-align: center;">Bot 通知固定句式</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，这些词汇的计数高度接近且以固定句式组合出现，明显来自「某某撤回了一条消息」「某某回了你的一条消息」类 Bot 通知。系统消息合计 1,505 条（多为拍一拍、揉一揉等互动提示），是这些词频的主要来源。在解读群成员真实语言习惯时，应排除这一部分干扰。</p>
+<h2 id="_12">小结</h2>
+<p>RED.25糖渍小番茄 的语言风格以口语化短句为主，中文高频词集中于疑问与感叹功能词，英文使用以缩写与专有名词为主，词频背后反映校园、二次元、数码、AI 等多重兴趣。消息长度呈现「高频短句」与「低频长文」两极分布。群聊的复读、接龙、谐音梗文化特征鲜明，语言生动活泼。Bot 互动通知对「撤回/条消息」等词频的贡献显著，已在分析中单独说明。</p>
+<p>本报告数据来源: .output/chat_stats.json, 抽样片段覆盖完整时间范围</p>
+
+<footer>
+    <a href="https://github.com/JularDepick/ChatAnalysis.SKILL" target="_blank" rel="noopener noreferrer">
+        SKILL技术支持·ChatAnalysis
+    </a>
+</footer>
+
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    function apply(t) {
+        if (t === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ 浅色';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            btn.textContent = '🌙 暗色';
+        }
+    }
+    apply(localStorage.getItem('theme') || 'light');
+    btn.addEventListener('click', function() {
+        var next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
+    });
+})();
+</script>
+</body>
+</html>

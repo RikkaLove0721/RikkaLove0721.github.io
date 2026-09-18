@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>互动模式分析</title>
+<script>
+(function() {
+    var t = localStorage.getItem('theme') || 'light';
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+})();
+</script>
+<style>:root {
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface2: #e8e8ed;
+    --text: #1d1d1f;
+    --text-muted: #86868b;
+    --accent: #007aff;
+    --accent-hover: #0056b3;
+    --link: #007aff;
+    --link-hover: #0056b3;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --code-bg: #f5f5f7;
+    --code-color: #c0392b;
+    --pre-color: #6c5ce7;
+    --table-header-bg: #f5f5f7;
+    --hover-bg: rgba(0,0,0,0.03);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    --blockquote-bg: rgba(0,122,255,0.04);
+    --blockquote-border: #007aff;
+    --success: #34c759;
+    --warning: #ff9500;
+    --danger: #ff3b30;
+}
+
+:root[data-theme="dark"] {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #f5f5f7;
+    --text-muted: #98989f;
+    --accent: #0a84ff;
+    --accent-hover: #409cff;
+    --link: #0a84ff;
+    --link-hover: #409cff;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.2);
+    --code-bg: #1c1c1e;
+    --code-color: #f48fb1;
+    --pre-color: #ce93d8;
+    --table-header-bg: #1c1c1e;
+    --hover-bg: rgba(255,255,255,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    --blockquote-bg: rgba(10,132,255,0.08);
+    --blockquote-border: #0a84ff;
+    --success: #30d158;
+    --warning: #ff9f0a;
+    --danger: #ff453a;
+}
+
+* { box-sizing: border-box; }
+
+html { scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar { display: none; }
+
+body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* ===== 主题切换按钮 ===== */
+.theme-toggle {
+    position: fixed; top: 16px; right: 16px; z-index: 1000;
+    padding: 8px 14px; border: 1px solid var(--border);
+    border-radius: 999px; background: var(--surface);
+    color: var(--text); font-size: 13px; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow);
+}
+.theme-toggle:hover { background: var(--hover-bg); border-color: var(--border-strong); }
+
+/* ===== 面包屑 ===== */
+.breadcrumb {
+    padding: 8px 0; margin-bottom: 24px;
+    font-size: 13px; color: var(--text-muted);
+}
+.breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--link); }
+.breadcrumb .sep { margin: 0 8px; opacity: 0.5; }
+
+/* ===== 排版 ===== */
+h1 { font-size: 1.8em; font-weight: 700; margin: 0 0 24px; line-height: 1.3; }
+h2 { font-size: 1.4em; font-weight: 700; margin: 40px 0 16px; line-height: 1.35; }
+h3 { font-size: 1.15em; font-weight: 600; margin: 24px 0 8px; line-height: 1.4; }
+h4 { font-size: 1em; font-weight: 600; margin: 16px 0 4px; }
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+/* ===== 表格 ===== */
+table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 13px;
+}
+th, td {
+    padding: 10px 14px; text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+th { background: var(--table-header-bg); font-weight: 600; position: sticky; top: 0; }
+tr:hover td { background: var(--hover-bg); }
+
+/* ===== 代码块 ===== */
+pre {
+    background: var(--code-bg); color: var(--pre-color);
+    padding: 16px 20px; border-radius: 10px;
+    overflow-x: auto; font-size: 0.88em; line-height: 1.6;
+    margin: 16px 0;
+    font-family: "SF Mono", "Fira Code", "JetBrains Mono",
+                 "Cascadia Code", Consolas, monospace;
+}
+code {
+    background: var(--code-bg); color: var(--code-color);
+    padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* ===== 引用块 ===== */
+blockquote {
+    border-left: 3px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: 12px 16px; margin: 16px 0;
+    border-radius: 0 6px 6px 0;
+    color: var(--text-muted); font-size: 0.95em;
+}
+
+/* ===== 高危区块 ===== */
+.danger-block {
+    border-left: 4px solid var(--danger);
+    background: color-mix(in srgb, var(--danger) 6%, transparent);
+    padding: 14px 18px; margin: 16px 0;
+    border-radius: 0 10px 10px 0;
+}
+.danger-block::before {
+    content: "⚠️ 高危提醒";
+    display: block; font-weight: 700; color: var(--danger);
+    margin-bottom: 8px; font-size: 0.9em;
+}
+
+/* ===== 折叠块 ===== */
+.collapsed-links { margin: 8px 0; }
+.collapsed-links summary {
+    cursor: pointer; font-weight: 600; padding: 8px 0;
+    color: var(--text-muted); font-size: 13px;
+}
+.collapsed-links summary:hover { color: var(--link); }
+
+/* ===== 排行榜 ===== */
+.leaderboard-item {
+    display: grid; grid-template-columns: 40px 1fr auto 120px;
+    align-items: center; gap: 8px;
+    padding: 12px 16px; margin: 4px 0;
+    border-radius: 10px; text-decoration: none; color: var(--text);
+    transition: background 0.15s;
+}
+.leaderboard-item:hover { background: var(--hover-bg); text-decoration: none; }
+.leaderboard-rank { font-weight: 700; font-size: 1.1em; color: var(--text-muted); text-align: center; }
+.leaderboard-rank.top3 { color: var(--accent); }
+.leaderboard-name { font-weight: 600; }
+.leaderboard-count { font-size: 13px; color: var(--text-muted); }
+.leaderboard-bar { height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.leaderboard-bar-fill {
+    height: 100%; background: var(--accent); border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ===== 首页卡片 ===== */
+.home-section { margin: 32px 0; }
+.home-section h2 { margin-bottom: 12px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card {
+    background: var(--surface); border-radius: 16px;
+    padding: 24px; box-shadow: var(--shadow);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block; color: var(--text); text-decoration: none;
+}
+.card:hover {
+    box-shadow: var(--shadow-lg); transform: translateY(-2px);
+    text-decoration: none;
+}
+.card h3 { margin: 0 0 8px; }
+.card p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.card-count {
+    display: inline-block; margin-top: 12px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--surface2); font-size: 12px; color: var(--text-muted);
+}
+
+/* ===== 首页统计 ===== */
+.stats-bar {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px; margin: 24px 0;
+}
+.stat-item {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; text-align: center; box-shadow: var(--shadow);
+}
+.stat-num { font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ===== 页脚 ===== */
+footer {
+    margin-top: 40px; padding: 16px 0;
+    border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--text-muted);
+}
+footer a { color: var(--text-muted); }
+footer a:hover { color: var(--link); }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+    .container { padding: 16px; }
+    .theme-toggle { top: 8px; right: 8px; padding: 6px 10px; font-size: 12px; }
+    table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .leaderboard-bar { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .leaderboard-item { grid-template-columns: 32px 1fr auto; }
+}
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙 暗色</button>
+<div class="container">
+<div class="breadcrumb"><a href="../index.html">首页</a><span class="sep">›</span><a href="index.html">统计分析</a><span class="sep">›</span><span>互动模式分析</span></div>
+
+<h1 id="_1">互动模式分析</h1>
+<h2 id="_2">总体说明</h2>
+<p>本报告分析 RED.25糖渍小番茄 的对话轮次结构、回复速度与回复指向性。全期消息 44,632 条被划分为 552 轮对话，平均每轮 80.9 条消息，说明群聊以长时段连续讨论为主，话题切换相对低频。回复型消息共 6,024 条，占全部消息的 13.5%，是成员之间建立指向性互动的重要方式。</p>
+<p>互动模式可以从三个层面观察：一是轮次层面的对话结构，二是时间层面的回复速度，三是对象层面的回复指向。本报告依次展开。</p>
+<h2 id="_3">对话轮次结构</h2>
+<p>按轮次长度划分的分布如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">轮次长度</th>
+<th style="text-align: center;">轮数</th>
+<th style="text-align: center;">占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1-5 条</td>
+<td style="text-align: center;">154</td>
+<td style="text-align: center;">27.9%</td>
+</tr>
+<tr>
+<td style="text-align: center;">6-20 条</td>
+<td style="text-align: center;">139</td>
+<td style="text-align: center;">25.2%</td>
+</tr>
+<tr>
+<td style="text-align: center;">21-50 条</td>
+<td style="text-align: center;">92</td>
+<td style="text-align: center;">16.7%</td>
+</tr>
+<tr>
+<td style="text-align: center;">50 条以上</td>
+<td style="text-align: center;">167</td>
+<td style="text-align: center;">30.2%</td>
+</tr>
+<tr>
+<td style="text-align: center;">合计</td>
+<td style="text-align: center;">552</td>
+<td style="text-align: center;">100%</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，轮次长度呈现明显的两极分化：短轮（1-5 条）与超长轮（50 条以上）各占约三成。超过 50 条的长轮共 167 轮，贡献了绝大多数消息量，说明群聊中存在大量长时间的「驻留式」讨论，而不是碎片化的快速问答。平均每轮 80.9 条的高数值也印证了这一点。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">轮次类型</th>
+<th style="text-align: center;">轮数</th>
+<th style="text-align: center;">特征</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">微型轮（1-5 条）</td>
+<td style="text-align: center;">154</td>
+<td style="text-align: center;">快速问答、一句吐槽</td>
+</tr>
+<tr>
+<td style="text-align: center;">短轮（6-20 条）</td>
+<td style="text-align: center;">139</td>
+<td style="text-align: center;">小型讨论</td>
+</tr>
+<tr>
+<td style="text-align: center;">中轮（21-50 条）</td>
+<td style="text-align: center;">92</td>
+<td style="text-align: center;">中等话题发酵</td>
+</tr>
+<tr>
+<td style="text-align: center;">长轮（50+ 条）</td>
+<td style="text-align: center;">167</td>
+<td style="text-align: center;">驻留式长讨论</td>
+</tr>
+</tbody>
+</table>
+<p>长轮次的典型场景是群体性话题的持续发酵，例如期末考试复习期的集中吐槽：</p>
+<pre><code>L：微积分必须学，不然就直接等补考和重修了
+L：泥🚢高数三件套是真的难
+若至：打熊会出现一大堆表情包
+得胜已是定局：不管我打出什么
+得胜已是定局：我都没有表情包
+番茄斗罗：学不下去
+苦来兮苦：那来狩猎
+</code></pre>
+<p>短轮次则多为点到为止的快速互动，例如一问一答或一句吐槽：</p>
+<pre><code>波克洛克：学车要多少天啊
+子路：我大概两天吧
+波克洛克：我指从开始到拿驾照
+子路：我没有驾照
+</code></pre>
+<h2 id="_4">轮次与话题的关联</h2>
+<p>长轮次通常由「持续性话题」驱动，这些话题包括：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">话题类型</th>
+<th style="text-align: center;">特征</th>
+<th style="text-align: center;">典型表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">学业吐槽</td>
+<td style="text-align: center;">期末复习期集中爆发</td>
+<td style="text-align: center;">高数、微积分、补考</td>
+</tr>
+<tr>
+<td style="text-align: center;">游戏讨论</td>
+<td style="text-align: center;">长时间交流攻略</td>
+<td style="text-align: center;">奥奇传说、原神、赛尔号</td>
+</tr>
+<tr>
+<td style="text-align: center;">复读接龙</td>
+<td style="text-align: center;">同句式多人接力</td>
+<td style="text-align: center;">还好在一教b</td>
+</tr>
+<tr>
+<td style="text-align: center;">斗图对战</td>
+<td style="text-align: center;">图片连发</td>
+<td style="text-align: center;">表情包测试与分享</td>
+</tr>
+<tr>
+<td style="text-align: center;">日常闲聊</td>
+<td style="text-align: center;">深夜长谈</td>
+<td style="text-align: center;">手办、手机、生活琐事</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">回复速度总体统计</h2>
+<p>回复速度以「秒」为单位统计，衡量成员发出一条消息后到其下一次发言之间的间隔。全群主要的回复速度统计如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">指标</th>
+<th style="text-align: center;">数值</th>
+<th style="text-align: center;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">回复速度计数</td>
+<td style="text-align: center;">26,000+</td>
+<td style="text-align: center;">覆盖主要发送者</td>
+</tr>
+<tr>
+<td style="text-align: center;">多数成员中位回复间隔</td>
+<td style="text-align: center;">8-20 秒</td>
+<td style="text-align: center;">高频快接</td>
+</tr>
+<tr>
+<td style="text-align: center;">多数成员平均回复间隔</td>
+<td style="text-align: center;">60-200 秒</td>
+<td style="text-align: center;">受长间隔拉高</td>
+</tr>
+<tr>
+<td style="text-align: center;">最短中位间隔</td>
+<td style="text-align: center;">5 秒（天兰天）</td>
+<td style="text-align: center;">连续快接</td>
+</tr>
+<tr>
+<td style="text-align: center;">最长中位间隔</td>
+<td style="text-align: center;">1201 秒（25 known）</td>
+<td style="text-align: center;">低频用户</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，活跃成员的中位回复间隔普遍在 8 至 20 秒之间，说明核心成员在参与讨论时保持高频接话；平均值则因偶发的长时间离开被明显拉高。回复速度的快慢可以区分「秒回型」与「沉思型」两类参与者。</p>
+<h2 id="_6">各用户回复速度对比</h2>
+<p>以下列出主要发送者的中位回复间隔、平均回复间隔与计数：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">中位（秒）</th>
+<th style="text-align: center;">平均（秒）</th>
+<th style="text-align: center;">计数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">苦来兮苦</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">90.0</td>
+<td style="text-align: center;">1,226</td>
+</tr>
+<tr>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">70.2</td>
+<td style="text-align: center;">2,089</td>
+</tr>
+<tr>
+<td style="text-align: center;">诗空 咲</td>
+<td style="text-align: center;">11</td>
+<td style="text-align: center;">101.6</td>
+<td style="text-align: center;">259</td>
+</tr>
+<tr>
+<td style="text-align: center;">赤焰琉霄</td>
+<td style="text-align: center;">11</td>
+<td style="text-align: center;">70.9</td>
+<td style="text-align: center;">1,079</td>
+</tr>
+<tr>
+<td style="text-align: center;">颜回momo</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">69.3</td>
+<td style="text-align: center;">841</td>
+</tr>
+<tr>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">79.8</td>
+<td style="text-align: center;">1,295</td>
+</tr>
+<tr>
+<td style="text-align: center;">得胜已是定局</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">85.0</td>
+<td style="text-align: center;">1,247</td>
+</tr>
+<tr>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">83.4</td>
+<td style="text-align: center;">2,682</td>
+</tr>
+<tr>
+<td style="text-align: center;">白金迪斯科</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">95.9</td>
+<td style="text-align: center;">700</td>
+</tr>
+<tr>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">79.9</td>
+<td style="text-align: center;">2,766</td>
+</tr>
+<tr>
+<td style="text-align: center;">雪花沉睡</td>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">110.8</td>
+<td style="text-align: center;">1,085</td>
+</tr>
+<tr>
+<td style="text-align: center;">002</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">105.4</td>
+<td style="text-align: center;">764</td>
+</tr>
+<tr>
+<td style="text-align: center;">26冶北风</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">81.1</td>
+<td style="text-align: center;">816</td>
+</tr>
+<tr>
+<td style="text-align: center;">番茄斗罗</td>
+<td style="text-align: center;">19</td>
+<td style="text-align: center;">191.0</td>
+<td style="text-align: center;">1,263</td>
+</tr>
+<tr>
+<td style="text-align: center;">群斟茶兵</td>
+<td style="text-align: center;">19</td>
+<td style="text-align: center;">125.8</td>
+<td style="text-align: center;">410</td>
+</tr>
+<tr>
+<td style="text-align: center;">枫糖总帅</td>
+<td style="text-align: center;">24</td>
+<td style="text-align: center;">187.9</td>
+<td style="text-align: center;">1,209</td>
+</tr>
+<tr>
+<td style="text-align: center;">某个好人</td>
+<td style="text-align: center;">25</td>
+<td style="text-align: center;">163.1</td>
+<td style="text-align: center;">1,000</td>
+</tr>
+<tr>
+<td style="text-align: center;">系统消息</td>
+<td style="text-align: center;">17</td>
+<td style="text-align: center;">133.1</td>
+<td style="text-align: center;">1,043</td>
+</tr>
+<tr>
+<td style="text-align: center;">永雏伯虎</td>
+<td style="text-align: center;">42</td>
+<td style="text-align: center;">200.0</td>
+<td style="text-align: center;">220</td>
+</tr>
+<tr>
+<td style="text-align: center;">海一花</td>
+<td style="text-align: center;">42</td>
+<td style="text-align: center;">303.5</td>
+<td style="text-align: center;">303</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，26瓦斯 与苦来兮苦 是典型的秒回型成员（中位 8-9 秒），26瓦斯 的回复计数高达 2,089 次，说明其几乎全程驻守在群内。番茄斗罗、枫糖总帅、某个好人 的平均间隔超过 150 秒，但中位间隔仍在 19-25 秒，表明他们大多数时候同样快速接话，只是偶尔长时间缺席拉高了平均值。</p>
+<h2 id="_7">回复速度梯队</h2>
+<p>按回复速度将主要成员划分为三个梯队：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">梯队</th>
+<th style="text-align: center;">判定标准</th>
+<th style="text-align: center;">代表成员</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">秒回梯队</td>
+<td style="text-align: center;">中位 8-11 秒</td>
+<td style="text-align: center;">26瓦斯、苦来兮苦、诗空 咲、赤焰琉霄</td>
+</tr>
+<tr>
+<td style="text-align: center;">快接梯队</td>
+<td style="text-align: center;">中位 12-20 秒</td>
+<td style="text-align: center;">颜回momo、子路、得胜已是定局、若至、波克洛克、番茄斗罗</td>
+</tr>
+<tr>
+<td style="text-align: center;">慢接梯队</td>
+<td style="text-align: center;">中位 20-42 秒</td>
+<td style="text-align: center;">枫糖总帅、某个好人、永雏伯虎、海一花</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到，秒回梯队与快接梯队的成员组成了群聊互动的主要参与方，慢接梯队成员则偏向「看完再回」。回复速度与发送量没有严格对应关系，例如波克洛克的发送量全群第一（3,737 条），但其回复中位为 18 秒，属于稳定快接而非极速秒回。</p>
+<h2 id="_8">回复中的快速连续场景</h2>
+<p>从抽样中可以看到连续秒接的对话节奏，成员在同一分钟内互相接话：</p>
+<pre><code>子路：我超
+子路：神了
+发霉の干冰：神了
+子路：拍张照来@25 W. nikke群377708664
+25 W. nikke群377708664：忠诚
+</code></pre>
+<p>游戏话题中的快速问答同样体现了高频接话：</p>
+<pre><code>枫糖总帅：我的手机配置低
+枫糖总帅：一玩原神就死机
+小喷菇：手机配置低
+小喷菇：一玩原神就死机
+小喷菇：我要买小米手机
+小喷菇：可是没钱要分期
+</code></pre>
+<h2 id="_9">回复目标（谁常回复谁）</h2>
+<p>回复型消息带有明确的指向性。以下为主要发送者最常回复的目标（按次数排序）：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">发送者</th>
+<th style="text-align: center;">主要回复目标（次数）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">波克洛克</td>
+<td style="text-align: center;">26（173）、26南梁改造工程（106）、26瓦斯（98）、26逍遥摸金群（86）、子路（56）</td>
+</tr>
+<tr>
+<td style="text-align: center;">若至</td>
+<td style="text-align: center;">26瓦斯（402）、26（104）、波克洛克（100）、25（78）、某个好人（46）</td>
+</tr>
+<tr>
+<td style="text-align: center;">26瓦斯</td>
+<td style="text-align: center;">26（26）、波克洛克（20）、26瓦斯（9）、某个好人（6）、苦来兮苦（5）</td>
+</tr>
+<tr>
+<td style="text-align: center;">子路</td>
+<td style="text-align: center;">某个冰冰子类（39）、26（34）、波克洛克（25）、25（20）、26瓦斯（18）</td>
+</tr>
+<tr>
+<td style="text-align: center;">苦来兮苦</td>
+<td style="text-align: center;">波克洛克（54）、若至（44）等高频互回</td>
+</tr>
+<tr>
+<td style="text-align: center;">颜回momo</td>
+<td style="text-align: center;">波克洛克（54）等高频互回</td>
+</tr>
+</tbody>
+</table>
+<p>从数据中可观察到几个明显的互动结构：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">互动对</th>
+<th style="text-align: center;">特征</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">若至 回复 26瓦斯（402 次）</td>
+<td style="text-align: center;">全群最紧密的回复关系</td>
+</tr>
+<tr>
+<td style="text-align: center;">波克洛克 回复 26（173 次）</td>
+<td style="text-align: center;">高频回复目标</td>
+</tr>
+<tr>
+<td style="text-align: center;">波克洛克 回复 26南梁改造工程（106 次）</td>
+<td style="text-align: center;">高频回复目标</td>
+</tr>
+<tr>
+<td style="text-align: center;">若至 回复 波克洛克（100 次）</td>
+<td style="text-align: center;">双向互动明显</td>
+</tr>
+<tr>
+<td style="text-align: center;">子路 与 波克洛克</td>
+<td style="text-align: center;">存在稳定互回关系</td>
+</tr>
+</tbody>
+</table>
+<p>若至对 26瓦斯 的回复达到 402 次，远超其它关系，二者构成了群聊互动的核心轴线。抽样中可以看到这种高频的互相接话：</p>
+<pre><code>26瓦斯：[回复消息]@波克洛克 最红的和最黑的有幸都玩
+波克洛克：[回复消息]@25瓦斯 我感觉是三年前的图
+波克洛克：不然不可能这么红
+若至：[回复消息]那这辈子完蛋了
+</code></pre>
+<h2 id="_10">回复结构中的关系特征</h2>
+<p>从回复目标数据中还可以观察到以下几类关系特征：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">关系类型</th>
+<th style="text-align: center;">表现</th>
+<th style="text-align: center;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">单向强回复</td>
+<td style="text-align: center;">若至 → 26瓦斯（402 次）</td>
+<td style="text-align: center;">一方高频回复另一方</td>
+</tr>
+<tr>
+<td style="text-align: center;">双向互回</td>
+<td style="text-align: center;">若至 ↔ 波克洛克</td>
+<td style="text-align: center;">双方互相回复</td>
+</tr>
+<tr>
+<td style="text-align: center;">中心辐射</td>
+<td style="text-align: center;">波克洛克回复多个对象</td>
+<td style="text-align: center;">话题枢纽</td>
+</tr>
+<tr>
+<td style="text-align: center;">同窗连接</td>
+<td style="text-align: center;">成员互相确认教室</td>
+<td style="text-align: center;">线下关系映射线上</td>
+</tr>
+<tr>
+<td style="text-align: center;">群内别名</td>
+<td style="text-align: center;">回复目标含群外昵称</td>
+<td style="text-align: center;">私聊关系的群内延伸</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_11">社交连接特征</h2>
+<p>结合回复目标、系统消息与抽样内容，群聊的社交连接呈现以下特征：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">特征</th>
+<th style="text-align: center;">表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">核心双人互动</td>
+<td style="text-align: center;">若至-26瓦斯 回复关系最强</td>
+</tr>
+<tr>
+<td style="text-align: center;">三角结构</td>
+<td style="text-align: center;">波克洛克、若至、26瓦斯 互相高频回复</td>
+</tr>
+<tr>
+<td style="text-align: center;">中心型辐射</td>
+<td style="text-align: center;">波克洛克 回复目标分散（26、子路、某个好人、苦来兮苦、颜回momo）</td>
+</tr>
+<tr>
+<td style="text-align: center;">系统互动提示</td>
+<td style="text-align: center;">拍一拍、揉一揉提示共 1,505 条</td>
+</tr>
+<tr>
+<td style="text-align: center;">线下联动</td>
+<td style="text-align: center;">成员现实中同校同课，互相确认教室</td>
+</tr>
+</tbody>
+</table>
+<p>波克洛克 的回复目标分布最广，涉及多个不同昵称的成员，起到话题枢纽作用；若至 则高度集中于 26瓦斯，关系专一。抽样中可以看到线下同校成员之间的强连接：</p>
+<pre><code>苦来兮苦：有无在综c203的
+颜回momo：在你隔壁
+26瓦斯：还好在一教b
+雪花沉睡：还好在一教b
+</code></pre>
+<p>系统消息中的拍一拍、揉一揉互动同样属于社交连接的一部分，抽样中多次出现此类提示：</p>
+<pre><code>系统消息：27柠柠揉了揉❄冰冰子💫 怪猎组322254106的头，要融化了....
+系统消息：秋水祀回应了你的消息:
+系统消息：波克洛克回应了你的消息:
+</code></pre>
+<h2 id="_12">互动中的表情与转发</h2>
+<p>回复与互动不仅通过文本进行，图片、转发同样承担互动功能。全期转发消息 275 条，图片 8,730 张，其中 6,024 条回复消息中大量伴随图片。抽样中可以看到转发多条消息并附评注的互动形式：</p>
+<pre><code>26冶北风💙💙💙：[转发消息: 6条] / 某个好人: [图片...] / 某个好人: 作者还有小巧思 / 某个好人: 泡泡里面是素颜
+</code></pre>
+<p>从数据中可观察到，转发内容多带个人评价，属于「二次分享」式互动；图片则高频用于接话与表情包对战，进一步强化了回复的即时性。图片连发在对话中形成视觉节奏：</p>
+<pre><code>若至：[图片:373A0E4D62C6DFF7C027341A330C6357.jpg]
+赤焰琉霄：[图片:7210E802F0F02FF40F825F357E2F45C3.jpg]
+若至：[图片:68E068FBBCDDA0D6CA74D1703906EA35.jpg]
+得胜已是定局：[图片:9DF791F31DC570D17F8339036B189F8D.jpg]
+</code></pre>
+<h2 id="_13">互动中的复读与玩梗</h2>
+<p>群聊的互动常以复读、玩梗的方式呈现，这类互动不需要严格的回复指向，但强化了群体的联结感。典型的复读场景包括句式接力：</p>
+<pre><code>26瓦斯：还好在一教b
+雪花沉睡：还好在一教b
+颜回momo：还好在一教b
+25 洛威尔：还好在一教b
+得胜已是定局：还好在一教b
+群心理委员：还好在一教b
+</code></pre>
+<p>以及对吐槽的接力重复：</p>
+<pre><code>波克洛克：你这家伙又在说什么
+雪花沉睡：你这家伙又在说什么
+苦来兮苦：你这家伙又在说什么
+</code></pre>
+<p>从数据中可观察到，复读互动往往在短时间内密集出现，参与者覆盖多位成员，是群聊「共同在场感」的重要来源。</p>
+<h2 id="bot">互动频率与 Bot 互动</h2>
+<p>除了成员之间的回复，Bot 互动也构成了互动模式的一部分。系统消息中 1,505 条包含大量拍一拍、揉一揉等互动提示与回应通知。Bot 互动类的关键词命中数为 121 次，说明成员主动触发 Bot 的行为也存在一定规模。抽样中可以看到成员与 Bot 之间围绕表情包触发的讨论：</p>
+<pre><code>若至：打熊会出现一大堆表情包
+若至：打出狗，和打出狗子出现的表情包不一样唉
+若至：打出猫，和打出猫咪出现的表情包也不一样
+得胜已是定局：不管我打出什么
+得胜已是定局：我都没有表情包
+</code></pre>
+<h2 id="_14">小结</h2>
+<p>RED.25糖渍小番茄 的互动模式以长轮次驻留式讨论为主，核心成员保持 8-20 秒的中位回复间隔。若至与 26瓦斯 构成最强的单向回复关系，波克洛克 承担话题枢纽角色，群聊内部存在清晰的线上互动与线下同校双重连接。复读、接龙、玩梗等群体性互动进一步强化了成员之间的联结。</p>
+<p>本报告数据来源: .output/chat_stats.json, 抽样片段覆盖完整时间范围</p>
+
+<footer>
+    <a href="https://github.com/JularDepick/ChatAnalysis.SKILL" target="_blank" rel="noopener noreferrer">
+        SKILL技术支持·ChatAnalysis
+    </a>
+</footer>
+
+</div>
+<script>
+(function() {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    function apply(t) {
+        if (t === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            btn.textContent = '☀️ 浅色';
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            btn.textContent = '🌙 暗色';
+        }
+    }
+    apply(localStorage.getItem('theme') || 'light');
+    btn.addEventListener('click', function() {
+        var next = localStorage.getItem('theme') === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        apply(next);
+    });
+})();
+</script>
+</body>
+</html>
